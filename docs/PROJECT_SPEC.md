@@ -500,6 +500,8 @@ The product will be developed incrementally.
 - Responsive desktop and mobile layouts.
 - Accessible event-list alternative.
 - Visible event source and status information.
+- Basic text search across event titles and descriptions using local fixture data.
+
 
 #### Acceptance Criteria
 
