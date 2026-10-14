@@ -75,3 +75,6 @@ Penn State SSO, production hosting, AI predictions, automated newsletter parsing
 **1a Foundation:** Next.js scaffold, strict TS, Tailwind tokens, Zod types, synthetic fixtures, range-based data interface, time utilities, pure relevance filtering, Vitest, CI, README. Pass clean install/lint/typecheck/test/build; cover explicit/inherited/unclassified/college-wide/multi-major relevance and test time logic under Eastern and non-Eastern process time zones.
 **1b Student calendar:** functional standard month/week/day/list calendar, event details, shareable URL-based major/category/organization filters, readable mobile list alternative, source and status labels.
 **1c Planner prototype:** exam overlays, separate audience controls and explanatory known-conflict panel. No scoring, auth or live feeds yet.
+
+## Time zone scope for the Penn State MVP
+All calendar views and organization/exam scheduling use America/New_York. Do not build a user-selectable time-zone experience or multi-institution zone switching in Milestone 1. Keep basic DST-safe event parsing and rendering, including correct all-day dates.
