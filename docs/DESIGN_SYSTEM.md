@@ -44,3 +44,13 @@ Components should be reusable and stylistically consistent; introduce only as im
 - Avoid generic repeated card grids, excessive shadows, decorative icons without purpose, and large empty marketing sections.
 - Dense information UI should emphasize scanability, alignment, useful whitespace and clear date/time typography.
 - Before committing visual changes, review desktop and mobile screenshots against these principles and accessibility constraints.
+
+
+## Concrete visual verification gates
+- Pugh Blue is a light fill/accent, not default text on white. Validate actual foreground/background contrast pairs rather than assuming brand colors satisfy accessibility.
+- Pressure levels require labels and/or icons in addition to colors; test luminance differentiation.
+- A keyboard-accessible event list is the primary alternative to dense grid views.
+- Check 320px, 375px, 430px, 768px and 1440px layouts; avoid unintended horizontal page overflow and obscured focus.
+- WCAG 2.2 AA is a target, not a certification. Check target size exceptions, focus not obscured, and contrast.
+- Use approved, license-compatible self-hosted typography via next/font when practical; avoid Inter.
+- Brand color reference: https://brand.psu.edu/visual-identity-standards/color-and-the-mark
