@@ -23,3 +23,11 @@ Feature meets its written acceptance criteria, has appropriate unit tests, passe
 - Do not use Inter, purple-gradient hero sections, excessive centered layouts, or uniformly rounded surfaces.
 - Prefer purposeful left alignment, restrained Penn State brand accents, a varied intentional radius scale, accessible typography, and calendar-first information density.
 - When implementing UI, inspect responsive screenshots and explicitly assess whether the result looks generic or template-generated. Revise before declaring it complete.
+
+
+## Milestone 1 workflow refinements
+- Public fixtures must be synthetic only. Private or actual data belongs in gitignored data/local/ and may not be committed pending permissions review.
+- Milestone 1a is infrastructure and pure logic only; do not implement live feeds, real accounts, scores or production UI.
+- Keep major-relevance statuses explicit/inherited/unclassified and test missing-targeting records.
+- Filter date windows are inclusive start, exclusive end; all-day dates are not UTC instants.
+- For UI reviews, check at 320/375/430/768/1440px, no unintended page overflow, keyboard focus and contrast. Human approval is required for stylistic judgments.
