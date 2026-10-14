@@ -17,3 +17,9 @@ Read docs/PROJECT_SPEC.md, docs/ARCHITECTURE.md, docs/DESIGN_SYSTEM.md and docs/
 
 ## Definition of done
 Feature meets its written acceptance criteria, has appropriate unit tests, passes lint/typecheck/build, does not introduce hidden external costs, and explains significant architectural changes.
+
+## Mandatory frontend design constraints
+- Apply docs/DESIGN_SYSTEM.md, including the anti-template visual design rules.
+- Do not use Inter, purple-gradient hero sections, excessive centered layouts, or uniformly rounded surfaces.
+- Prefer purposeful left alignment, restrained Penn State brand accents, a varied intentional radius scale, accessible typography, and calendar-first information density.
+- When implementing UI, inspect responsive screenshots and explicitly assess whether the result looks generic or template-generated. Revise before declaring it complete.
