@@ -31,3 +31,6 @@ Feature meets its written acceptance criteria, has appropriate unit tests, passe
 - Keep major-relevance statuses explicit/inherited/unclassified and test missing-targeting records.
 - Filter date windows are inclusive start, exclusive end; all-day dates are not UTC instants.
 - For UI reviews, check at 320/375/430/768/1440px, no unintended page overflow, keyboard focus and contrast. Human approval is required for stylistic judgments.
+
+## Time-zone scope
+Implement one Penn State display zone (America/New_York). Do not add multi-time-zone UX. Handle DST and date-only events correctly with targeted tests, without building a generic time-zone management subsystem.
