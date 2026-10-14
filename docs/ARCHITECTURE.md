@@ -64,3 +64,22 @@ Include institution_id and local zone as conceptual dimensions; initially only P
 
 ## Key risks to review
 External feed permission and reliability, duplicates/cancellations, exam coverage bias, relevance misclassification, Daylight Saving Time, row-level security, and maintenance after officer transitions.
+
+
+## Pre-implementation decisions for schemas and fixtures
+- **Identity:** an Event represents one occurrence. Optional seriesId links related occurrences. Future recurring series expand using original IANA zone; a source occurrence is identified by source/feed ID + external UID + recurrence ID (or explicit occurrence key). Series expansion and exception handling are deferred.
+- **Targeting:** use targetingState = explicit | inherited | unclassified. Explicit means reviewed target majors; inherited uses a host's default major audience and must be labeled inferred, not verified; unclassified events stay in All Events until classified. Recommended-major results include college-wide events and major matches by explicit or inherited targeting. An unclassified event can be tentatively matched only through a documented host default, without silently reclassifying it.
+- **Time:** target FullCalendar v7 named timeZone = America/New_York for Penn State views; no extra named-timezone connector is needed in v7. Use temporal-polyfill where date objects need zone-accurate operations. Pinned major version must be checked at implementation. Preserve UTC instants for timed events and date-only all-day entries. Test DST, midnight crossing, multi-day and all-day displays with test processes in different TZ settings.
+- **Data interfaces:** getEvents({start,end,filters?}), getEventById(id), getOrganizations(), getExams({start,end,termId?}). In Milestone 1 use in-memory date-window filtering so the contract survives future persistence. Specify inclusive start/exclusive end boundaries.
+- **Exams:** support termId, courseId, date, optional start/end times, timeKnown, source, verificationStatus, sectionScope and curated approximate major audience. Unknown exam time is shown as date-only, not fabricated.
+- **Planning analysis:** initial target-major set comes from the planning organization's stated audience, not current calendar display settings. Show 'Analyzing for' and permit explicit change. Timed events conflict on [start,end) interval intersection; back-to-back intervals do not conflict. All-day and multiday conflicts need explicit category-aware treatment and tests, not blanket duration overlap.
+- **Fixture policy:** commit only synthetic, non-identifying sample events/exams. Put real sample records in ignored data/local/ and load through a local-only adapter after checking permissions.
+
+## Decisions required before Milestone 2
+- Provenance link table connects many external source records to one canonical event, recording exact/suggested/admin-confirmed match types, review status and evidence.
+- Proposed field precedence (needs stakeholder validation): manual approved override; verified host source; department/college source; newsletter.
+- Cancellations and repeated successful-feed omissions should be tracked per source. Do not remove canonical records after one failed sync. Never auto-merge fuzzy candidates.
+- Review actual feed recurrence identifiers, access permissions, original time zones, and privacy fields before implementing synchronization.
+
+## Decisions required before star feature
+Treat priority as a designation attributable to an organization and event, with a per-semester allocation. Decide co-host costs, refunds, deadlines, concurrency enforcement and admin exception handling before implementation.
