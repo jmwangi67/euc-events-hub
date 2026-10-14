@@ -1,0 +1,145 @@
+/** Entire dataset is fictional; none of these records are official Penn State programming. */
+import {
+  eventSchema,
+  examSchema,
+  majorSchema,
+  organizationSchema,
+} from "../../lib/domain/models";
+
+export const majors = majorSchema.array().parse([
+  { id: "bme", name: "Biomedical Engineering", abbreviation: "BME" },
+  { id: "che", name: "Chemical Engineering", abbreviation: "CHE" },
+  { id: "me", name: "Mechanical Engineering", abbreviation: "ME" },
+]);
+export const organizations = organizationSchema.array().parse([
+  {
+    id: "example-council",
+    name: "Example Engineering Council (synthetic)",
+    defaultMajorIds: [],
+    classification: "college-wide",
+  },
+  {
+    id: "example-process",
+    name: "Example Process Engineering Society (synthetic)",
+    defaultMajorIds: ["che"],
+    classification: "academic",
+  },
+  {
+    id: "example-design",
+    name: "Example Design Collective (synthetic)",
+    defaultMajorIds: ["me", "bme"],
+    classification: "project",
+  },
+]);
+const source = {
+  label: "Fictional Milestone 1A fixture",
+  verification: "synthetic" as const,
+};
+const base = {
+  allDay: false,
+  collegeWide: false,
+  status: "published",
+  targetMajorIds: [],
+  targeting: "unclassified",
+  category: "student-organization",
+  source,
+};
+export const events = eventSchema.array().parse([
+  {
+    ...base,
+    id: "example-welcome",
+    title: "Synthetic example: Engineering welcome",
+    hostOrganizationIds: ["example-council"],
+    collegeWide: true,
+    start: "2026-10-19T17:00:00-04:00",
+    end: "2026-10-19T18:00:00-04:00",
+    location: "Example meeting room",
+    description: "Fictional college-wide welcome for development only.",
+  },
+  {
+    ...base,
+    id: "example-process-lab",
+    title: "Synthetic example: Process lab workshop",
+    hostOrganizationIds: ["example-process"],
+    targeting: "explicit",
+    targetMajorIds: ["che"],
+    category: "technical-workshop",
+    start: "2026-10-20T18:00:00-04:00",
+    end: "2026-10-20T19:30:00-04:00",
+  },
+  {
+    ...base,
+    id: "example-industry",
+    title: "Synthetic example: Bioprocess industry discussion",
+    hostOrganizationIds: ["example-process"],
+    targeting: "explicit",
+    targetMajorIds: ["che", "bme"],
+    category: "corporate-recruiting",
+    audienceEligibility: "Students interested in bioprocess engineering",
+    start: "2026-10-21T16:00:00-04:00",
+    end: "2026-10-21T17:00:00-04:00",
+  },
+  {
+    ...base,
+    id: "example-design-meeting",
+    title: "Synthetic example: Design collective meeting",
+    hostOrganizationIds: ["example-design"],
+    targeting: "inherited",
+    seriesId: "example-design-series",
+    start: "2026-10-22T17:00:00-04:00",
+    end: "2026-10-22T18:00:00-04:00",
+  },
+  {
+    ...base,
+    id: "example-open-topic",
+    title: "Synthetic example: Topic to be announced",
+    hostOrganizationIds: ["example-process"],
+    status: "tentative",
+    start: "2026-10-23T15:00:00-04:00",
+    end: "2026-10-23T16:00:00-04:00",
+  },
+  {
+    ...base,
+    id: "example-design-days",
+    title: "Synthetic example: Design exploration days",
+    hostOrganizationIds: ["example-design"],
+    targeting: "inherited",
+    allDay: true,
+    start: "2026-10-24",
+    end: "2026-10-26",
+    category: "competition",
+  },
+  {
+    ...base,
+    id: "example-night-build",
+    title: "Synthetic example: Late design session",
+    hostOrganizationIds: ["example-design"],
+    targeting: "inherited",
+    start: "2026-10-26T23:30:00-04:00",
+    end: "2026-10-27T00:30:00-04:00",
+  },
+]);
+export const exams = examSchema.array().parse([
+  {
+    id: "example-math-exam",
+    courseId: "EXAMPLE-MATH",
+    termId: "example-fall-2026",
+    date: "2026-10-21",
+    timeKnown: false,
+    sectionScope: ["Example sections"],
+    relevantMajorIds: ["bme", "che", "me"],
+    source,
+  },
+  {
+    id: "example-physics-exam",
+    courseId: "EXAMPLE-PHYSICS",
+    termId: "example-fall-2026",
+    date: "2026-10-22",
+    timeKnown: true,
+    start: "2026-10-22T19:00:00-04:00",
+    end: "2026-10-22T20:30:00-04:00",
+    sectionScope: ["Example section A"],
+    relevantMajorIds: ["me"],
+    source,
+  },
+]);
