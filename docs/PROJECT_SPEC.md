@@ -62,3 +62,16 @@ Penn State SSO, production hosting, AI predictions, automated newsletter parsing
 - Penn State branding/external hosting approvals.
 - Production stewardship and code ownership agreement between the personal repository and EUC.
 - Data protection and organizational verification process.
+
+
+## Approved pre-implementation clarifications
+- Public committed fixture data must be entirely synthetic and clearly labeled. Real provided datasets belong in gitignored local paths until redistribution rights and privacy are reviewed.
+- Event recurrence is deferred, but the prototype represents each event as one occurrence, with optional seriesId.
+- Recommended major view: college-wide plus explicit target-major matches plus inherited host-default major matches. Events without enough targeting metadata remain visible in All Events and enter a future classification queue, not auto-matched indiscriminately.
+- The planning audience defaults to the organization's declared target majors, separately from display-only filters.
+- Scheduling score 0–100 is out of scope for Milestone 1. Display explicit known conflicts instead.
+
+## Revised Milestone 1 increments
+**1a Foundation:** Next.js scaffold, strict TS, Tailwind tokens, Zod types, synthetic fixtures, range-based data interface, time utilities, pure relevance filtering, Vitest, CI, README. Pass clean install/lint/typecheck/test/build; cover explicit/inherited/unclassified/college-wide/multi-major relevance and test time logic under Eastern and non-Eastern process time zones.
+**1b Student calendar:** functional standard month/week/day/list calendar, event details, shareable URL-based major/category/organization filters, readable mobile list alternative, source and status labels.
+**1c Planner prototype:** exam overlays, separate audience controls and explanatory known-conflict panel. No scoring, auth or live feeds yet.
