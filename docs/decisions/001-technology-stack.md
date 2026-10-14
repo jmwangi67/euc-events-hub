@@ -1,5 +1,5 @@
 # ADR 001: Initial Technology Stack
-Status: Proposed for Claude review
+Status: Accepted for initial prototype
 Date: 2026-10-14
 
 ## Context
