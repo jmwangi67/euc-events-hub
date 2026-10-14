@@ -83,3 +83,6 @@ External feed permission and reliability, duplicates/cancellations, exam coverag
 
 ## Decisions required before star feature
 Treat priority as a designation attributable to an organization and event, with a per-semester allocation. Decide co-host costs, refunds, deadlines, concurrency enforcement and admin exception handling before implementation.
+
+## Time-zone simplification decision
+The Penn State MVP is single-zone: use America/New_York for display, event entry, exams and local week boundaries. No browser-local switching, user time-zone preferences, or internationalization infrastructure. Preserve unambiguous instants and original source zone metadata for future feed integrations. Retain targeted DST and all-day tests; non-Eastern test environment is a small correctness regression check, not a separate feature or product priority.
