@@ -34,3 +34,13 @@ Official university marks, logos, and branding claims require appropriate permis
 ## Suggested components
 AppShell, SiteHeader, FilterBar, MajorPicker, EventCard, EventDetail, EventCalendar, CalendarLegend, ExamMarker, PlannerConflictPanel, SourceStatus, EmptyState.
 Components should be reusable and stylistically consistent; introduce only as implemented.
+
+## Anti-template visual design rules (required)
+- Avoid "AI slop": no excessive centered layouts, purple gradients, uniform rounded corners, or Inter font.
+- Prefer left-aligned editorial hierarchy and purposeful asymmetry. Centered content is reserved for contexts where it helps comprehension, not the default for every section.
+- Use Penn State navy/blue and restrained neutrals, not generic purple-gradient hero backgrounds.
+- Use a considered alternative typeface with clear hierarchy and comfortable calendar readability; evaluate licensing and loading before selection. Do not default to Inter.
+- Use a deliberate radius scale: square or minimally rounded structural regions, modestly rounded cards/inputs, and pills only for genuine chips or tags. Do not round every component identically.
+- Avoid generic repeated card grids, excessive shadows, decorative icons without purpose, and large empty marketing sections.
+- Dense information UI should emphasize scanability, alignment, useful whitespace and clear date/time typography.
+- Before committing visual changes, review desktop and mobile screenshots against these principles and accessibility constraints.
