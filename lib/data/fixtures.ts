@@ -37,17 +37,17 @@ function overlaps(
 ): boolean {
   return a.start < b.end && a.end > b.start;
 }
-export function getEvents({
-  start,
-  end,
-  filters = {},
-}: DateWindow & { filters?: EventFilters }): Event[] {
+/** Published-only public queries; optional local fixtures keep tests isolated. */
+export function getEvents(
+  { start, end, filters = {} }: DateWindow & { filters?: EventFilters },
+  eventFixtures: readonly Event[] = events,
+): Event[] {
   const window = parseWindow({ start, end });
   return structuredClone(
-    events
+    eventFixtures
       .filter(
         (event) =>
-          (event.status === "published" || event.status === "tentative") &&
+          event.status === "published" &&
           overlaps(eventInterval(event), window) &&
           isEventRelevant(
             event,
@@ -68,11 +68,12 @@ export function getEvents({
       ),
   );
 }
-export function getEventById(id: string): Event | undefined {
-  const event = events.find(
-    (event) =>
-      event.id === id &&
-      (event.status === "published" || event.status === "tentative"),
+export function getEventById(
+  id: string,
+  eventFixtures: readonly Event[] = events,
+): Event | undefined {
+  const event = eventFixtures.find(
+    (event) => event.id === id && event.status === "published",
   );
   return event ? structuredClone(event) : undefined;
 }

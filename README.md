@@ -56,7 +56,7 @@ The font copyright and SIL license are preserved in `public/fonts/IBM-Plex-Sans-
 
 Each event is one occurrence; optional `seriesId` groups occurrences without expanding recurrence. Timed events use offset-bearing ISO timestamps; all-day events use `YYYY-MM-DD` values with exclusive end dates. Unknown-time exams contain a date and no fabricated timestamps. Known-time exams require a positive interval and a date matching their Eastern start date. Optional information stays absent when unknown. Source attribution and verification state distinguish synthetic samples from verified data.
 
-`getEvents({ start, end, filters? })` and `getExams({ start, end, termId? })` accept **Eastern date-only windows**, inclusive start and exclusive end. Overlap queries include multi-day and midnight-crossing records even when they begin before the window. Invalid or empty windows throw. `getEventById(id)` returns `undefined` for missing records. Public event queries include published and tentative events and omit drafts and cancellations; canceled-event presentation is a future calendar decision.
+`getEvents({ start, end, filters? })` and `getExams({ start, end, termId? })` accept **Eastern date-only windows**, inclusive start and exclusive end. Overlap queries include multi-day and midnight-crossing records even when they begin before the window. Invalid or empty windows throw. `getEventById(id)` returns `undefined` for missing records. Both public event queries (`getEvents` and `getEventById`) return only published events; All Events means all published events regardless of major classification, not all publication states. Tentative, draft, and canceled events are omitted from public results. Those statuses remain supported by the event schema, and the existing tentative fixture is preserved. Tentative-event access belongs to a future authorized organization planner; no planner access or status override is exposed in Milestone 1A.
 
 ```ts
 getEvents({
@@ -72,7 +72,7 @@ getExams({
 });
 ```
 
-Recommended views include college-wide events, explicit target matches, and the union of documented host audiences for inherited events. Explicit audiences take precedence over host classifications. Unclassified events remain available in All Events. An empty recommended selection includes only college-wide programming. Optional organization and category filters further narrow display queries. No planning analysis exists in this milestone.
+Recommended views include college-wide events, explicit target matches, and the union of documented host audiences for inherited events. Explicit audiences take precedence over host classifications. Published unclassified events remain available in All Events. An empty recommended selection includes only college-wide programming. Optional organization and category filters further narrow display queries. No planning analysis exists in this milestone. Event queries accept an optional readonly event-fixture array for isolated tests; production callers use the default fixtures. Tests supply local boundary/status records rather than mutating the shared exports.
 
 All timed labels use `America/New_York`, including EST/EDT. All-day labels preserve their dates. Calendar boundaries use IANA rules rather than fixed offsets; a Sunday-start week is the initial convention. Timed ranges show both dates and zone labels, including midnight crossings.
 
@@ -80,4 +80,18 @@ All timed labels use `America/New_York`, including EST/EDT. All-day labels prese
 
 This milestone supplies a development shell, not a working calendar or planner. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, scoring, or priority allocation. Fixture IDs and academic audience mappings are development examples. Final source formats, calendar cancellation behavior, and production ownership remain future decisions. The shell is not a claim of formal WCAG compliance or university endorsement.
 
-The current full dependency audit reports five high-severity entries rooted in `braces` (GHSA-vfj7-8cjw-p6xm), pulled in by Next.js lint tooling. They affect development dependencies; the production-only audit reports zero vulnerabilities. No patched `braces` release was available from the registry at implementation time. ESLint 9 is also past upstream support, retained here for declared plugin compatibility. Recheck these tooling dependencies before expanding the application.
+### Development dependency review (October 15, 2026)
+
+Rechecked with `npm audit --json`, `npm audit --omit=dev --json`, `npm outdated --json`, and registry dependency/peer manifests. The full audit still reports five high-severity entries from one underlying advisory, [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), along this development-only dependency chain:
+
+```text
+eslint-config-next 16.4.1
+  → @next/eslint-plugin-next 16.4.1
+    → fast-glob 3.3.1
+      → micromatch 4.0.8
+        → braces 3.0.3
+```
+
+A non-breaking `eslint-config-next` 16.4.2 patch is available, but its Next.js lint plugin still pins `fast-glob` 3.3.1. Even `fast-glob` 3.3.3 (latest) still depends on `micromatch` ^4.0.8, whose latest release remains 4.0.8 and depends on `braces` ^3.0.3. The latest published `braces` is still 3.0.3, which is affected. Thus no compatible update currently resolves this advisory. The available Vitest 5.0.5 patch is outside the affected dependency chain. Dependency versions and the lockfile are retained; no forced upgrades or overrides were applied. The audit's proposed `eslint-config-next` 14.2.35 downgrade would change major versions and is not an appropriate automatic fix for this Next.js 16 foundation.
+
+The impact is potential stack-exhaustion denial of service when development tooling processes maliciously deeply nested glob patterns, potentially failing a local lint run or CI. This code is not in the production runtime, and the production-only audit reports zero vulnerabilities. ESLint 9.39.5 remains the latest 9.x release and is past upstream support; ESLint 10 is outside the declared peer ranges of the current React, accessibility, and import plugins. Recheck upstream tooling releases for a compatible fix; the unresolved development-tooling risk remains documented rather than being hidden by an incompatible upgrade.

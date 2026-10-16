@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { events, exams } from "../../data/fixtures";
+import type { Event } from "../domain/models";
 import {
   getEventById,
   getEvents,
   getExams,
   getOrganizations,
 } from "./fixtures";
-const ids = (start: string, end: string) =>
-  getEvents({ start, end }).map((e) => e.id);
+const ids = (start: string, end: string, eventFixtures?: readonly Event[]) =>
+  getEvents({ start, end }, eventFixtures).map((e) => e.id);
 describe("fixture-backed queries", () => {
   it("includes start and excludes end boundaries", () => {
     expect(ids("2026-10-19", "2026-10-20")).toEqual(["example-welcome"]);
@@ -23,36 +24,39 @@ describe("fixture-backed queries", () => {
     expect(ids("2026-10-27", "2026-10-28")).toEqual(["example-night-build"]));
   it("uses exact interval boundaries rather than UTC dates", () => {
     const template = events[0];
-    events.push({
-      ...template,
-      id: "boundary",
-      allDay: false,
-      start: "2026-10-20T00:00:00-04:00",
-      end: "2026-10-20T01:00:00-04:00",
-    });
-    try {
-      expect(ids("2026-10-19", "2026-10-20")).not.toContain("boundary");
-      expect(ids("2026-10-20", "2026-10-21")).toContain("boundary");
-    } finally {
-      events.pop();
-    }
+    const localEvents: Event[] = [
+      {
+        ...template,
+        id: "boundary",
+        allDay: false,
+        start: "2026-10-20T00:00:00-04:00",
+        end: "2026-10-20T01:00:00-04:00",
+      },
+    ];
+    expect(ids("2026-10-19", "2026-10-20", localEvents)).not.toContain(
+      "boundary",
+    );
+    expect(ids("2026-10-20", "2026-10-21", localEvents)).toContain("boundary");
   });
   it("does not include intervals ending exactly at the window start", () => {
-    events.push({
-      ...events[0],
-      id: "ends-at-start",
-      allDay: false,
-      start: "2026-10-19T23:00:00-04:00",
-      end: "2026-10-20T00:00:00-04:00",
-    });
-    try {
-      expect(ids("2026-10-20", "2026-10-21")).not.toContain("ends-at-start");
-    } finally {
-      events.pop();
-    }
+    const localEvents: Event[] = [
+      {
+        ...events[0],
+        id: "ends-at-start",
+        allDay: false,
+        start: "2026-10-19T23:00:00-04:00",
+        end: "2026-10-20T00:00:00-04:00",
+      },
+    ];
+    expect(ids("2026-10-19", "2026-10-20", localEvents)).toContain(
+      "ends-at-start",
+    );
+    expect(ids("2026-10-20", "2026-10-21", localEvents)).not.toContain(
+      "ends-at-start",
+    );
   });
   it("queries Eastern dates through both DST transitions", () => {
-    events.push(
+    const localEvents: Event[] = [
       {
         ...events[0],
         id: "spring-day",
@@ -67,15 +71,17 @@ describe("fixture-backed queries", () => {
         start: "2026-11-01T23:30:00-05:00",
         end: "2026-11-02T00:00:00-05:00",
       },
+    ];
+    expect(ids("2026-03-08", "2026-03-09", localEvents)).toContain(
+      "spring-day",
     );
-    try {
-      expect(ids("2026-03-08", "2026-03-09")).toContain("spring-day");
-      expect(ids("2026-03-09", "2026-03-10")).not.toContain("spring-day");
-      expect(ids("2026-11-01", "2026-11-02")).toContain("fall-late");
-      expect(ids("2026-11-02", "2026-11-03")).not.toContain("fall-late");
-    } finally {
-      events.splice(-2);
-    }
+    expect(ids("2026-03-09", "2026-03-10", localEvents)).not.toContain(
+      "spring-day",
+    );
+    expect(ids("2026-11-01", "2026-11-02", localEvents)).toContain("fall-late");
+    expect(ids("2026-11-02", "2026-11-03", localEvents)).not.toContain(
+      "fall-late",
+    );
   });
   it("combines category, host, and intended audience filters", () =>
     expect(
@@ -89,21 +95,64 @@ describe("fixture-backed queries", () => {
         },
       }).map((e) => e.id),
     ).toEqual(["example-industry"]));
-  it("retains unclassified events in the default All Events query", () =>
-    expect(ids("2026-10-23", "2026-10-24")).toContain("example-open-topic"));
-  it("excludes drafts and cancellations from public queries", () => {
-    events.push(
-      { ...events[0], id: "draft-example", status: "draft" },
-      { ...events[0], id: "canceled-example", status: "canceled" },
+  it("retains published unclassified events in All Events", () => {
+    const unclassified = events.find(
+      (event) => event.id === "example-open-topic",
+    )!;
+    const localEvents: Event[] = [{ ...unclassified, status: "published" }];
+    expect(ids("2026-10-23", "2026-10-24", localEvents)).toEqual([
+      unclassified.id,
+    ]);
+    expect(getEventById(unclassified.id, localEvents)?.status).toBe(
+      "published",
     );
-    try {
-      expect(ids("2026-10-19", "2026-10-20")).toEqual(["example-welcome"]);
-      expect(getEventById("draft-example")).toBeUndefined();
-      expect(getEventById("canceled-example")).toBeUndefined();
-    } finally {
-      events.splice(-2);
-    }
   });
+  it("returns only published fixtures by default, including for direct lookup", () => {
+    const results = getEvents({ start: "2026-10-19", end: "2026-10-28" });
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((event) => event.status === "published")).toBe(true);
+    expect(getEventById("example-open-topic")).toBeUndefined();
+    expect(ids("2026-10-23", "2026-10-24")).toEqual([]);
+    // Tentative records remain in the source for a future authorized planner.
+    expect(
+      events.find((event) => event.id === "example-open-topic")?.status,
+    ).toBe("tentative");
+  });
+  it.each(["draft", "tentative", "canceled"] as const)(
+    "excludes %s events from list and direct public queries",
+    (status) => {
+      const unpublished: Event = {
+        ...events[0],
+        id: "unpublished-example",
+        status,
+      };
+      const localEvents = [events[0], unpublished];
+      expect(ids("2026-10-19", "2026-10-20", localEvents)).toEqual([
+        "example-welcome",
+      ]);
+      expect(getEventById(unpublished.id, localEvents)).toBeUndefined();
+      expect(
+        getEvents(
+          {
+            start: "2026-10-19",
+            end: "2026-10-20",
+            filters: { audience: { mode: "all" } },
+          },
+          localEvents,
+        ).map((event) => event.id),
+      ).toEqual(["example-welcome"]);
+      expect(
+        getEvents(
+          {
+            start: "2026-10-19",
+            end: "2026-10-20",
+            filters: { audience: { mode: "recommended", majorIds: ["bme"] } },
+          },
+          localEvents,
+        ).map((event) => event.id),
+      ).toEqual(["example-welcome"]);
+    },
+  );
   it("returns detached records and handles missing IDs", () => {
     const event = getEventById("example-welcome")!;
     event.title = "changed";
