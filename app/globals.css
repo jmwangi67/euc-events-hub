@@ -1319,3 +1319,214 @@ button.planner-analyze:hover {
 .planner-context .fc-timegrid-event .event-title {
   overflow-wrap: break-word;
 }
+
+/* Planner refinements retain semantic surfaces and the public-calendar layout. */
+.planner-layout {
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+}
+.planner-month-surface {
+  --width-week-summary: 170px;
+}
+.planner-month-surface .planner-week-empty .fc-daygrid-day-frame {
+  min-height: 120px;
+}
+.planner-month-surface .planner-week-populated .fc-daygrid-day-frame {
+  min-height: 270px;
+}
+.weekly-summary-cell {
+  display: flex;
+  flex-direction: column;
+}
+.weekly-summary-trigger {
+  height: auto;
+  flex: 1;
+  min-height: 0;
+}
+.focus-week-control {
+  flex: none;
+  text-align: left;
+  padding: 0 10px 8px;
+  font-size: 11px;
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.week-row-link {
+  font-size: 11px;
+  padding: 4px;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: left;
+  min-height: 30px;
+}
+.planner-month-surface .fc-daygrid-day-top {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.compact-weekly-summaries {
+  margin: 16px 0;
+}
+.compact-week-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 24px;
+  justify-content: space-between;
+}
+.compact-week-heading h3 {
+  font-weight: 600;
+  font-size: 17px;
+}
+.compact-week-heading label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  min-width: 0;
+}
+.compact-week-heading select {
+  max-width: 100%;
+  min-width: 0;
+}
+.compact-weekly-summaries .weekly-summary-cell {
+  margin-bottom: 0;
+}
+.compact-weekly-summaries .weekly-summary-trigger {
+  gap: 6px;
+}
+.overall-pressure-pending h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+.overall-pressure-pending {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.pressure-days {
+  margin-top: 12px;
+}
+.pressure-day {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.pressure-day h4 {
+  font-weight: 600;
+  font-size: 13px;
+}
+.single-pressure-day {
+  grid-template-columns: minmax(0, 1fr);
+}
+.experimental-day-preparation {
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+.preparation-cells,
+.audience-uncertainty {
+  margin: 12px 0;
+}
+.preparation-cell {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.preparation-cell h4 {
+  font-weight: 600;
+}
+.preparation-cell ul,
+.preparation-cutoffs {
+  list-style: disc;
+  padding-left: 18px;
+}
+.preparation-cell li {
+  margin: 8px 0;
+}
+.preparation-cells summary,
+.proposal-factors summary {
+  cursor: pointer;
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.audience-uncertainty {
+  border-left: 3px solid var(--color-academic);
+  padding: 12px;
+  background: var(--color-academic-surface);
+}
+.audience-uncertainty h3 {
+  font-weight: 600;
+  font-size: 15px;
+}
+.audience-uncertainty li {
+  margin-top: 10px;
+}
+.proposal-factors {
+  margin-bottom: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.proposal-factors h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+.proposal-factors h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.proposal-factors .choice {
+  margin: 16px 0 8px;
+}
+.proposal-preparation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+.subgroup-factors li {
+  margin-top: 10px;
+}
+.external-psu-wide {
+  border-left-color: var(--color-primary) !important;
+}
+@media (max-width: 1279px) {
+  .planner-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .proposal-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 24px;
+  }
+  .proposal-form > h2,
+  .proposal-form > p,
+  .proposal-form > .planner-errors,
+  .proposal-form > .planner-field,
+  .proposal-form > .planning-audience,
+  .proposal-form > .planner-analyze {
+    grid-column: 1 / -1;
+  }
+  .planning-audience .choice {
+    display: inline-flex;
+    margin-right: 20px;
+  }
+}
+@media (max-width: 767px) {
+  .proposal-preparation-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .compact-week-heading label {
+    width: 100%;
+  }
+}
+/* Boundary-week controls retain contrast while adjacent-month date numbers stay muted. */
+.planner-month-surface .fc-day-other .fc-daygrid-day-top {
+  opacity: 1;
+}
+.planner-month-surface .fc-day-other .fc-daygrid-day-number {
+  opacity: 0.6;
+}

@@ -1,4 +1,9 @@
 import type { AcademicLevel, Event, Exam, Organization } from "./models";
+import {
+  DEFAULT_RELEVANCE_WEIGHTS,
+  validateRelevanceWeights,
+  type RelevanceWeights,
+} from "./planning-parameters";
 import { isEventRelevant } from "./relevance";
 export const ACADEMIC_LEVELS: Record<AcademicLevel, string> = {
   first: "First year",
@@ -39,7 +44,12 @@ export function eventAudienceMatch(
     levelExplicit: !!event.targetAcademicLevels?.length,
   };
 }
-export function examAudienceMatch(exam: Exam, audience: PlanningAudience) {
+export function examAudienceMatch(
+  exam: Exam,
+  audience: PlanningAudience,
+  weights: RelevanceWeights = DEFAULT_RELEVANCE_WEIGHTS,
+) {
+  validateRelevanceWeights(weights);
   const major =
     !exam.relevantMajorIds.length ||
     exam.relevantMajorIds.some((id) => audience.majorIds.includes(id));
@@ -50,14 +60,53 @@ export function examAudienceMatch(exam: Exam, audience: PlanningAudience) {
   );
   return {
     relevant: major && levels.length > 0 && audience.majorIds.length > 0,
-    // Model-strength weights, never enrollment shares or attendance probabilities.
-    weight: typical ? 1 : known ? 0.65 : 0.8,
+    audienceUncertain: !exam.relevantMajorIds.length,
+    numericalEligible:
+      exam.relevantMajorIds.length > 0 && major && levels.length > 0,
+    weight: !exam.relevantMajorIds.length
+      ? 0
+      : typical
+        ? weights.typical
+        : known
+          ? weights.atypical
+          : weights.unknown,
     explanation: !exam.relevantMajorIds.length
-      ? "Major mapping unknown; conservatively included."
+      ? "Audience mapping unknown; retained as an academic caution, excluded from numerical preparation."
       : !known
         ? "Academic levels unknown; conservatively included."
         : typical
           ? "Typical academic levels intersect; course mapping is approximate, not enrollment."
           : "Outside typical course sequence; retained because students take courses out of sequence.",
   };
+}
+
+export function audienceCells(audience: PlanningAudience) {
+  return [...new Set(audience.majorIds)].flatMap((majorId) =>
+    [...new Set(audience.academicLevels ?? ALL_LEVELS)].map(
+      (academicLevel) => ({
+        id: `${majorId}:${academicLevel}`,
+        majorId,
+        academicLevel,
+        audience: {
+          majorIds: [majorId],
+          academicLevels: [academicLevel],
+          clusterIds: audience.clusterIds,
+        },
+      }),
+    ),
+  );
+}
+export function eventAudienceCells(
+  event: Event,
+  audience: PlanningAudience,
+  organizations: readonly Organization[],
+) {
+  return audienceCells(audience).filter(
+    (cell) => eventAudienceMatch(event, cell.audience, organizations).relevant,
+  );
+}
+export function clusterTargetingLabel(event: Event) {
+  return event.targetClusterIds?.length
+    ? "Explicit organization-cluster targeting"
+    : "Cluster targeting unspecified; host membership does not imply targeting";
 }

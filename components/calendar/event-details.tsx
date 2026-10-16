@@ -1,6 +1,12 @@
 "use client";
 import { DetailsDialog } from "./details-dialog";
-import type { Event, Major, Organization } from "../../lib/domain/models";
+import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
+import type {
+  Event,
+  Major,
+  Organization,
+  OrganizationCluster,
+} from "../../lib/domain/models";
 import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
 import { formatEventTime } from "../../lib/time/eastern";
 
@@ -9,8 +15,15 @@ type Props = {
   majors: Major[];
   organizations: Organization[];
   onClose: () => void;
+  planningClusters?: OrganizationCluster[];
 };
-export function EventDetails({ event, majors, organizations, onClose }: Props) {
+export function EventDetails({
+  event,
+  majors,
+  organizations,
+  onClose,
+  planningClusters,
+}: Props) {
   const hosts = organizations.filter((org) =>
     event.hostOrganizationIds.includes(org.id),
   );
@@ -81,6 +94,34 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
             {event.audienceEligibility && <p>{event.audienceEligibility}</p>}
           </dd>
         </div>
+        {planningClusters && (
+          <>
+            <div>
+              <dt>Organization-cluster targeting</dt>
+              <dd>
+                {event.targetClusterIds?.length
+                  ? event.targetClusterIds
+                      .map(
+                        (id) =>
+                          planningClusters.find((cluster) => cluster.id === id)
+                            ?.name ?? id,
+                      )
+                      .join(", ")
+                  : "Unspecified; host membership does not imply event targeting."}
+              </dd>
+            </div>
+            <div>
+              <dt>Academic-level targeting</dt>
+              <dd>
+                {event.targetAcademicLevels?.length
+                  ? event.targetAcademicLevels
+                      .map((level) => ACADEMIC_LEVELS[level])
+                      .join(", ")
+                  : "No documented academic-level restriction."}
+              </dd>
+            </div>
+          </>
+        )}
         <div>
           <dt>Source</dt>
           <dd>

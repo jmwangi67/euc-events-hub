@@ -1,0 +1,81 @@
+import type { EventInput } from "@fullcalendar/core";
+import {
+  getEvents,
+  getExams,
+  getOrganizations,
+  type EventFilters,
+} from "../../lib/data/fixtures";
+import { getExternalEvents } from "../../lib/data/weekly-planning";
+import {
+  eventAudienceMatch,
+  examAudienceMatch,
+} from "../../lib/domain/planning-audience";
+import { intervalsOverlap } from "../../lib/domain/planning";
+import { toCalendarEvent } from "./calendar-events";
+import {
+  toExamCalendarItem,
+  toExternalCalendarItem,
+  toProposalCalendarItem,
+} from "./planner-events";
+import type { PlanningCalendarOptions } from "./calendar-types";
+export function loadCalendarItems(
+  range: { startStr: string; endStr: string },
+  filters: EventFilters,
+  planning?: PlanningCalendarOptions,
+): EventInput[] {
+  const window = {
+    start: range.startStr.slice(0, 10),
+    end: range.endStr.slice(0, 10),
+  };
+  const organizations = getOrganizations();
+  const events =
+    planning && !planning.showEvents
+      ? []
+      : getEvents({ ...window, filters: planning ? undefined : filters });
+  const items: EventInput[] = events
+    .filter(
+      (event) =>
+        !planning ||
+        eventAudienceMatch(event, planning.audience, organizations).relevant,
+    )
+    .map((event) => {
+      const mapped = toCalendarEvent(event);
+      return {
+        ...mapped,
+        extendedProps: {
+          ...mapped.extendedProps,
+          hosts: organizations
+            .filter((org) => event.hostOrganizationIds.includes(org.id))
+            .map((org) => org.name)
+            .join(", "),
+        },
+      };
+    });
+  if (planning?.showExams)
+    items.push(
+      ...getExams(window)
+        .filter((exam) => examAudienceMatch(exam, planning.audience).relevant)
+        .map(toExamCalendarItem),
+    );
+  if (planning)
+    items.push(
+      ...getExternalEvents(window)
+        .filter((event) =>
+          event.scope === "national"
+            ? planning.showNational
+            : event.scope === "psu-wide"
+              ? planning.showPsuWide
+              : planning.showCampusLocal,
+        )
+        .map(toExternalCalendarItem),
+    );
+  if (
+    planning?.proposal &&
+    intervalsOverlap(planning.proposal, {
+      start: range.startStr,
+      end: range.endStr,
+    })
+  )
+    items.push(toProposalCalendarItem(planning.proposal));
+  return items;
+}

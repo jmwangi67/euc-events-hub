@@ -1,3 +1,4 @@
+import { examOccurrences } from "./exam-occurrences";
 import { dateOnlySchema } from "./models";
 import type { Event, Exam, Organization } from "./models";
 import type { ExternalEvent } from "./external-events";
@@ -8,6 +9,8 @@ import {
 } from "./planning-audience";
 import { addCalendarDays, easternDate, easternDayStart } from "../time/eastern";
 import { intervalsOverlap } from "./planning";
+import { dailyPreparation } from "./preparation-sampling";
+import { externalEligibility } from "./scheduling-eligibility";
 import { combinedExamPreparation } from "./exam-pressure";
 export type PlanningContext = {
   events: readonly Event[];
@@ -59,7 +62,14 @@ export function summarizeWeek(
       eventAudienceMatch(event, audience, context.organizations).relevant &&
       intervalsOverlap(window, eventInterval(event)),
   );
-  const exams = unique(context.exams).filter(
+  const canonicalExams = examOccurrences(context.exams);
+  const identityUncertain = new Set(
+    canonicalExams.identityUncertainExams.map((exam) => exam.id),
+  );
+  const academic = [
+    ...canonicalExams.exams,
+    ...canonicalExams.identityUncertainExams,
+  ].filter(
     (exam) =>
       examAudienceMatch(exam, audience).relevant &&
       intervalsOverlap(
@@ -72,6 +82,16 @@ export function summarizeWeek(
             },
       ),
   );
+  const exams = academic.filter(
+    (exam) =>
+      !examAudienceMatch(exam, audience).audienceUncertain &&
+      !identityUncertain.has(exam.id),
+  );
+  const uncertainExams = academic.filter(
+    (exam) =>
+      examAudienceMatch(exam, audience).audienceUncertain ||
+      identityUncertain.has(exam.id),
+  );
   const externalEvents = unique(context.externalEvents).filter((event) =>
     intervalsOverlap(window, eventInterval(event)),
   );
@@ -82,11 +102,17 @@ export function summarizeWeek(
     ...week,
     events,
     exams,
+    uncertainExams,
     externalEvents,
+    eligibleExternalEvents: externalEvents.filter(
+      (event) => externalEligibility(event, audience).eligible,
+    ),
     counts: {
       collegeWide: events.filter((e) => e.collegeWide).length,
       otherEvents: events.filter((e) => !e.collegeWide).length,
       exams: exams.length,
+      uncertainExams: uncertainExams.length,
+      psuWide: externalEvents.filter((e) => e.scope === "psu-wide").length,
       campusLocal: externalEvents.filter((e) => e.scope === "campus-local")
         .length,
       national: externalEvents.filter((e) => e.scope === "national").length,
@@ -95,7 +121,9 @@ export function summarizeWeek(
         .length,
       clusterMatches: matches.filter((m) => m.cluster).length,
       uniqueTotal: new Set(
-        [...events, ...exams, ...externalEvents].map((record) => record.id),
+        [...events, ...exams, ...uncertainExams, ...externalEvents].map(
+          (record) => record.id,
+        ),
       ).size,
     },
   };
@@ -121,10 +149,10 @@ export const SCHEDULING_FACTORS = [
       "Explicit/inherited major relevance or explicit cluster targeting, with academic-level intersection.",
   },
   {
-    id: "campus-local",
-    label: "Campus / local commitments",
+    id: "psu-wide",
+    label: "PSU-wide commitments",
     method:
-      "Separate curated scenario layer with timing and source uncertainty.",
+      "Explicit university-wide classification; ordinary local records need a selected-audience relationship and never qualify from proximity alone.",
   },
   {
     id: "national",
@@ -149,19 +177,29 @@ export function dayPressureBreakdown(
   };
   return {
     date,
+    preparation: dailyPreparation(context.exams, date, audience),
     preparationAtDayStart: combinedExamPreparation(
       context.exams,
       window.start,
       audience,
     ),
+    allDayConstraints: day.events
+      .filter((event) => event.allDay)
+      .map((event) => ({ id: event.id, ...eventInterval(event) })),
     knownTimedConstraints: unique([
       ...day.events.filter((e) => !e.allDay),
       ...day.exams.filter((e) => e.timeKnown),
-      ...day.externalEvents.filter((e) => e.timeKnown),
+      ...day.externalEvents.filter(
+        (e) => e.timeKnown && externalEligibility(e, audience).eligible,
+      ),
     ]).map((e) => ({ id: e.id, start: e.start!, end: e.end! })),
     dateOnlyConstraints:
       day.exams.filter((e) => !e.timeKnown).length +
-      day.externalEvents.filter((e) => !e.timeKnown).length,
+      day.eligibleExternalEvents.filter((e) => !e.timeKnown).length,
+    audienceUncertainExams: day.uncertainExams,
+    contextOnlyExternalEvents: day.externalEvents.filter(
+      (e) => !externalEligibility(e, audience).eligible,
+    ),
     counts: day.counts,
     overall: { status: "awaiting-methodology-review" as const, score: null },
   };

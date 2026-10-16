@@ -46,6 +46,7 @@ test("planner navigation, independent display and explanatory synthetic conflict
   await expect(panel(page)).toContainText("Verification: synthetic");
   await page.getByLabel("Show published events", { exact: true }).uncheck();
   await page.getByLabel("Show academic exams", { exact: true }).uncheck();
+  await page.getByLabel("Show PSU-wide commitments", { exact: true }).uncheck();
   await page
     .getByLabel("Show campus / local commitments", { exact: true })
     .uncheck();

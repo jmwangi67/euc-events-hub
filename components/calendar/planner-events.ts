@@ -27,7 +27,7 @@ export function toExamCalendarItem(exam: Exam): EventInput {
     extendedProps: {
       kind: "exam",
       exam,
-      category: `Academic exam · ${exam.timeKnown ? "Known time" : "Time unknown"} · ${exam.source.verification}`,
+      category: `Academic exam${!exam.relevantMajorIds.length ? " · Audience unknown · No numerical preparation" : ""} · ${exam.timeKnown ? "Known time" : "Time unknown"} · ${exam.source.verification}`,
       timeLabel: examTimeLabel(exam),
       listTimes: exam.timeKnown
         ? listEventTimes({ allDay: false, start: exam.start, end: exam.end })
@@ -68,7 +68,7 @@ export function toExternalCalendarItem(
     extendedProps: {
       kind: "external",
       externalEvent: event,
-      category: `${event.scope === "national" ? "National" : "Campus / local"} · Synthetic scenario`,
+      category: `${event.scope === "national" ? "National" : event.scope === "psu-wide" ? "PSU-wide" : "Local context"} · ${event.analysis === "context-only" ? "Context only · " : ""}Synthetic scenario`,
       timeLabel,
       listTimes: event.timeKnown
         ? listEventTimes({ allDay: false, start: event.start, end: event.end })

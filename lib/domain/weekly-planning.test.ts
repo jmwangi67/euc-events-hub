@@ -169,7 +169,7 @@ describe("weekly factual counts", () => {
     expect(result.counts).toMatchObject({
       otherEvents: 1,
       exams: 1,
-      campusLocal: 1,
+      psuWide: 1,
       clusterMatches: 1,
       majorMatches: 1,
       academicLevelMatches: 1,
@@ -179,10 +179,14 @@ describe("weekly factual counts", () => {
   it("distinguishes college-wide programming from campus/local and national", () => {
     const result = summarizeWeek(week, audience, context);
     expect(result.counts.collegeWide).toBe(1);
-    expect(result.counts.campusLocal).toBe(3);
+    expect(result.counts.psuWide).toBe(2);
+    expect(result.counts.campusLocal).toBe(1);
     expect(result.counts.national).toBe(1);
     expect(result.counts.uniqueTotal).toBe(
-      result.events.length + result.exams.length + result.externalEvents.length,
+      result.events.length +
+        result.exams.length +
+        result.uncertainExams.length +
+        result.externalEvents.length,
     );
   });
   it("counts a multi-day external occurrence once in each intersecting week", () => {
@@ -279,14 +283,15 @@ describe("weekly factual counts", () => {
       score: null,
       status: "awaiting-methodology-review",
     });
-    expect(result.dateOnlyConstraints).toBe(2);
+    expect(result.dateOnlyConstraints).toBe(1);
+    expect(result.contextOnlyExternalEvents).toHaveLength(1);
     expect(result.knownTimedConstraints.some((c) => c.id === industry.id)).toBe(
       true,
     );
     expect(
-      result.preparationAtDayStart.contributions.some(
-        (c) => c.state === "date-uncertain",
-      ),
+      result.preparationAtDayStart.cells
+        .flatMap((cell) => cell.contributions)
+        .some((c) => c.state === "date-uncertain"),
     ).toBe(true);
   });
   it("handles unknown exam levels without fabricating stored data", () => {
@@ -316,7 +321,7 @@ it("deduplicates a canonical occurrence across layers while retaining category c
   });
   expect(result.counts).toMatchObject({
     otherEvents: 1,
-    campusLocal: 1,
+    psuWide: 1,
     uniqueTotal: 1,
   });
   expect(

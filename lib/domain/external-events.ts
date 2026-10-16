@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { easternDate, addCalendarDays } from "../time/eastern";
-import { dateOnlySchema, instantSchema, sourceSchema } from "./models";
+import {
+  academicLevelSchema,
+  dateOnlySchema,
+  instantSchema,
+  sourceSchema,
+} from "./models";
 export const EXTERNAL_CATEGORIES = {
   thon: "THON scenario",
   homecoming: "Homecoming scenario",
@@ -19,7 +24,17 @@ const fields = {
       ...(keyof typeof EXTERNAL_CATEGORIES)[],
     ],
   ),
-  scope: z.enum(["campus-local", "national"]),
+  scope: z.enum(["psu-wide", "campus-local", "national"]),
+  analysis: z
+    .enum(["broad-context", "audience-targeted", "context-only"])
+    .default("context-only"),
+  analysisReason: z
+    .string()
+    .min(1)
+    .default("Context only; no analytical audience relationship documented."),
+  targetMajorIds: z.array(z.string().min(1)).optional(),
+  targetAcademicLevels: z.array(academicLevelSchema).optional(),
+  targetClusterIds: z.array(z.string().min(1)).optional(),
   geography: z.string().min(1),
   audience: z.string().min(1),
   source: sourceSchema,
@@ -65,11 +80,37 @@ export const externalEventSchema = z
       });
     const national =
       event.category === "election" || event.category === "super-bowl";
+    const universityWide = ["thon", "homecoming", "football"].includes(
+      event.category,
+    );
+    if (universityWide !== (event.scope === "psu-wide"))
+      ctx.addIssue({
+        code: "custom",
+        path: ["scope"],
+        message: "University-wide categories require explicit PSU-wide scope.",
+      });
+    if (event.analysis === "broad-context" && event.scope === "campus-local")
+      ctx.addIssue({
+        code: "custom",
+        path: ["analysis"],
+        message:
+          "Ordinary local context requires explicit audience targeting for analytical eligibility.",
+      });
+    if (
+      event.analysis === "audience-targeted" &&
+      !event.targetMajorIds?.length &&
+      !event.targetClusterIds?.length
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["analysis"],
+        message: "Audience targeting requires documented majors or clusters.",
+      });
     if (national !== (event.scope === "national"))
       ctx.addIssue({
         code: "custom",
         path: ["scope"],
-        message: "Category must match campus/local or national scope.",
+        message: "Category must match its explicitly classified scope.",
       });
     if (event.timeKnown && Date.parse(event.end) <= Date.parse(event.start))
       ctx.addIssue({

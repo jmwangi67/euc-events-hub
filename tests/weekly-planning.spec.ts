@@ -102,7 +102,7 @@ test("desktop month adds one aligned eighth summary cell per week and keeps stud
   await expect(
     page.locator(".planner-month-surface .external-indicator").first(),
   ).toBeVisible();
-  await expect(page.locator(".pressure-days")).toHaveCount(0);
+  await expect(page.locator(".experimental-day-preparation")).toHaveCount(0);
   await page.getByLabel("Go to date", { exact: true }).fill("2026-12-31");
   await expect(
     page.getByRole("button", {
@@ -126,6 +126,7 @@ test("external layers default visible and hiding them leaves analysis and weekly
   await expect(campus).toBeChecked();
   await expect(national).toBeChecked();
   const initial = (await summary(page).textContent())!;
+  await page.getByLabel("Show PSU-wide commitments", { exact: true }).uncheck();
   await campus.uncheck();
   await national.uncheck();
   await expect(page.locator(".fc-event.planner-external")).toHaveCount(0);
@@ -176,7 +177,7 @@ test("week preparation preview is opt-in and distinct from overall scoring and d
   await page
     .getByRole("button", { name: "Analyze proposal", exact: true })
     .click();
-  await page.getByRole("button", { name: "Week", exact: true }).click();
+  await page.getByRole("button", { name: "1 Week", exact: true }).click();
   const proposalCard = page.locator(
     ".fc-timegrid-event.planner-proposal .fc-event-main",
   );
@@ -186,20 +187,22 @@ test("week preparation preview is opt-in and distinct from overall scoring and d
       (element) => element.scrollWidth <= element.clientWidth,
     ),
   ).toBe(true);
-  await expect(page.locator(".pressure-days")).toHaveCount(0);
+  await expect(page.locator(".experimental-day-preparation")).toHaveCount(0);
   await page
     .getByLabel("Preview experimental exam preparation", { exact: true })
     .check();
   await expect(page.locator(".pressure-day")).toHaveCount(7);
   await expect(page.locator(".pressure-preview")).toContainText(
-    "Snapshots at Eastern day start",
+    "10 PM Eastern reference",
   );
   await expect(page.locator(".pressure-preview")).toContainText(
     "never percentages",
   );
   await expect(
-    page.locator(".pressure-day").filter({ hasText: "Oct 21, 2026" }),
-  ).toContainText(/Prep \d+\.\d–\d+\.\d/);
+    page.locator(".pressure-day").filter({
+      has: page.getByRole("heading", { name: "Oct 21, 2026", exact: true }),
+    }),
+  ).toContainText("Experimental day peak");
   const values = await page.locator(".preparation-value").allTextContents();
   await page.getByLabel("Show academic exams", { exact: true }).uncheck();
   await page.getByLabel("Show national commitments", { exact: true }).uncheck();

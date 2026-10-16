@@ -34,6 +34,13 @@ export function ExamDetails({
           overlap. No start or end time has been assigned.
         </p>
       )}
+      {!exam.relevantMajorIds.length && (
+        <p className="planner-warning">
+          Audience mapping unknown. This record is retained as an academic
+          caution and contributes no numerical preparation to any selected major
+          or academic level. Enrollment and affected groups are not established.
+        </p>
+      )}
       <dl className="event-facts">
         <div>
           <dt>Relevant majors</dt>

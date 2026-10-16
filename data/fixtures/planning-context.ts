@@ -31,6 +31,10 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-homecoming",
     title: "Synthetic Homecoming weekend",
     category: "homecoming",
+    scope: "psu-wide",
+    analysis: "broad-context",
+    analysisReason:
+      "Explicitly designated synthetic university-wide commitment; participation varies.",
     startDate: "2026-10-23",
     endDate: "2026-10-26",
   },
@@ -39,6 +43,10 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-football",
     title: "Synthetic Penn State football game",
     category: "football",
+    scope: "psu-wide",
+    analysis: "broad-context",
+    analysisReason:
+      "Explicitly designated synthetic university-wide commitment; participation varies.",
     startDate: "2026-10-24",
     endDate: "2026-10-25",
     timeKnown: true,
@@ -50,6 +58,10 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-thon",
     title: "Synthetic THON planning scenario",
     category: "thon",
+    scope: "psu-wide",
+    analysis: "broad-context",
+    analysisReason:
+      "Explicitly designated synthetic university-wide commitment; participation varies.",
     startDate: "2026-10-30",
     endDate: "2026-11-02",
   },
@@ -74,6 +86,9 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-election",
     title: "Synthetic major election scenario",
     category: "election",
+    analysis: "broad-context",
+    analysisReason:
+      "Curated major national scenario with plausible scheduling implications, not guaranteed participation.",
     scope: "national",
     geography: "United States (scenario)",
     startDate: "2026-10-20",
@@ -84,6 +99,9 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-super-bowl",
     title: "Synthetic Super Bowl scenario",
     category: "super-bowl",
+    analysis: "broad-context",
+    analysisReason:
+      "Curated major national scenario with plausible scheduling implications, not guaranteed participation.",
     scope: "national",
     geography: "United States (scenario)",
     startDate: "2026-10-25",

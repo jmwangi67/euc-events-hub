@@ -1,27 +1,24 @@
 "use client";
-import { useState } from "react";
-import type {
-  WeeklySummary,
-  PlanningContext,
-} from "../../lib/domain/weekly-planning";
-import {
-  dayPressureBreakdown,
-  SCHEDULING_FACTORS,
-} from "../../lib/domain/weekly-planning";
+import type { WeeklySummary } from "../../lib/domain/weekly-planning";
+import { SCHEDULING_FACTORS } from "../../lib/domain/weekly-planning";
 import type { PlanningAudience } from "../../lib/domain/planning-audience";
-import { examAudienceMatch } from "../../lib/domain/planning-audience";
+import {
+  clusterTargetingLabel,
+  examAudienceMatch,
+} from "../../lib/domain/planning-audience";
 import {
   addCalendarDays,
   formatAllDayDate,
   formatEventTime,
 } from "../../lib/time/eastern";
 import { EXTERNAL_CATEGORIES } from "../../lib/domain/external-events";
+import { AudienceUncertainty } from "./preparation-details";
 import { DetailsDialog } from "../calendar/details-dialog";
 import { examTimeLabel } from "../calendar/planner-events";
 export function weekLabel(week: { start: string; end: string }) {
   return `${formatAllDayDate(week.start)} – ${formatAllDayDate(addCalendarDays(week.end, -1))}`;
 }
-function compactWeekLabel(week: WeeklySummary) {
+export function compactWeekLabel(week: WeeklySummary) {
   const last = addCalendarDays(week.end, -1);
   const format = new Intl.DateTimeFormat("en-US", {
     timeZone: "UTC",
@@ -35,10 +32,12 @@ export function WeeklySummaryCell({
   week,
   onSelect,
   height,
+  onFocusWeek,
 }: {
   week: WeeklySummary;
   onSelect: (week: WeeklySummary) => void;
   height?: number;
+  onFocusWeek?: (week: WeeklySummary) => void;
 }) {
   const c = week.counts;
   return (
@@ -50,35 +49,56 @@ export function WeeklySummaryCell({
         className="weekly-summary-trigger"
         data-calendar-event-id={`week:${week.start}`}
         onClick={() => onSelect(week)}
-        aria-label={`Weekly summary: ${weekLabel(week)}. ${c.uniqueTotal} unique commitments. Open details.`}
+        aria-haspopup="dialog"
+        aria-label={`Weekly summary: ${weekLabel(week)}. ${c.uniqueTotal} unique commitments: ${c.collegeWide} College-wide, ${c.otherEvents} other relevant events, ${c.exams} mapped exams, ${c.psuWide} PSU-wide, ${c.campusLocal} local context, ${c.national} national; ${c.uncertainExams} audience-uncertain exams. Open details.`}
       >
         <span className="week-summary-date">{compactWeekLabel(week)}</span>
         <span>
           <strong>{c.uniqueTotal}</strong> unique commitments
         </span>
-        <span className="weekly-counts">
-          <span>
-            College-wide <b>{c.collegeWide}</b>
+        {c.uniqueTotal > 0 && (
+          <span className="weekly-counts">
+            <span>
+              College-wide <b>{c.collegeWide}</b>
+            </span>
+            <span>
+              Other engineering <b>{c.otherEvents}</b>
+            </span>
+            <span>
+              Academic exams <b>{c.exams}</b>
+            </span>
+            <span>
+              PSU-wide <b>{c.psuWide}</b>
+            </span>
+            <span>
+              Local context <b>{c.campusLocal}</b>
+            </span>
+            <span>
+              National <b>{c.national}</b>
+            </span>
           </span>
-          <span>
-            Other engineering <b>{c.otherEvents}</b>
+        )}
+        {c.uniqueTotal > 0 && (
+          <span className="weekly-audience-tags">
+            Audience tags: {c.majorMatches} major · {c.academicLevelMatches}{" "}
+            level · {c.clusterMatches} cluster
           </span>
-          <span>
-            Academic exams <b>{c.exams}</b>
-          </span>
-          <span>
-            Campus / local <b>{c.campusLocal}</b>
-          </span>
-          <span>
-            National <b>{c.national}</b>
-          </span>
-        </span>
-        <span className="weekly-audience-tags">
-          Audience tags: {c.majorMatches} major · {c.academicLevelMatches} level
-          · {c.clusterMatches} cluster
-        </span>
+        )}
+        {c.uncertainExams > 0 && (
+          <span>{c.uncertainExams} audience-uncertain exams</span>
+        )}
         <span className="field-help">View weekly details →</span>
       </button>
+      {onFocusWeek && (
+        <button
+          type="button"
+          className="focus-week-control"
+          onClick={() => onFocusWeek(week)}
+          aria-label={`Focus calendar week: ${weekLabel(week)}`}
+        >
+          Go to calendar week ↑
+        </button>
+      )}
     </div>
   );
 }
@@ -122,6 +142,7 @@ export function WeeklyDetails({
           <li key={event.id}>
             <strong>{event.title}</strong>
             <span>{formatEventTime(event)}</span>
+            <span>{clusterTargetingLabel(event)}</span>
             <span>
               {event.collegeWide
                 ? "College-wide"
@@ -155,6 +176,7 @@ export function WeeklyDetails({
           </li>
         ))}
       </ul>
+      <AudienceUncertainty exams={week.uncertainExams} />
       <h3>Significant external commitments ({week.externalEvents.length})</h3>
       <ul className="weekly-detail-records">
         {week.externalEvents.map((event) => (
@@ -162,7 +184,11 @@ export function WeeklyDetails({
             <strong>{event.title}</strong>
             <span>
               {EXTERNAL_CATEGORIES[event.category]} ·{" "}
-              {event.scope === "national" ? "National" : "Campus / local"}
+              {event.scope === "national"
+                ? "National"
+                : event.scope === "psu-wide"
+                  ? "PSU-wide"
+                  : "Local context"}
             </span>
             <span>
               {event.timeKnown
@@ -172,6 +198,12 @@ export function WeeklyDetails({
                     end: event.end,
                   })
                 : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · Time unknown`}
+            </span>
+            <span>
+              {event.analysisReason}{" "}
+              {event.analysis === "context-only"
+                ? "Excluded from pressure inputs."
+                : "Eligibility follows documented scope/audience; participation is unknown."}
             </span>
             <span>
               {event.geography} · {event.audience}
@@ -204,100 +236,5 @@ export function WeeklyDetails({
         reservations or verified enrollment are inferred.
       </p>
     </DetailsDialog>
-  );
-}
-export function WeekPressurePreview({
-  start,
-  audience,
-  context,
-}: {
-  start: string;
-  audience: PlanningAudience;
-  context: PlanningContext;
-}) {
-  const [enabled, setEnabled] = useState(false);
-  return (
-    <section
-      className="pressure-preview"
-      aria-label="Experimental week breakdown"
-    >
-      <label className="choice">
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={(e) => setEnabled(e.target.checked)}
-        />
-        Preview experimental exam preparation
-      </label>
-      <p className="field-help">
-        Overall scoring methodology awaiting review. Preparation values are
-        relative model units, never percentages of students unavailable.
-      </p>
-      {enabled && (
-        <>
-          <p className="field-help">
-            Snapshots at Eastern day start, not daily averages or event-time
-            conflict scores. Unknown exam hours produce ranges. A contribution
-            stops at the actual exam start; direct intervals remain separate.
-          </p>
-          <div className="pressure-days">
-            {Array.from({ length: 7 }, (_, i) => {
-              const day = dayPressureBreakdown(
-                addCalendarDays(start, i),
-                audience,
-                context,
-              );
-              const [low, high] = day.preparationAtDayStart.range;
-              return (
-                <div className="pressure-day" key={day.date}>
-                  <h3>{formatAllDayDate(day.date)}</h3>
-                  <p className="preparation-value">
-                    Prep {low.toFixed(1)}
-                    {Math.abs(high - low) > 0.01 ? `–${high.toFixed(1)}` : ""} /
-                    10
-                  </p>
-                  <div className="preparation-track" aria-hidden="true">
-                    <span style={{ width: `${high * 10}%` }} />
-                  </div>
-                  <p>
-                    {day.knownTimedConstraints.length} known-time commitments
-                    <br />
-                    {day.dateOnlyConstraints} date-level uncertainties
-                  </p>
-                  <p>
-                    Campus / local {day.counts.campusLocal} · National{" "}
-                    {day.counts.national}
-                  </p>
-                  <details>
-                    <summary>Model contributions</summary>
-                    <ul>
-                      {day.preparationAtDayStart.contributions
-                        .filter(
-                          (c) =>
-                            c.range[1] > 0 || c.state === "direct-constraint",
-                        )
-                        .map((c) => (
-                          <li key={c.examId}>
-                            {c.examId}: {c.range[0].toFixed(1)}–
-                            {c.range[1].toFixed(1)} · {c.state}. {c.explanation}
-                          </li>
-                        ))}
-                    </ul>
-                    <p>Direct intervals (not preparation):</p>
-                    <ul>
-                      {day.knownTimedConstraints.map((c) => (
-                        <li key={c.id}>
-                          {c.id}: {formatEventTime({ allDay: false, ...c })}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </section>
   );
 }

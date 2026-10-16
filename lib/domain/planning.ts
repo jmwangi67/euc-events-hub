@@ -1,3 +1,4 @@
+import { examOccurrences } from "./exam-occurrences";
 import { z } from "zod";
 import {
   academicLevelSchema,
@@ -34,7 +35,11 @@ export const proposalSchema = z
 export type Proposal = z.infer<typeof proposalSchema>;
 export type PlanningConflict = {
   id: string;
-  kind: "event-overlap" | "exam-overlap" | "exam-date-warning";
+  kind:
+    | "event-overlap"
+    | "exam-overlap"
+    | "exam-date-warning"
+    | "exam-audience-warning";
   record: Event | Exam;
   majorIds: string[];
   reason: string;
@@ -70,7 +75,9 @@ export function analyzeProposal(
 ): PlanningConflict[] {
   const proposal = proposalSchema.parse(input);
   const conflicts: PlanningConflict[] = [];
-  for (const event of events) {
+  for (const event of new Map(
+    events.map((event) => [event.id, event]),
+  ).values()) {
     if (
       event.status !== "published" ||
       !eventAudienceMatch(event, proposal, organizations).relevant
@@ -102,7 +109,14 @@ export function analyzeProposal(
             : "Audience relevance is inferred from the hosts’ documented majors.",
     });
   }
-  for (const exam of exams) {
+  const canonical = examOccurrences(exams);
+  const identityUncertain = new Set(
+    canonical.identityUncertainExams.map((exam) => exam.id),
+  );
+  for (const exam of [
+    ...canonical.exams,
+    ...canonical.identityUncertainExams,
+  ]) {
     if (
       !examAudienceMatch(exam, {
         ...proposal,
@@ -119,12 +133,20 @@ export function analyzeProposal(
     if (!intervalsOverlap(proposal, interval)) continue;
     conflicts.push({
       id: `exam:${exam.id}`,
-      kind: exam.timeKnown ? "exam-overlap" : "exam-date-warning",
+      kind:
+        examAudienceMatch(exam, proposal).audienceUncertain ||
+        identityUncertain.has(exam.id)
+          ? "exam-audience-warning"
+          : exam.timeKnown
+            ? "exam-overlap"
+            : "exam-date-warning",
       record: exam,
       majorIds: proposal.majorIds.filter((id) =>
         exam.relevantMajorIds.includes(id),
       ),
-      reason: `The course-to-major mapping includes part of your planning audience; it is an approximation, not enrollment data. ${examAudienceMatch(exam, proposal).explanation}`,
+      reason: identityUncertain.has(exam.id)
+        ? "Canonical exam records disagree about timing; retained as uncertainty, not a confirmed overlap."
+        : examAudienceMatch(exam, proposal).explanation,
     });
   }
   return conflicts;

@@ -1,5 +1,6 @@
 import type { Major, Event, Exam } from "../../lib/domain/models";
 import type { PlanningConflict, Proposal } from "../../lib/domain/planning";
+import { clusterTargetingLabel } from "../../lib/domain/planning-audience";
 import { formatEventTime } from "../../lib/time/eastern";
 import { examTimeLabel } from "../calendar/planner-events";
 
@@ -17,7 +18,7 @@ export function ConflictPanel({
   onEventSelect,
   onExamSelect,
 }: Props) {
-  const exact = conflicts.filter((c) => c.kind !== "exam-date-warning").length;
+  const exact = conflicts.filter((c) => !c.kind.endsWith("warning")).length;
   const warnings = conflicts.length - exact;
   return (
     <section className="conflict-panel" aria-labelledby="conflicts-title">
@@ -60,16 +61,18 @@ export function ConflictPanel({
                 return (
                   <li
                     key={conflict.id}
-                    className={`conflict-item ${conflict.kind === "exam-date-warning" ? "date-warning" : "interval-overlap"}`}
+                    className={`conflict-item ${conflict.kind.endsWith("warning") ? "date-warning" : "interval-overlap"}`}
                   >
                     <p className="constraint-kind">
                       {event
                         ? event.allDay
                           ? "Recorded all-day interval overlap"
                           : "Known-time event overlap"
-                        : exam?.timeKnown
-                          ? "Known-time academic exam overlap"
-                          : "Date-level academic warning · Time unknown"}
+                        : conflict.kind === "exam-audience-warning"
+                          ? "Audience-uncertain academic constraint"
+                          : exam?.timeKnown
+                            ? "Known-time academic exam overlap"
+                            : "Date-level academic warning · Time unknown"}
                     </p>
                     <h3>
                       <button
@@ -86,12 +89,17 @@ export function ConflictPanel({
                       {event ? formatEventTime(event) : examTimeLabel(exam!)}
                     </p>
                     <p>{conflict.reason}</p>
+                    {event && (
+                      <p className="field-help">
+                        {clusterTargetingLabel(event)}
+                      </p>
+                    )}
                     <p>
                       <strong>Relevant majors:</strong>{" "}
                       {majors
                         .filter((m) => conflict.majorIds.includes(m.id))
                         .map((m) => m.abbreviation)
-                        .join(", ")}
+                        .join(", ") || "Not established"}
                     </p>
                     {!event && !exam!.timeKnown && (
                       <p className="constraint-uncertainty">
