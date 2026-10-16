@@ -309,7 +309,7 @@ However, the score must:
 - Acknowledge missing information.
 - Avoid presenting itself as a guaranteed attendance prediction.
 
-**Numerical scheduling-pressure scoring is not included in Milestone 1.**
+**Numerical overall scheduling-pressure scoring remains excluded.** The approved PR #5 expansion permits the isolated experimental exam-preparation model described in ADR 003, with independent review required.
 
 The initial prototype will identify explicit conflicts instead.
 
@@ -595,7 +595,7 @@ Milestone 1 will not include:
 - Multi-university deployment.
 - User-selectable time zones.
 - Room reservations.
-- Numerical scheduling-pressure scores.
+- Numerical overall scheduling-pressure scores (experimental exam preparation is separately authorized by ADR 003).
 
 ## 17. Product Success Criteria
 
@@ -627,3 +627,19 @@ The following decisions remain outstanding:
 8. Production operating costs and funding responsibilities.
 
 These decisions should be addressed before the relevant production milestones rather than blocking the initial synthetic-data prototype.
+
+## Approved Milestone 1C expansion (PR #5)
+
+See [ADR 003](decisions/003-weekly-planning-intelligence.md) for audience semantics, curated many-to-many clusters, typical-level exam uncertainty, separately classified synthetic PSU-wide, local-context and national commitments, weekly Sunday–Saturday summaries, per-major × academic-level preparation, exact interval limits and examples, and the overall-score approval gate. Calendar display toggles never narrow analysis. The student calendar and existing module/technology boundaries remain intact. No live schedules, empirical attendance claims, dark mode or production services are introduced.
+
+## PR #5 final owner requirements and review corrections
+
+ADR 003 now governs the corrected prototype: relevant commitments and preparation are analyzed per selected major × academic-level cell, without pooling disjoint majors or inventing enrollment shares. Curated many-to-many clusters add event relevance only through explicit event targeting. Unmapped exams remain source-labeled audience-uncertain cautions and add no numerical preparation. Typical, atypical and unknown-level strengths are centralized candidate parameters.
+
+Overall eligibility is limited to explicitly designated PSU-wide commitments, curated major national events, and commitments relevant to the selected audience. Ordinary nearby concerts/local events remain context-only unless an explicit audience relationship qualifies them. Visibility never narrows analysis; factual counts remain separate from pressure.
+
+Planner desktop views are Month, 2 Weeks (date grid), 1 Week (hourly), Day (hourly), and List. Month and 2 Weeks have weekly summaries after Saturday; compact lists place a selectable weekly summary above events and keep empty weeks concise. The student calendar retains its approved four-view experience.
+
+Week/Day lead with overall scoring unavailable pending methodology review (`score: null`). Optional experimental preparation reports evening references, exact daily/proposal interval maxima and affected cells; known start cutoffs and unknown-hour ranges are distinct from direct overlaps. Saturday preparation may come from an exam in the following week without changing factual weekly exam counts. No overall score, thresholds, attendance probability or dark mode is introduced.
+
+**Future enhancement: Smart Scheduling Recommendations.** Comparing prospective dates and suggesting lower-conflict alternatives is deferred; no recommendation algorithm or UI is authorized in PR #5. See the review reconciliation and updated Claude handoff before independent re-review and any merge decision.

@@ -1,11 +1,5 @@
 "use client";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Major, Organization } from "../../lib/domain/models";
 import { getEventById } from "../../lib/data/fixtures";
 import {
@@ -20,13 +14,7 @@ import { DiscoveryFilters } from "../filters/discovery-filters";
 import { EventCalendar } from "./event-calendar";
 import { EventDetails } from "./event-details";
 
-const subscribeToMobile = (listener: () => void) => {
-  const media = window.matchMedia("(max-width: 1023px)");
-  media.addEventListener("change", listener);
-  return () => media.removeEventListener("change", listener);
-};
-const getMobile = () => window.matchMedia("(max-width: 1023px)").matches;
-const getServerMobile = () => false;
+import { useCompactCalendar } from "./use-compact-calendar";
 type Props = {
   initialState: DiscoveryState;
   majors: Major[];
@@ -39,11 +27,7 @@ export function StudentCalendar({
 }: Props) {
   const [state, setState] = useState(initialState);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const mobile = useSyncExternalStore(
-    subscribeToMobile,
-    getMobile,
-    getServerMobile,
-  );
+  const mobile = useCompactCalendar();
   const view =
     mobile && state.view !== "timeGridDay"
       ? "listMonth"

@@ -1,6 +1,12 @@
 "use client";
-import { useEffect, useRef } from "react";
-import type { Event, Major, Organization } from "../../lib/domain/models";
+import { DetailsDialog } from "./details-dialog";
+import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
+import type {
+  Event,
+  Major,
+  Organization,
+  OrganizationCluster,
+} from "../../lib/domain/models";
 import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
 import { formatEventTime } from "../../lib/time/eastern";
 
@@ -9,10 +15,15 @@ type Props = {
   majors: Major[];
   organizations: Organization[];
   onClose: () => void;
+  planningClusters?: OrganizationCluster[];
 };
-export function EventDetails({ event, majors, organizations, onClose }: Props) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const heading = useRef<HTMLHeadingElement>(null);
+export function EventDetails({
+  event,
+  majors,
+  organizations,
+  onClose,
+  planningClusters,
+}: Props) {
   const hosts = organizations.filter((org) =>
     event.hostOrganizationIds.includes(org.id),
   );
@@ -30,87 +41,19 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
           .filter((major) => audienceIds.includes(major.id))
           .map((major) => major.name)
           .join(", ") || "Audience not provided";
-  useEffect(() => {
-    const element = dialog.current!;
-    const previousFocus = document.activeElement as HTMLElement | null;
-    element.showModal();
-    heading.current?.focus();
-    return () => {
-      element.close();
-      // FullCalendar may replace the opener during a responsive view change.
-      const trigger =
-        previousFocus?.isConnected &&
-        previousFocus.dataset.calendarEventId === event.id
-          ? previousFocus
-          : document.querySelector<HTMLElement>(
-              `[data-calendar-event-id="${CSS.escape(event.id)}"]`,
-            );
-      trigger?.focus();
-    };
-  }, [event.id]);
   return (
-    <dialog
-      ref={dialog}
-      className="event-dialog"
-      aria-labelledby="event-detail-title"
-      aria-describedby={
+    <DetailsDialog
+      triggerId={event.id}
+      title={event.title}
+      titleId="event-detail-title"
+      label="Event details"
+      describedBy={
         event.source.verification === "synthetic"
           ? "event-example-note"
           : undefined
       }
-      onKeyDown={(key) => {
-        if (key.key !== "Tab") return;
-        const controls = Array.from(
-          key.currentTarget.querySelectorAll<HTMLElement>(
-            "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])",
-          ),
-        );
-        const first = controls[0];
-        const last = controls[controls.length - 1];
-        if (!first) return;
-        if (!controls.includes(document.activeElement as HTMLElement)) {
-          key.preventDefault();
-          (key.shiftKey ? last : first).focus();
-        } else if (key.shiftKey && document.activeElement === first) {
-          key.preventDefault();
-          last.focus();
-        } else if (!key.shiftKey && document.activeElement === last) {
-          key.preventDefault();
-          first.focus();
-        }
-      }}
-      onCancel={(cancel) => {
-        // Native dismissal restores focus before its queued close notification.
-        // Clear React's selection now, so immediate reactivation is not a no-op.
-        cancel.preventDefault();
-        onClose();
-      }}
       onClose={onClose}
-      onClick={(e) => {
-        if (e.target !== e.currentTarget) return;
-        const box = e.currentTarget.getBoundingClientRect();
-        if (
-          e.clientX < box.left ||
-          e.clientX > box.right ||
-          e.clientY < box.top ||
-          e.clientY > box.bottom
-        )
-          onClose();
-      }}
     >
-      <div className="dialog-top">
-        <span className="eyebrow">Event details</span>
-        <button
-          className="control"
-          onClick={onClose}
-          aria-label="Close event details"
-        >
-          Close ×
-        </button>
-      </div>
-      <h2 id="event-detail-title" ref={heading} tabIndex={-1}>
-        {event.title}
-      </h2>
       {event.source.verification === "synthetic" && (
         <p className="example-note" id="event-example-note">
           Fictional development example. This is not an official Penn State
@@ -151,6 +94,34 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
             {event.audienceEligibility && <p>{event.audienceEligibility}</p>}
           </dd>
         </div>
+        {planningClusters && (
+          <>
+            <div>
+              <dt>Organization-cluster targeting</dt>
+              <dd>
+                {event.targetClusterIds?.length
+                  ? event.targetClusterIds
+                      .map(
+                        (id) =>
+                          planningClusters.find((cluster) => cluster.id === id)
+                            ?.name ?? id,
+                      )
+                      .join(", ")
+                  : "Unspecified; host membership does not imply event targeting."}
+              </dd>
+            </div>
+            <div>
+              <dt>Academic-level targeting</dt>
+              <dd>
+                {event.targetAcademicLevels?.length
+                  ? event.targetAcademicLevels
+                      .map((level) => ACADEMIC_LEVELS[level])
+                      .join(", ")
+                  : "No documented academic-level restriction."}
+              </dd>
+            </div>
+          </>
+        )}
         <div>
           <dt>Source</dt>
           <dd>
@@ -190,6 +161,6 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
           </a>
         </p>
       )}
-    </dialog>
+    </DetailsDialog>
   );
 }

@@ -12,7 +12,7 @@ export const instantSchema = z.iso
   );
 const httpUrl = z.url({ protocol: /^https?$/ });
 const verification = z.enum(["synthetic", "unverified", "verified"]);
-const sourceSchema = z.object({
+export const sourceSchema = z.object({
   label: z.string().min(1),
   url: httpUrl.optional(),
   verification,
@@ -23,6 +23,18 @@ export const majorSchema = z.object({
   name: z.string().min(1),
   abbreviation: z.string().min(1),
 });
+export const academicLevelSchema = z.enum([
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth-plus",
+]);
+export const organizationClusterSchema = z.object({
+  id,
+  name: z.string().min(1),
+  description: z.string().min(1),
+});
 export const organizationSchema = z.object({
   id,
   name: z.string().min(1),
@@ -30,6 +42,7 @@ export const organizationSchema = z.object({
   defaultMajorIds: z.array(id),
   classification: z.string().optional(),
   networkIds: z.array(id).default([]),
+  clusterIds: z.array(id).optional(),
 });
 export const eventCategorySchema = z.enum([
   "corporate-recruiting",
@@ -53,6 +66,8 @@ const eventFields = {
   category: eventCategorySchema,
   tags: z.array(z.string().min(1)).default([]),
   audienceEligibility: z.string().optional(),
+  targetAcademicLevels: z.array(academicLevelSchema).optional(),
+  targetClusterIds: z.array(id).optional(),
   status: z.enum(["draft", "published", "tentative", "canceled"]),
   location: z.string().optional(),
   virtualMeetingUrl: httpUrl.optional(),
@@ -111,6 +126,8 @@ const examFields = {
   date: dateOnlySchema,
   sectionScope: z.array(z.string().min(1)),
   relevantMajorIds: z.array(id),
+  typicalAcademicLevels: z.array(academicLevelSchema).optional(),
+  courseScope: z.enum(["general-stem", "major-specific"]).optional(),
   source: sourceSchema,
 };
 export const examSchema = z
@@ -161,3 +178,6 @@ export type Organization = z.infer<typeof organizationSchema>;
 export type Event = z.infer<typeof eventSchema>;
 export type Exam = z.infer<typeof examSchema>;
 export type EventCategory = z.infer<typeof eventCategorySchema>;
+
+export type AcademicLevel = z.infer<typeof academicLevelSchema>;
+export type OrganizationCluster = z.infer<typeof organizationClusterSchema>;
