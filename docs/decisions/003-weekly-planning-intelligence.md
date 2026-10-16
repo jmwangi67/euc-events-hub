@@ -1,85 +1,110 @@
 # ADR 003: Weekly planning intelligence and experimental exam preparation
 
-Status: Implemented prototype; independent mathematical/product review pending. Overall numerical scoring NOT approved.
+Status: Revised for owner-provided independent Claude findings on commit `23f81a3`; follow-up independent review and overall scoring approval pending.
 Date: 2026-10-16
 
-## Authorized scope and documentation reconciliation
+## Scope and architecture
 
-The PR #5 expansion request supersedes the original Milestone 1C exclusion of all numerical pressure work. It authorizes an isolated, labeled **exam-preparation** prototype, factual weekly summaries, and an overall scoring **design**. It does not authorize a numerical overall score, empirical claims, production enrollment data, authentication, ingestion, or dark mode. ADR 001's stack and module boundaries remain unchanged. The earlier blanket exclusions in AGENTS, PROJECT_SPEC and ARCHITECTURE must be read with this explicitly approved exception.
+The owner's PR #5 expansion and final refinement request supersede the original blanket numerical-pressure exclusion for Milestone 1C. Only an isolated experimental **exam-preparation** model is authorized. Overall status remains `awaiting-methodology-review` and its score remains `null`. No attendance predictions, overall thresholds, enrollment shares, recommendations, auth, persistence, live ingestion, deployment or dark mode are authorized.
 
-## Audience and data decisions
+ADR 001's stack and module boundaries remain unchanged. Calculations live in pure `lib/domain` modules, range-based fixture reads in `lib/data`, Eastern conversion in `lib/time`, and FullCalendar-specific behavior in the single calendar adapter and its focused helper modules. Audience controls, proposal factors, pressure explanations, weekly details and navigation are separate components. The public student calendar retains its four views, URL state, search, published-only queries, existing relevance and details behavior.
 
-- Academic levels are first, second, third, fourth, fifth-plus; shortcuts select first+second, third+, or all. They are independent of majors and display visibility.
-- Curated organization clusters use many-to-many organization `clusterIds`. An event is cluster-relevant only through its own explicit `targetClusterIds`. Hosting-cluster membership NEVER implies event targeting. Major relevance OR explicit cluster relevance qualifies an event, intersected with explicit event academic-level eligibility. Missing event levels mean no documented level restriction. Public student relevance is unchanged.
-- Exams require an intersecting major mapping; missing mappings are conservatively included for a nonempty audience. Typical levels affect model strength, not exclusion. Model-strength factors are 1 for typical-level intersection, 0.65 for out-of-sequence, and 0.8 for unknown levels. These arbitrary candidate weights are **not enrollment fractions**. General STEM fixtures span majors; upper-level fixtures are major-specific. Missing sections, levels, verification and hours remain unknown.
-- Significant commitments have a separate schema, category, campus/local vs national scope, geography, audience description and source. Date-only ranges have exclusive ends and unknown clocks. Known intervals retain offsets and must agree with Eastern date bounds. THON, Homecoming, football, concert, State College, election and Super Bowl fixtures are explicitly fictional, including their dates. They are not College-wide engineering events and imply no universal participation.
-- Stable IDs identify canonical occurrences. Repeated IDs within a layer count once. A shared canonical ID across layers counts once in the unique total and known-time interval list, while category counts may overlap. No fuzzy deduplication is attempted. Future imports must reconcile identity before scoring; unrelated IDs for the same occurrence would still double count.
+## Overall scheduling-pressure eligibility
 
-## Weekly summaries and presentation
+Factual record counts never constitute a score. Eligible future analytical factors are:
 
-Weeks are Eastern Sunday–Saturday, represented by inclusive Sunday/exclusive following Sunday dates. A multi-day occurrence counts once in every week it intersects. Audience tags overlap and cannot be summed. Category counts and the deduplicated total are labeled separately. Counts are factual record counts, never scores.
+1. Explicitly classified **PSU-wide** commitments (THON, Homecoming, football, or another reviewed university-wide designation), with a documented broad-context reason. These do not imply uniform student participation.
+2. Explicitly classified **major national** commitments (election, Super Bowl, or another curated designation), with a documented reason. Popularity or reach is not an attendance probability.
+3. Published events, exams and preparation relevant to the selected major × academic-level audience and explicit organization-cluster relationships.
 
-The sole FullCalendar adapter retains seven day columns, then renders a planner-only adjacent eighth summary column. A ResizeObserver aligns summary cells to actual month rows; no FullCalendar premium plugins or calendar reimplementation. Compact layouts retain the approved grouped chronological list and offer accessible weekly sections. External month indicators sit on their actual dates; weekly dialogs supply full timing/source/audience information. Week view has an opt-in experimental breakdown; no pressure charts appear in month cells. Calendar visibility controls are not analysis inputs. FullCalendar-specific measurement stays in the adapter.
+`ExternalEvent.scope` distinguishes `psu-wide`, `campus-local`, and `national`. `analysis` independently records `broad-context`, `audience-targeted`, or `context-only`, with an explanation. Ordinary local records cannot use broad-context eligibility: they need explicit selected-major/cluster targeting, intersected with any documented academic-level eligibility. Classification is never inferred from a title. A nearby concert or festival remains displayable context and is excluded analytically unless its explicit audience relationship qualifies it. Sources, geographic context, verification and unknown hours remain visible. All fixture names and dates are fictional scenarios, including THON and national-event names.
 
-## Candidate exam-preparation formulation
+Display controls independently hide published events, exams, PSU-wide, local context and national layers. All are visible by default. None is an analytical exclusion. Analysis functions accept no visibility arguments. Local contextual counts remain factual and separately labeled; eligible direct intervals and date-level cautions exclude irrelevant local context.
 
-For an exam on date D, choose the **strictly preceding Saturday S** (Saturday exams use the previous Saturday). No contribution before S. Let C(t) be an Eastern calendar-day coordinate: the UTC date ordinal plus the fraction of actual elapsed time between that date's IANA-resolved Eastern midnights. A civil day has one model unit even when DST gives it 23 or 25 elapsed hours. The normalized elapsed fraction remains monotonic through repeated fall clocks; it is not a fixed-offset conversion.
+## Audience cells, clusters and unknown mappings (H1, M3, M4)
 
-In the Desmos reference coordinate, `x(t) = 1 + C(t) − C(S)`: Saturday midnight is 1, Sunday 2, Monday 3, through Friday 7. The remaining-day difference is invariant to this shift.
+Selected majors and academic levels are independent. Shortcuts choose first+second year, third+fourth+fifth-plus, or all five levels. A BME+CHE selection means both audiences, not that anyone takes every associated course.
 
-For a known start T, remaining model days r = max(0, C(T) − C(t)). While S ≤ date(t) and t < T:
+Calculate preparation separately for each selected **major × academic-level cell**. Determine applicable exams, deduplicate their canonical occurrence IDs, apply candidate level strength, and combine within that cell only. Report all cells, the cells with the greatest modeled upper bound, their contributing exams/factors and uncertainty. The subgroup envelope is the maximum across cells, not a pooled individual's burden, population average or statement about everyone. Tied/overlapping uncertain bounds do not establish a precise ranking.
 
-`P_i(t) = 10 × relevanceWeight × exp(−decay × r^exponent)`
+Canonical duplicates with consistent date/timing merge their documented audience/section mappings and count once per applicable cell. Conflicting timing under one canonical ID is withheld from numerical preparation and surfaced as uncertainty. Original source records remain available. Distinct IDs for one real occurrence still require future ingestion reconciliation; no fuzzy deduplication is attempted.
 
-Candidate parameters: decay = **0.30**, exponent = **1.35**. At and after the actual start instant, preparation becomes **zero**. The known exam interval is instead a direct constraint until its exclusive end. No residual post-exam contribution exists.
+Candidate level strengths are centralized/configurable in `planning-parameters.ts`: typical-level intersection **1**, atypical level **0.65**, unknown level **0.8**. Values are model strengths, not enrollment proportions, study hours or measured effects. Major mappings remain curated approximations. Out-of-sequence students remain included. Missing **major/audience mappings** add no numerical preparation to any cell; the record remains an audience-uncertain academic caution with source and verification. Missing typical levels with a documented major mapping use the unknown-level parameter rather than an invented academic year. Parameter sensitivity is tested at 0, 0.3, 0.8 and 1, including invalid values.
 
-This single curve handles every weekday. It starts Monday weekend pressure much higher than Friday, grows nonlinearly, and approaches its maximum the night before and through exam morning. The exponent controls curvature and decay controls width. It is not globally convex: growth accelerates then flattens near the maximum. At the Saturday boundary there is an explicit onset discontinuity. Neither parameters nor shape are evidence-based predictions.
+Organization clusters are curated many-to-many memberships. Host membership alone never implies an event audience. An event qualifies through explicit event `targetClusterIds` OR existing major relevance, intersected with explicit event level restrictions. Missing event levels mean no documented restriction. Unspecified cluster targeting is labeled unknown in planner details. Multiple cluster/major matches never duplicate a canonical event.
 
-The supplied shifted cube roots are visual references only: they can become negative or exceed 10, have unrelated weekday offsets and no consistent onset/start/end boundaries. The bounded exponential in remaining days supports coherent common parameters and explicit lifecycle boundaries instead.
+### BME + CHE example
 
-Unknown exam start: never choose an hour. Before its date, return lower/upper values obtained over the entire possible exam-date interval. On the exam date return `[0, 10 × relevanceWeight]` with no point estimate, because it may be upcoming, active or completed. After that date, zero. These are model uncertainty bounds, not confidence intervals. Midnight bounds are analytical boundaries, not assigned exam timestamps.
+The fictional upper-biomedical and upper-process exams both start October 28 at 09:00 Eastern. The former maps to BME, the latter to CHE; both typically map to third year and above. For a proposal October 27, 17:00–18:00, each typical-level BME cell gets only the biomedical contribution and each typical-level CHE cell only the process contribution: approximately **8.41 at start**, approaching **8.53 at the exclusive end**. The UI rounds these relative units. It does not combine the two exams into approximately 9.75 for an invented individual or treat that subgroup as the entire audience. First/second-year cells remain included with the atypical strength, without claiming their enrollment.
 
-### Daily examples
+## Candidate preparation curve and Saturday onset (M1)
 
-Hypothetical 09:00–10:00 exams, typical-level match (weight 1), same reference week. Values are snapshots at **12:00 Eastern**, not day averages. The exam-date noon value is zero because the example exam has ended.
+For an exam on date D, S is the strictly preceding Saturday; a Saturday exam uses the previous week's Saturday. No preparation occurs before S. The owner's onset discontinuity is intentionally retained, not smoothed.
 
-| Snapshot | Monday exam (Oct 19) | Wednesday exam (Oct 21) | Friday exam (Oct 23) |
-|---|---:|---:|---:|
-| Saturday, Oct 17 | 4.96 | 1.54 | 0.38 |
-| Sunday, Oct 18 | 7.78 | 2.87 | 0.78 |
-| Monday, Oct 19 | 0.00 | 4.96 | 1.54 |
-| Tuesday, Oct 20 | 0.00 | 7.78 | 2.87 |
-| Wednesday, Oct 21 | 0.00 | 0.00 | 4.96 |
-| Thursday, Oct 22 | 0.00 | 0.00 | 7.78 |
-| Friday, Oct 23 | 0.00 | 0.00 | 0.00 |
+C(t) is the Eastern date ordinal plus the fraction of actual elapsed time between that date's IANA-resolved midnights. A civil date has one model unit even across 23/25-hour DST dates. The fraction stays monotonic through repeated fall clocks. The reference coordinate is `x(t) = 1 + C(t) − C(S)`: Saturday midnight is 1, Sunday 2, Monday 3, through Friday 7. This is a normalized calendar-day model, not a fixed-offset or fixed-24-hour calculation.
 
-For each: night before at 22:00 ≈ 9.01; exam morning at 08:00 ≈ 9.96. Outputs are calculated by the implementation and tested with tolerances. Day-start snapshots in the opt-in UI are labeled with that sampling time and may show a range when hours are unknown. They are distinct from interval-overlap checks at the proposed event time.
+For known start T and remaining model days `r = max(0, C(T) − C(t))`, while date(t) ≥ S and t < T:
 
-## Multiple exams
+`P_i(t) = 10 × relevanceWeight × exp(−0.30 × r^1.35)`
 
-Deduplicate by canonical exam ID, then combine:
+Decay and exponent remain configurable with finite positive decay and exponent greater than one. The shape approximates the owner's desired weekday behavior without copying unbounded shifted cube-root references. Growth accelerates then flattens near its bound; it is not globally convex. Parameters and shape remain uncalibrated assumptions.
+
+At the actual known exam start, preparation becomes zero and the recorded exam interval becomes a separate direct constraint. At its exclusive end the direct constraint ends. There is no residual preparation. Direct time overlap uses real instants, independent from day-level modeling.
+
+Unknown hour: do not select an exam time. Before its date, report bounds over possible start positions across the entire exam date. During its date, return `[0, 10 × relevanceWeight]` and no point estimate. After the date, zero. These are model bounds, not confidence intervals. Midnight analytical boundaries are not assigned exam timestamps.
+
+### Daily examples (weight-1 cell, hypothetical 09:00–10:00 exams)
+
+Noon snapshots are examples of the curve, not whole-day estimates. The exam-date noon value is zero because the hypothetical exam has ended.
+
+| Noon snapshot     | Monday exam (Oct 19) | Wednesday exam (Oct 21) | Friday exam (Oct 23) |
+| ----------------- | -------------------: | ----------------------: | -------------------: |
+| Saturday, Oct 17  |                 4.96 |                    1.54 |                 0.38 |
+| Sunday, Oct 18    |                 7.78 |                    2.87 |                 0.78 |
+| Monday, Oct 19    |                 0.00 |                    4.96 |                 1.54 |
+| Tuesday, Oct 20   |                 0.00 |                    7.78 |                 2.87 |
+| Wednesday, Oct 21 |                 0.00 |                    0.00 |                 4.96 |
+| Thursday, Oct 22  |                 0.00 |                    0.00 |                 7.78 |
+| Friday, Oct 23    |                 0.00 |                    0.00 |                 0.00 |
+
+Night before at 22:00 ≈ 9.01; exam morning at 08:00 ≈ 9.96; pre-start left limit = 10; exact start and later preparation = 0. These are model units, never percentages.
+
+## Sampling and exact interval limits (H2, M2, M5)
+
+Daily analysis reports a **22:00 Eastern reference** and a **maximum over the Eastern date**. Proposal analysis separately reports its start and maximum over its inclusive-start/exclusive-end interval. Neither is a daily average. The UI labels peaks that may be limiting values immediately before a cutoff; it never presents that value as pressure after the exam starts.
+
+Between discontinuities, all applicable contributions and their bounded combination are nondecreasing. Evaluate the interval's start, each onset/known start/known end/unknown-date boundary inside it, and exact left limits before boundaries and the exclusive interval end. No minute grid or arbitrary epsilon approximates the peak. Evaluating an exact exam start gives zero preparation; evaluating its left limit gives the valid pre-exam supremum. Lower and upper maximum bounds can occur at different references, so both references remain inspectable in the domain output. Under unknown hours, the upper bound is conservative and may not be jointly attainable across all records.
+
+Fetch complete Sunday–Saturday summary weeks plus seven days of exam lookahead. Saturday preparation for a following-week Sunday/Monday exam is included and explicitly attributed to the upcoming exam date. That exam is not counted as occurring in the earlier week. Weekly factual counts only include actual occurrence/date intersections.
+
+Within a cell, after identity deduplication:
 
 `E = 10 × (1 − product(1 − P_i / 10))`
 
-This returns a single exam's contribution, increases with added positive contributions, saturates at 10, and applies the same monotone rule to lower/upper uncertainty bounds. Empty input yields zero. Reject nonfinite/out-of-range inputs.
+Empty input yields zero, one exam yields its contribution, additions are monotonic, order does not matter, and the result is bounded by 10. Apply the monotone rule to uncertainty bounds. This is a diminishing-returns choice, not a statistical probability union. Correlation, saturation, approximated audiences and uncertain times still require scrutiny. UI values are rounded relative units; raw decimal precision is retained only for calculation/tests and documented examples. No Low/Moderate/High overall labels exist.
 
-This is a diminishing-returns design choice, **not a probability union**. Correlated courses, shared audiences, duplicate upstream IDs and saturation can overstate or hide burdens. A broad audience's typical-level intersection uses maximum mapping strength, not an inferred proportion. We do not average student populations or claim enrollment percentages. These decisions need review/calibration.
+## Planner views, summaries and accessibility (M6, M8, M9)
 
-## Overall scoring design and implementation gate
+Planner desktop hierarchy: **Month | 2 Weeks | 1 Week | Day | List**. Only 1 Week and Day use hourly grids. 2 Weeks uses FullCalendar's standard day grid, two Sunday–Saturday rows, fortnight navigation and the same eighth summary column as Month. No paid plugins or duplicate calendar. Month has no daily preparation chart; List has no numerical chart.
 
-`dayPressureBreakdown` exposes separate preparation contributions, actual known-time intervals, date-level uncertainties, and category counts. `SCHEDULING_FACTORS` defines five inspectable factor families. The overall result has status `awaiting-methodology-review` and `score: null`; there is no numeric overall aggregation or hidden weighted sum.
+The default Week/Day factor area leads with overall score unavailable/pending methodology review and factual commitments. A separate opt-in reveals experimental preparation with synchronized daily peak and evening references, subgroup attribution and uncertainty. Proposal explanations separate known overlaps, date-level cautions, selected audiences, broad commitments, context-only records and optional preparation.
 
-Before any overall score is authorized:
+Weekly summary controls include the date range and factual category counts in accessible names. Sunday week-detail buttons occur in calendar row tab order, so users can open a week's summary before traversing that week's events. Summary-to-calendar focus controls and existing Enter/Space/Escape/Tab dialog handling provide predictable navigation and responsive focus restoration. A ResizeObserver matches actual five/six-row and two-row grid geometry; all adapter-specific DOM work stays inside calendar modules.
 
-1. Review factor semantics and source reliability. Separate date-presence from actual overlap with the candidate interval. Unknown hours must remain uncertain.
-2. Reconcile canonical occurrence IDs across layers. Preserve category tags, but allocate each occurrence once to the final aggregation.
-3. Use interval unions/overlap duration for direct commitments rather than adding counts. Exam preparation ends when the exam starts, avoiding that within-exam double count.
-4. Review diminishing returns within competing-event/campus/national factor families. An event's size or category alone cannot supply an attendance probability.
-5. Approve cross-factor weighting and bounded aggregation only after sensitivity analysis, correlated-audience review and human calibration against representative schedules. Do not add arbitrarily weighted counts to preparation.
-6. Validate uncertainty/missing-data explanations and review UI thresholds before exposing any overall numeric value. No low/moderate/high overall labels yet.
+Compact layouts keep the approved blue-gray day sections, attached full-month date headers and bordered white event rows. A native week selector and current-week summary appear **above** the list. Empty summaries are compact. Explicit week choices persist while filters change; date navigation/sample loading selects the corresponding week. At intermediate desktop widths the proposal form stacks above the workspace, leaving space for readable day columns. Responsive checks cover 320/375/430/768/1024/1280/1440px and 200%-equivalent browser reflow.
 
-## Limitations and independent review
+## Overall scoring gate and deferred work
 
-Synthetic, sparse records; approximate sequencing; arbitrary preparation parameters and relevance weights; discontinuous Saturday onset; day-start snapshots; uncertainty ranges may become wide/saturate; no production source coverage, attendance prediction, enrollment, persistence or auth. External events are contextual commitments, not universally binding obligations. Compact weekly summaries increase page length deliberately rather than compressing an eight-column grid.
+The domain exposes eligible factors, source uncertainty, direct intervals, subgroup-specific preparation and factual counts, with overall `{status: "awaiting-methodology-review", score: null}`. No aggregate numerical algorithm or simulated overall values exist.
 
-Mandatory Claude review remains pending unless an actual external review is recorded. Scrutinize equation boundaries, DST coordinates, uncertainty propagation, audience semantics, identity deduplication, column alignment/focus restoration and the overall-score gate. See the copy-ready handoff in `docs/reviews/PR5_CLAUDE_HANDOFF.md`. Do not merge or describe this prototype as finally approved before review findings are reconciled.
+Before any overall score: reconcile canonical identities across layers; distinguish date presence from actual proposal overlap; union intersecting direct intervals; avoid within-exam preparation/direct double counting; review relevance, correlated audiences and diminishing returns; approve factor weights and cross-factor aggregation; calibrate against representative schedules; review uncertainty and presentation thresholds. Approval cannot be inferred from green tests.
+
+**Future enhancement: Smart Scheduling Recommendations.** Comparing candidate dates and suggesting lower-conflict options remains documentation only. No recommendation algorithm or recommendation UI is implemented.
+
+## CI and review
+
+The runner is pinned to Ubuntu 24.04. Upstream version tags, README breaking-change notes and action inputs/runtime were inspected before pinning checkout 6.1.0, setup-node 6.5.0 and upload-artifact 7.0.2 to immutable SHAs. Their Node 24 action runtime uses hosted runners; the application/test Node version remains 22. Explicit npm caching and zipped diagnostic artifacts preserve the existing input contracts. Remote CI verifies the updated workflow; the failure-only artifact path is source-reviewed and not intentionally forced to fail.
+
+See `docs/reviews/PR5_REVIEW_RECONCILIATION.md` for H1/H2 and M1–M9 statuses, sources/tests and remaining limits. Owner-provided Claude findings are the basis of these corrections; a new independent Claude pass remains pending. Do not merge before owner review and independent-review reconciliation.
+
+Common-exam refinement: numerical analysis preserves each original major/typical-level relationship before deduplicating the occurrence within a cell. Multiple applicable mappings use the strongest documented candidate relevance within that cell, once; merged factual metadata never invents cross-major/year numerical relationships. The selected contribution retains its source. The correlated-mapping regression verifies BME-third/CHE-first mappings retain atypical strength for BME-first/CHE-third.
