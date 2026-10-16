@@ -82,3 +82,41 @@ it("formats compact Eastern ranges with date-rollover and all-day cues", () => {
     "(60 min elapsed)",
   ]);
 });
+
+it("keeps accurate, chronological ranges for multiple events sharing one Eastern day", () => {
+  const base = getEventById("example-industry")!;
+  const records = [
+    {
+      ...base,
+      id: "late",
+      start: "2026-10-26T23:30:00-04:00",
+      end: "2026-10-27T00:30:00-04:00",
+    },
+    {
+      ...base,
+      id: "morning",
+      start: "2026-10-26T10:00:00-04:00",
+      end: "2026-10-26T11:00:00-04:00",
+    },
+    {
+      ...base,
+      id: "afternoon",
+      start: "2026-10-26T14:00:00-04:00",
+      end: "2026-10-26T15:30:00-04:00",
+    },
+  ];
+  const mapped = getEvents(
+    { start: "2026-10-26", end: "2026-10-27" },
+    records,
+  ).map(toCalendarEvent);
+  expect(mapped.map((event) => event.id)).toEqual([
+    "morning",
+    "afternoon",
+    "late",
+  ]);
+  expect(mapped.map((event) => event.extendedProps?.listTimes)).toEqual([
+    ["10:00–11:00 AM"],
+    ["2:00–3:30 PM"],
+    ["11:30 PM–", "12:30 AM", "Next day"],
+  ]);
+});

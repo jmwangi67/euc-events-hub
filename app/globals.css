@@ -666,3 +666,36 @@ button.control[aria-pressed="true"] {
 .event-time .time-part {
   white-space: nowrap;
 }
+
+/* The mobile chronological list uses FullCalendar's shared day headers. */
+.fc .mobile-list-event {
+  display: block;
+}
+.fc .mobile-list-content,
+.fc .mobile-list-content > span {
+  display: block;
+}
+.fc .mobile-list-content .event-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.fc .mobile-list-content .list-event-times {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.fc .mobile-list-content .time-part {
+  display: inline-block;
+  white-space: nowrap;
+}
+.fc .mobile-list-content .event-category {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.fc .mobile-list-content .time-note {
+  margin-left: 4px;
+}

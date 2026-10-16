@@ -417,3 +417,72 @@ for (const width of [320, 375, 430, 768, 1023]) {
     ).toBe(true);
   });
 }
+
+for (const width of [320, 375, 430]) {
+  test(`mobile day groups have shared dates and title-first event rows at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1100 });
+    await page.goto(sample);
+    await expect(page.locator(".timezone-label")).toHaveText(
+      "All Times Eastern (ET)",
+    );
+    const headers = page.locator(".fc-list-day");
+    await expect(headers).toHaveCount(9);
+    await expect(headers.first()).toHaveText("Monday, Oct 19");
+    await expect(
+      page.locator('.fc-list-day[data-date="2026-10-26"]'),
+    ).toHaveCount(1);
+    for (const header of await headers.all())
+      await expect(header).not.toContainText("2026");
+    const rows = page.locator(".mobile-list-event");
+    await expect(rows).toHaveCount(9);
+    const expected = [
+      [
+        "Engineering welcome",
+        "5:00–6:00 PM",
+        "Student organization",
+        "Example Engineering Council",
+      ],
+      [
+        "Process lab workshop",
+        "6:00–7:30 PM",
+        "Technical workshop",
+        "Example Process Engineering Society",
+      ],
+      [
+        "Bioprocess industry discussion",
+        "4:00–5:00 PM",
+        "Corporate recruiting",
+        "Example Process Engineering Society",
+      ],
+    ];
+    for (const [title, time, category, host] of expected) {
+      const row = event(page, title);
+      await expect(row.locator(".event-title")).toHaveText(title);
+      await expect(row.locator(".list-event-times")).toHaveText(time);
+      await expect(row.locator(".event-category")).toContainText(category);
+      await expect(row.locator(".event-category")).toContainText(host);
+      await expect(row).not.toContainText(/2026|Oct|Monday|Tuesday|Wednesday/);
+      const titleBox = await row.locator(".event-title").boundingBox();
+      const timeBox = await row.locator(".list-event-times").boundingBox();
+      const metaBox = await row.locator(".event-category").boundingBox();
+      expect(titleBox!.y + titleBox!.height).toBeLessThanOrEqual(timeBox!.y);
+      expect(timeBox!.y + timeBox!.height).toBeLessThanOrEqual(metaBox!.y);
+    }
+    const welcome = event(page, "Engineering welcome");
+    for (const key of ["Enter", "Space"]) {
+      await welcome.focus();
+      await page.keyboard.press(key);
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog")).not.toBeVisible();
+      await expect(welcome).toBeFocused();
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  });
+}

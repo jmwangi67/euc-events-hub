@@ -7,7 +7,7 @@ import listPlugin from "@fullcalendar/list";
 import luxonPlugin from "@fullcalendar/luxon3";
 import type { EventSourceFunc, DatesSetArg } from "@fullcalendar/core";
 import type { EventFilters } from "../../lib/data/fixtures";
-import { getEvents } from "../../lib/data/fixtures";
+import { getEvents, getOrganizations } from "../../lib/data/fixtures";
 import { DISPLAY_TIME_ZONE, easternDate } from "../../lib/time/eastern";
 import type { CalendarView } from "../../lib/domain/calendar-state";
 import { toCalendarEvent } from "./calendar-events";
@@ -58,7 +58,22 @@ export function EventCalendar({
         });
         setCount(events.length);
         setError(false);
-        success(events.map(toCalendarEvent));
+        const organizations = getOrganizations();
+        success(
+          events.map((event) => {
+            const mapped = toCalendarEvent(event);
+            return {
+              ...mapped,
+              extendedProps: {
+                ...mapped.extendedProps,
+                hosts: organizations
+                  .filter((org) => event.hostOrganizationIds.includes(org.id))
+                  .map((org) => org.name)
+                  .join(", "),
+              },
+            };
+          }),
+        );
       } catch (cause) {
         setError(true);
         failure(
@@ -181,7 +196,14 @@ export function EventCalendar({
             hour: "numeric",
             minute: "2-digit",
           }}
+          listDayFormat={
+            mobile
+              ? { weekday: "long", month: "short", day: "numeric" }
+              : undefined
+          }
+          listDaySideFormat={mobile ? false : undefined}
           eventOrder="start,title"
+          eventOrderStrict={mobile && view.startsWith("list")}
           eventInteractive
           navLinks={false}
           allDayText="All day"
@@ -226,22 +248,51 @@ export function EventCalendar({
             return info.view.type.startsWith("list") ? (
               <button
                 type="button"
-                className="list-event-trigger"
+                className={`list-event-trigger ${mobile ? "mobile-list-event" : ""}`}
                 data-calendar-event-id={info.event.id}
-                aria-label={`${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. Fictional example. Open event details.`}
+                aria-label={`${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. ${mobile && info.event.extendedProps.hosts ? `${info.event.extendedProps.hosts}. ` : ""}Fictional example. Open event details.`}
                 onClick={(click) => {
                   click.stopPropagation();
                   onEventSelect(info.event.id);
                 }}
               >
-                <span className="list-event-times" aria-hidden="true">
-                  {cardTimes.map((time, index) => (
-                    <span key={time + index}>
-                      <span className="time-part">{time}</span>
+                {mobile ? (
+                  <span className="mobile-list-content">
+                    <span className="event-title">
+                      {info.event.title.replace(/^Synthetic example: /, "")}
                     </span>
-                  ))}
-                </span>
-                {content}
+                    <span className="list-event-times" aria-hidden="true">
+                      {cardTimes.map((part, index) => {
+                        const isNote =
+                          /Next day|From prev day|^\+\d+ days$/.test(part);
+                        return (
+                          <span
+                            className={`time-part ${isNote ? "time-note" : ""}`}
+                            key={index}
+                          >
+                            {isNote ? `(${part})` : part}
+                          </span>
+                        );
+                      })}
+                    </span>
+                    <span className="event-category">
+                      {info.event.extendedProps.category}
+                      {info.event.extendedProps.hosts &&
+                        ` · ${info.event.extendedProps.hosts}`}
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="list-event-times" aria-hidden="true">
+                      {cardTimes.map((time, index) => (
+                        <span key={time + index}>
+                          <span className="time-part">{time}</span>
+                        </span>
+                      ))}
+                    </span>
+                    {content}
+                  </>
+                )}
               </button>
             ) : (
               content
