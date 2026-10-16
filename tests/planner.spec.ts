@@ -46,6 +46,10 @@ test("planner navigation, independent display and explanatory synthetic conflict
   await expect(panel(page)).toContainText("Verification: synthetic");
   await page.getByLabel("Show published events", { exact: true }).uncheck();
   await page.getByLabel("Show academic exams", { exact: true }).uncheck();
+  await page
+    .getByLabel("Show campus / local commitments", { exact: true })
+    .uncheck();
+  await page.getByLabel("Show national commitments", { exact: true }).uncheck();
   await expect(page.locator(".calendar-region .fc-event")).toHaveCount(1); // local proposal only
   await expect(panel(page)).toContainText(
     "1 interval overlap · 1 date-level warning",

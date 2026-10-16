@@ -13,16 +13,41 @@ import type {
 } from "@fullcalendar/core";
 import type { EventFilters } from "../../lib/data/fixtures";
 import { getEvents, getExams, getOrganizations } from "../../lib/data/fixtures";
-import { DISPLAY_TIME_ZONE, easternDate } from "../../lib/time/eastern";
+import {
+  DISPLAY_TIME_ZONE,
+  easternDate,
+  addCalendarDays,
+} from "../../lib/time/eastern";
 import type { CalendarView } from "../../lib/domain/calendar-state";
 import type { Exam } from "../../lib/domain/models";
+import { intervalsOverlap, type Proposal } from "../../lib/domain/planning";
 import {
-  isExamRelevant,
-  intervalsOverlap,
-  type Proposal,
-} from "../../lib/domain/planning";
-import { toExamCalendarItem, toProposalCalendarItem } from "./planner-events";
+  toExamCalendarItem,
+  toProposalCalendarItem,
+  toExternalCalendarItem,
+} from "./planner-events";
 import { listRangeCrossesYears, toCalendarEvent } from "./calendar-events";
+
+import {
+  eventAudienceMatch,
+  examAudienceMatch,
+  type PlanningAudience,
+} from "../../lib/domain/planning-audience";
+import {
+  getExternalEvents,
+  getWeeklyPlanningContext,
+} from "../../lib/data/weekly-planning";
+import {
+  calendarWeeks,
+  summarizeWeek,
+  type WeeklySummary,
+  weekForInstant,
+} from "../../lib/domain/weekly-planning";
+import {
+  WeeklySummaryCell,
+  WeeklyDetails,
+  WeekPressurePreview,
+} from "../planner/weekly-intelligence";
 
 type Props = {
   date: string;
@@ -34,10 +59,12 @@ type Props = {
   onReset: () => void;
   mobile: boolean;
   planning?: {
-    majorIds: string[];
+    audience: PlanningAudience;
     proposal: Proposal | null;
     showEvents: boolean;
     showExams: boolean;
+    showCampusLocal: boolean;
+    showNational: boolean;
     onExamSelect: (exam: Exam) => void;
     onProposalSelect: () => void;
   };
@@ -61,6 +88,60 @@ export function EventCalendar({
   mobile,
   planning,
 }: Props) {
+  const surface = useRef<HTMLDivElement>(null);
+  const [window, setWindow] = useState({
+    start: date,
+    end: addCalendarDays(date, 1),
+  });
+  const [weekTriggerId, setWeekTriggerId] = useState("");
+  const [selectedWeek, setSelectedWeek] = useState<WeeklySummary | null>(null);
+  const [weekLayout, setWeekLayout] = useState({
+    header: 28,
+    rows: [] as number[],
+  });
+  const planningAudience = planning?.audience;
+  const isPlanning = !!planningAudience;
+  const context = useMemo(
+    () => (isPlanning ? getWeeklyPlanningContext(window) : null),
+    [window, isPlanning],
+  );
+  const weeks = useMemo(
+    () =>
+      planningAudience && context
+        ? calendarWeeks(window.start, window.end).map((week) =>
+            summarizeWeek(week, planningAudience, context),
+          )
+        : [],
+    [window, planningAudience, context],
+  );
+  const monthSummaries = !!planning && !mobile && view === "dayGridMonth";
+  useEffect(() => {
+    if (!monthSummaries || !surface.current) return;
+    const root = surface.current;
+    const measure = () => {
+      const rows = Array.from(
+        root.querySelectorAll(".fc-daygrid-body > table > tbody > tr"),
+      );
+      if (!rows.length) return;
+      const header =
+        rows[0].getBoundingClientRect().top - root.getBoundingClientRect().top;
+      const heights = rows.map((row) => row.getBoundingClientRect().height);
+      setWeekLayout((current) =>
+        Math.abs(current.header - header) < 0.1 &&
+        current.rows.join() === heights.join()
+          ? current
+          : { header, rows: heights },
+      );
+    };
+    const observer = new ResizeObserver(measure);
+    const calendarElement = root.querySelector(".fc");
+    if (calendarElement) observer.observe(calendarElement);
+    root
+      .querySelectorAll(".fc-daygrid-body > table > tbody > tr")
+      .forEach((row) => observer.observe(row));
+    measure();
+    return () => observer.disconnect();
+  }, [monthSummaries, window, weeks]);
   const calendar = useRef<FullCalendar>(null);
   const [title, setTitle] = useState("");
   const [showGroupYear, setShowGroupYear] = useState(false);
@@ -79,29 +160,49 @@ export function EventCalendar({
             : getEvents({
                 start: range.startStr.slice(0, 10),
                 end: range.endStr.slice(0, 10),
-                filters,
+                filters: planning ? undefined : filters,
               });
         setError(false);
         const organizations = getOrganizations();
-        const items: EventInput[] = events.map((event) => {
-          const mapped = toCalendarEvent(event);
-          return {
-            ...mapped,
-            extendedProps: {
-              ...mapped.extendedProps,
-              hosts: organizations
-                .filter((org) => event.hostOrganizationIds.includes(org.id))
-                .map((org) => org.name)
-                .join(", "),
-            },
-          };
-        });
+        const items: EventInput[] = events
+          .filter(
+            (event) =>
+              !planning ||
+              eventAudienceMatch(event, planning.audience, organizations)
+                .relevant,
+          )
+          .map((event) => {
+            const mapped = toCalendarEvent(event);
+            return {
+              ...mapped,
+              extendedProps: {
+                ...mapped.extendedProps,
+                hosts: organizations
+                  .filter((org) => event.hostOrganizationIds.includes(org.id))
+                  .map((org) => org.name)
+                  .join(", "),
+              },
+            };
+          });
         if (planning?.showExams) {
           const exams = getExams({
             start: range.startStr.slice(0, 10),
             end: range.endStr.slice(0, 10),
-          }).filter((exam) => isExamRelevant(exam, planning.majorIds));
+          }).filter(
+            (exam) => examAudienceMatch(exam, planning.audience).relevant,
+          );
           items.push(...exams.map(toExamCalendarItem));
+        }
+        if (planning) {
+          const external = getExternalEvents({
+            start: range.startStr.slice(0, 10),
+            end: range.endStr.slice(0, 10),
+          }).filter((event) =>
+            event.scope === "national"
+              ? planning.showNational
+              : planning.showCampusLocal,
+          );
+          items.push(...external.map(toExternalCalendarItem));
         }
         if (
           planning?.proposal &&
@@ -133,17 +234,43 @@ export function EventCalendar({
     api[direction]();
     onDateChange(easternDate(api.getDate().toISOString()));
   };
-  const selectItem = (event: EventApi) => {
-    if (event.extendedProps.kind === "exam")
+  const selectItem = (event: EventApi, segmentDate?: string) => {
+    setWeekTriggerId(event.id);
+    if (event.extendedProps.kind === "external" && planning && context) {
+      const external = event.extendedProps.externalEvent;
+      const eventWeek = segmentDate
+        ? calendarWeeks(segmentDate, addCalendarDays(segmentDate, 1))[0]
+        : external.timeKnown
+          ? weekForInstant(external.start)
+          : calendarWeeks(external.startDate, external.endDate)[0];
+      const week = weeks.find((w) => w.start === eventWeek.start) ?? weeks[0];
+      if (week)
+        setSelectedWeek(summarizeWeek(week, planning.audience, context));
+    } else if (event.extendedProps.kind === "exam")
       planning?.onExamSelect(event.extendedProps.exam as Exam);
     else if (event.extendedProps.kind === "proposal")
       planning?.onProposalSelect();
     else onEventSelect(event.id);
   };
+  const selection = useRef(selectItem);
+  useEffect(() => {
+    selection.current = selectItem;
+  });
+  const openWeek = (week: WeeklySummary) => {
+    setWeekTriggerId(`week:${week.start}`);
+    setSelectedWeek(week);
+  };
   const itemLabel = (event: EventApi) =>
-    `${event.title}. ${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${mobile && event.extendedProps.hosts ? `${event.extendedProps.hosts}. ` : ""}${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional example. Open event details."}`;
+    `${event.title}. ${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${mobile && event.extendedProps.hosts ? `${event.extendedProps.hosts}. ` : ""}${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Synthetic scenario. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional example. Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
+    const next = {
+      start: range.startStr.slice(0, 10),
+      end: range.endStr.slice(0, 10),
+    };
+    setWindow((current) =>
+      current.start === next.start && current.end === next.end ? current : next,
+    );
     setShowGroupYear(
       listRangeCrossesYears(
         range.startStr.slice(0, 10),
@@ -233,7 +360,17 @@ export function EventCalendar({
           Events could not be loaded. Change the date range to retry.
         </p>
       )}
-      <div className="calendar-surface">
+      {planning && context && view === "timeGridWeek" && (
+        <WeekPressurePreview
+          start={weeks[0]?.start ?? window.start}
+          audience={planning.audience}
+          context={context}
+        />
+      )}
+      <div
+        ref={surface}
+        className={`calendar-surface ${monthSummaries ? "planner-month-surface" : ""}`}
+      >
         <FullCalendar
           key={view}
           ref={calendar}
@@ -246,6 +383,8 @@ export function EventCalendar({
           height={view.startsWith("timeGrid") ? 700 : "auto"}
           scrollTime="12:00:00"
           fixedWeekCount={false}
+          stickyHeaderDates={planning ? false : undefined}
+          slotEventOverlap={planning ? false : undefined}
           dayMaxEvents={3}
           events={source}
           datesSet={datesSet}
@@ -294,9 +433,28 @@ export function EventCalendar({
           )}
           eventClick={(info) => {
             info.jsEvent.preventDefault();
-            selectItem(info.event);
+            selectItem(
+              info.event,
+              (info.jsEvent.target as HTMLElement).closest<HTMLElement>(
+                "[data-date]",
+              )?.dataset.date,
+            );
           }}
           eventContent={(info) => {
+            if (
+              info.event.extendedProps.kind === "external" &&
+              info.view.type === "dayGridMonth"
+            )
+              return (
+                <span className="external-indicator">
+                  <span aria-hidden="true">◆</span>{" "}
+                  {info.event.title.replace(/^Synthetic /, "")}
+                  <span className="sr-only">
+                    {" "}
+                    · Synthetic scenario · See weekly summary
+                  </span>
+                </span>
+              );
             const cardTimes = (
               info.event.extendedProps.listTimes as string[]
             ).map((label) =>
@@ -383,13 +541,64 @@ export function EventCalendar({
             trigger.onkeydown = (key) => {
               if (key.key === "Enter" || key.key === " ") {
                 key.preventDefault();
-                selectItem(info.event);
+                selection.current(
+                  info.event,
+                  trigger.closest<HTMLElement>("[data-date]")?.dataset.date,
+                );
               }
             };
             trigger.setAttribute("aria-label", itemLabel(info.event));
           }}
         />
+        {monthSummaries && (
+          <aside
+            className="weekly-summary-column"
+            aria-label="Weekly scheduling summaries"
+          >
+            <div
+              className="weekly-column-heading"
+              style={{ height: weekLayout.header }}
+            >
+              Week summary
+            </div>
+            {weeks.map((week, index) => (
+              <WeeklySummaryCell
+                key={week.start}
+                week={week}
+                onSelect={openWeek}
+                height={weekLayout.rows[index]}
+              />
+            ))}
+          </aside>
+        )}
       </div>
+      {planning && !monthSummaries && (
+        <section
+          className="compact-weekly-summaries"
+          aria-label="Weekly scheduling summaries"
+        >
+          <h3>Weekly scheduling summaries</h3>
+          <p className="field-help">
+            All analysis layers included, even when hidden. Overall scoring
+            methodology awaiting review.
+          </p>
+          {weeks.map((week) => (
+            <WeeklySummaryCell
+              key={week.start}
+              week={week}
+              onSelect={openWeek}
+            />
+          ))}
+        </section>
+      )}
+      {selectedWeek && planning && (
+        <WeeklyDetails
+          triggerId={weekTriggerId}
+          week={selectedWeek}
+          audience={planning.audience}
+          onClose={() => setSelectedWeek(null)}
+        />
+      )}
       {count === 0 && view !== "listMonth" && (
         <div className="empty-state">
           <p>

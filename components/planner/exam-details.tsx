@@ -1,5 +1,6 @@
 "use client";
 import type { Exam, Major } from "../../lib/domain/models";
+import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
 import { DetailsDialog } from "../calendar/details-dialog";
 import { examTimeLabel } from "../calendar/planner-events";
 export function ExamDetails({
@@ -41,6 +42,15 @@ export function ExamDetails({
               .filter((m) => exam.relevantMajorIds.includes(m.id))
               .map((m) => m.abbreviation)
               .join(", ") || "Not provided"}
+          </dd>
+        </div>
+        <div>
+          <dt>Typical academic levels (approximate)</dt>
+          <dd>
+            {exam.typicalAcademicLevels
+              ?.map((level) => ACADEMIC_LEVELS[level])
+              .join(", ") || "Unknown; conservatively included"}
+            . Students outside the typical sequence remain relevant.
           </dd>
         </div>
         <div>

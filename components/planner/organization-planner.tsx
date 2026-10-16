@@ -7,7 +7,12 @@ import {
   useState,
   type FormEvent,
 } from "react";
-import type { Major, Organization, Exam } from "../../lib/domain/models";
+import type {
+  Major,
+  Organization,
+  Exam,
+  AcademicLevel,
+} from "../../lib/domain/models";
 import type { CalendarView } from "../../lib/domain/calendar-state";
 import {
   analyzeProposal,
@@ -28,6 +33,11 @@ import { EventCalendar } from "../calendar/event-calendar";
 import { EventDetails } from "../calendar/event-details";
 import { useCompactCalendar } from "../calendar/use-compact-calendar";
 import { ConflictPanel } from "./conflict-panel";
+import {
+  ACADEMIC_LEVELS,
+  ALL_LEVELS,
+} from "../../lib/domain/planning-audience";
+import { getOrganizationClusters } from "../../lib/data/weekly-planning";
 import { ExamDetails } from "./exam-details";
 
 type Draft = {
@@ -63,6 +73,15 @@ export function OrganizationPlanner({
     organizations.find((org) => org.defaultMajorIds.length) ?? organizations[0];
   const [organizationId, setOrganizationId] = useState(initialOrg.id);
   const [majorIds, setMajorIds] = useState(() => planningAudience(initialOrg));
+  const [academicLevels, setAcademicLevels] = useState<AcademicLevel[]>([
+    ...ALL_LEVELS,
+  ]);
+  const [clusterIds, setClusterIds] = useState<string[]>([]);
+  const clusters = useMemo(() => getOrganizationClusters(), []);
+  const audience = useMemo(
+    () => ({ majorIds, academicLevels, clusterIds }),
+    [majorIds, academicLevels, clusterIds],
+  );
   const [draft, setDraft] = useState(() => emptyDraft(initialDate));
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,6 +89,8 @@ export function OrganizationPlanner({
   const [view, setView] = useState<CalendarView>("dayGridMonth");
   const [showEvents, setShowEvents] = useState(true);
   const [showExams, setShowExams] = useState(true);
+  const [showCampusLocal, setShowCampusLocal] = useState(true);
+  const [showNational, setShowNational] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const errorSummary = useRef<HTMLDivElement>(null);
@@ -100,17 +121,29 @@ export function OrganizationPlanner({
   const restoreDisplay = useCallback(() => {
     setShowEvents(true);
     setShowExams(true);
+    setShowCampusLocal(true);
+    setShowNational(true);
   }, []);
   const planning = useMemo(
     () => ({
-      majorIds,
+      audience,
       proposal,
       showEvents,
       showExams,
+      showCampusLocal,
+      showNational,
       onExamSelect: setSelectedExam,
       onProposalSelect: focusProposal,
     }),
-    [majorIds, proposal, showEvents, showExams, focusProposal],
+    [
+      audience,
+      proposal,
+      showEvents,
+      showExams,
+      showCampusLocal,
+      showNational,
+      focusProposal,
+    ],
   );
   useEffect(() => {
     if (Object.keys(errors).length) errorSummary.current?.focus();
@@ -145,6 +178,8 @@ export function OrganizationPlanner({
     e.preventDefault();
     const nextErrors: Record<string, string> = {};
     if (!draft.title.trim()) nextErrors.title = "Enter a proposed event title.";
+    if (!academicLevels.length)
+      nextErrors.levels = "Select at least one academic level.";
     if (!majorIds.length)
       nextErrors.audience = "Select at least one planning major.";
     let start = "",
@@ -173,6 +208,8 @@ export function OrganizationPlanner({
       end,
       category: draft.category || undefined,
       majorIds,
+      academicLevels,
+      clusterIds,
     });
     if (start && end && !result.success)
       for (const issue of result.error.issues)
@@ -191,6 +228,8 @@ export function OrganizationPlanner({
     const org = organizations.find((org) => org.id === "example-process")!;
     setOrganizationId(org.id);
     setMajorIds(planningAudience(org));
+    setAcademicLevels([...ALL_LEVELS]);
+    setClusterIds([]);
     setDraft({
       ...emptyDraft("2026-10-21"),
       title: "Sample organization workshop",
@@ -307,6 +346,107 @@ export function OrganizationPlanner({
               <strong>{audienceLabel || "Select a planning audience"}</strong>
             </p>
           </fieldset>
+          <fieldset className="planning-audience academic-levels">
+            <legend>Academic levels</legend>
+            <div
+              className="audience-shortcuts"
+              role="group"
+              aria-label="Academic level shortcuts"
+            >
+              {[
+                ["Underclassmen", ["first", "second"]],
+                ["Upperclassmen", ["third", "fourth", "fifth-plus"]],
+                ["All years", ALL_LEVELS],
+              ].map(([label, levels]) => (
+                <button
+                  key={String(label)}
+                  type="button"
+                  className="control"
+                  aria-pressed={
+                    academicLevels.length === levels.length &&
+                    (levels as AcademicLevel[]).every((level) =>
+                      academicLevels.includes(level),
+                    )
+                  }
+                  onClick={() => {
+                    setAcademicLevels([...(levels as AcademicLevel[])]);
+                    setProposal(null);
+                    setErrors({});
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {ALL_LEVELS.map((level) => (
+              <label className="choice" key={level}>
+                <input
+                  type="checkbox"
+                  checked={academicLevels.includes(level)}
+                  onChange={() => {
+                    setAcademicLevels((current) =>
+                      current.includes(level)
+                        ? current.filter((id) => id !== level)
+                        : [...current, level],
+                    );
+                    setProposal(null);
+                    setErrors({});
+                  }}
+                />
+                {ACADEMIC_LEVELS[level]}
+              </label>
+            ))}
+            <p className="field-help">
+              Levels are independent of majors. Typical exam sequencing is
+              approximate; out-of-sequence students remain included.
+            </p>
+          </fieldset>
+          <fieldset className="planning-audience">
+            <legend>Organization clusters</legend>
+            {clusters.map((cluster) => (
+              <label key={cluster.id} className="choice">
+                <input
+                  type="checkbox"
+                  checked={clusterIds.includes(cluster.id)}
+                  onChange={() => {
+                    setClusterIds((current) =>
+                      current.includes(cluster.id)
+                        ? current.filter((id) => id !== cluster.id)
+                        : [...current, cluster.id],
+                    );
+                    setProposal(null);
+                    setErrors({});
+                  }}
+                />
+                {cluster.name}
+              </label>
+            ))}
+            <p className="field-help">
+              Synthetic curated memberships. {organization.name} belongs to:{" "}
+              {clusters
+                .filter((cluster) =>
+                  organization.clusterIds?.includes(cluster.id),
+                )
+                .map((cluster) => cluster.name)
+                .join(", ") || "none documented"}
+              . Only explicit event cluster targeting adds relevance; host
+              membership never does.
+            </p>
+          </fieldset>
+          <p className="field-help planning-scope" aria-live="polite">
+            Current analysis: {audienceLabel || "No majors"} ·{" "}
+            {academicLevels.length === ALL_LEVELS.length
+              ? "All years"
+              : academicLevels
+                  .map((level) => ACADEMIC_LEVELS[level])
+                  .join(", ") || "No academic levels"}{" "}
+            ·{" "}
+            {clusters
+              .filter((cluster) => clusterIds.includes(cluster.id))
+              .map((cluster) => cluster.name)
+              .join(", ") || "No clusters selected"}
+            .
+          </p>
           <label className="planner-field">
             Proposed event title
             <input
@@ -453,6 +593,22 @@ export function OrganizationPlanner({
                   onChange={(e) => setShowExams(e.target.checked)}
                 />
                 Show academic exams
+              </label>
+              <label className="choice">
+                <input
+                  type="checkbox"
+                  checked={showCampusLocal}
+                  onChange={(e) => setShowCampusLocal(e.target.checked)}
+                />
+                Show campus / local commitments
+              </label>
+              <label className="choice">
+                <input
+                  type="checkbox"
+                  checked={showNational}
+                  onChange={(e) => setShowNational(e.target.checked)}
+                />
+                Show national commitments
               </label>
             </fieldset>
             <p className="field-help">

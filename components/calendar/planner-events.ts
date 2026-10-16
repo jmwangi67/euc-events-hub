@@ -51,3 +51,28 @@ export function toProposalCalendarItem(proposal: Proposal): EventInput {
     },
   };
 }
+
+export function toExternalCalendarItem(
+  event: import("../../lib/domain/external-events").ExternalEvent,
+): EventInput {
+  const timeLabel = event.timeKnown
+    ? formatEventTime({ allDay: false, start: event.start, end: event.end })
+    : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · Time unknown`;
+  return {
+    id: `external:${event.id}`,
+    title: event.title,
+    allDay: !event.timeKnown,
+    start: event.timeKnown ? event.start : event.startDate,
+    end: event.timeKnown ? event.end : event.endDate,
+    classNames: ["planner-external", `external-${event.scope}`],
+    extendedProps: {
+      kind: "external",
+      externalEvent: event,
+      category: `${event.scope === "national" ? "National" : "Campus / local"} · Synthetic scenario`,
+      timeLabel,
+      listTimes: event.timeKnown
+        ? listEventTimes({ allDay: false, start: event.start, end: event.end })
+        : ["Time unknown"],
+    },
+  };
+}

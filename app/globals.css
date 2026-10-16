@@ -1095,3 +1095,227 @@ button.planner-analyze:hover {
     margin-right: 20px;
   }
 }
+
+/* Planner intelligence: shared semantic colors, no overall-score palette yet. */
+@theme {
+  --color-external-campus: #38556b;
+  --color-external-national: #635033;
+  --color-preparation: #1e407c;
+  --width-week-summary: 164px;
+}
+.audience-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+.audience-shortcuts .control {
+  font-size: 12px;
+  padding: 7px;
+  min-height: 36px;
+}
+.audience-shortcuts [aria-pressed="true"] {
+  background: var(--color-day-group);
+  border-color: var(--color-primary);
+}
+.planning-scope {
+  margin: 12px 0 20px;
+}
+.planner-month-surface {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--width-week-summary);
+  align-items: start;
+}
+.planner-month-surface > .fc {
+  min-width: 0;
+}
+.planner-month-surface .fc-daygrid-day-frame {
+  min-height: 210px;
+}
+.weekly-summary-column {
+  border-right: 1px solid var(--color-border);
+  min-width: 0;
+}
+.weekly-column-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-block: 1px solid var(--color-border);
+  background: var(--color-day-group);
+  font-size: 12px;
+  font-weight: 600;
+}
+.weekly-summary-cell {
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  min-width: 0;
+}
+.weekly-summary-trigger {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  color: var(--color-foreground);
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.weekly-summary-trigger:hover {
+  background: var(--color-day-group);
+}
+.weekly-summary-trigger:focus-visible {
+  outline-offset: -4px;
+}
+.week-summary-date {
+  font-weight: 600;
+}
+.weekly-counts {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+}
+.weekly-counts > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+.weekly-summary-trigger .field-help {
+  font-size: 11px;
+}
+.compact-weekly-summaries {
+  margin-top: 24px;
+}
+.compact-weekly-summaries > h3 {
+  font-size: 17px;
+  font-weight: 600;
+}
+.compact-weekly-summaries > .field-help {
+  margin-bottom: 12px;
+}
+.compact-weekly-summaries .weekly-summary-cell {
+  margin-bottom: 12px;
+  border: 1px solid var(--color-border);
+}
+.compact-weekly-summaries .weekly-summary-trigger {
+  padding: 12px 16px;
+  font-size: 13px;
+}
+.compact-weekly-summaries .weekly-counts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 24px;
+}
+.weekly-detail-records {
+  margin: 10px 0 24px;
+}
+.weekly-detail-records li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+.weekly-detail-records span {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-foreground-muted);
+  font-size: 13px;
+}
+.weekly-detail-records strong {
+  font-weight: 600;
+}
+.event-dialog h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 20px;
+}
+.event-dialog {
+  overflow-wrap: anywhere;
+}
+.planner-external {
+  border-left: 3px solid var(--color-external-campus) !important;
+}
+.external-national {
+  border-left-color: var(--color-external-national) !important;
+}
+.external-indicator {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-external-campus);
+  white-space: normal;
+}
+.external-national .external-indicator {
+  color: var(--color-external-national);
+}
+.fc-daygrid-event.planner-external {
+  background: var(--color-surface-muted);
+  border-width: 0 !important;
+  padding: 2px;
+}
+.external-indicator > span:first-child {
+  font-size: 8px;
+}
+.pressure-preview {
+  margin: 12px 0 20px;
+  padding: 12px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+}
+.pressure-preview .choice {
+  font-weight: 500;
+}
+.pressure-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+.pressure-day {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+.pressure-day h3 {
+  font-size: 12px;
+  font-weight: 600;
+}
+.pressure-day p {
+  margin: 8px 0;
+}
+.preparation-value {
+  font-weight: 500;
+}
+.preparation-track {
+  height: 4px;
+  background: var(--color-border);
+}
+.preparation-track span {
+  display: block;
+  height: 100%;
+  background: var(--color-preparation);
+}
+.pressure-day summary {
+  cursor: pointer;
+  text-decoration: underline;
+}
+@media (max-width: 767px) {
+  .compact-weekly-summaries .weekly-counts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.weekly-audience-tags {
+  font-size: 11px;
+  color: var(--color-foreground-muted);
+}
+/* Week columns can share time slots; retain complete clocks without lateral scrolling. */
+.planner-context .fc-timegrid-event {
+  padding: 4px 3px;
+}
+.planner-context .fc-timegrid-event .time-part {
+  white-space: normal;
+}
+.planner-context .fc-timegrid-event .event-title {
+  overflow-wrap: break-word;
+}
