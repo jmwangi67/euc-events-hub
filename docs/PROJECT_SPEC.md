@@ -309,7 +309,7 @@ However, the score must:
 - Acknowledge missing information.
 - Avoid presenting itself as a guaranteed attendance prediction.
 
-**Numerical scheduling-pressure scoring is not included in Milestone 1.**
+**Numerical overall scheduling-pressure scoring remains excluded.** The approved PR #5 expansion permits the isolated experimental exam-preparation model described in ADR 003, with independent review required.
 
 The initial prototype will identify explicit conflicts instead.
 
@@ -595,7 +595,7 @@ Milestone 1 will not include:
 - Multi-university deployment.
 - User-selectable time zones.
 - Room reservations.
-- Numerical scheduling-pressure scores.
+- Numerical overall scheduling-pressure scores (experimental exam preparation is separately authorized by ADR 003).
 
 ## 17. Product Success Criteria
 
@@ -627,3 +627,7 @@ The following decisions remain outstanding:
 8. Production operating costs and funding responsibilities.
 
 These decisions should be addressed before the relevant production milestones rather than blocking the initial synthetic-data prototype.
+
+## Approved Milestone 1C expansion (PR #5)
+
+See [ADR 003](decisions/003-weekly-planning-intelligence.md) for audience semantics, curated many-to-many clusters, typical-level exam uncertainty, separate synthetic campus/local and national commitments, weekly Sunday–Saturday summaries, preparation equations and examples, and the overall-score approval gate. Calendar display toggles never narrow analysis. The student calendar and existing module/technology boundaries remain intact. No live schedules, empirical attendance claims, dark mode or production services are introduced.

@@ -209,7 +209,7 @@ Do not introduce production backend services unless explicitly approved.
 
 Implement exam overlays, planning audience controls, explicit conflicts, and explanatory planning information.
 
-Do not implement numerical scheduling-pressure scoring or real officer accounts.
+Do not implement numerical overall scheduling-pressure scoring or real officer accounts. The explicitly approved PR #5 expansion permits an isolated, labeled experimental exam-preparation model and weekly intelligence; see ADR 003. Overall scoring remains gated pending methodology review and approval.
 
 For later milestones, follow the approved product specification and corresponding task instructions.
 

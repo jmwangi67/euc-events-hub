@@ -177,7 +177,7 @@ describe("fixture-backed queries", () => {
         termId: "different-term",
       }),
     ).toEqual([]);
-    expect(exams).toHaveLength(2);
+    expect(exams).toHaveLength(5);
   });
   it("rejects malformed, reversed and empty windows", () => {
     expect(() => getEvents({ start: "invalid", end: "2026-10-23" })).toThrow();

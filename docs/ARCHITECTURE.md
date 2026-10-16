@@ -298,7 +298,7 @@ However:
 - The score should not be represented as a guaranteed attendance prediction.
 - Display filters should not silently change the analysis scope.
 
-**A numerical 0–100 scheduling-pressure score is not required for Milestone 1.**
+**A numerical overall scheduling-pressure score is not authorized for this prototype.** ADR 003 documents the approved PR #5 expansion: weekly factual counts, independent major/academic-level/cluster audiences, significant external scenarios, and a separately labeled experimental exam-preparation model. Overall weighting/aggregation remains a reviewed design, with `score: null`.
 
 The initial planner will show known scheduling conflicts.
 
@@ -549,7 +549,7 @@ Implement:
 - Explanatory conflict details.
 - Priority-star visual examples where useful.
 
-Do not implement production authentication, live data synchronization, or numerical pressure scoring during this milestone.
+Do not implement production authentication, live data synchronization, or numerical overall pressure scoring. The approved PR #5 expansion adds weekly intelligence and a separate experimental exam-preparation model under ADR 003.
 
 ## 16. Key Risks
 
@@ -580,3 +580,7 @@ The following decisions remain unresolved:
 8. Newsletter delivery infrastructure.
 
 These decisions should be resolved when their corresponding implementation milestones approach, rather than blocking initial frontend development.
+
+## Approved Milestone 1C expansion (PR #5)
+
+See [ADR 003](decisions/003-weekly-planning-intelligence.md) for audience semantics, curated many-to-many clusters, typical-level exam uncertainty, separate synthetic campus/local and national commitments, weekly Sunday–Saturday summaries, preparation equations and examples, and the overall-score approval gate. Calendar display toggles never narrow analysis. The student calendar and existing module/technology boundaries remain intact. No live schedules, empirical attendance claims, dark mode or production services are introduced.

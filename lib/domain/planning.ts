@@ -1,12 +1,17 @@
 import { z } from "zod";
 import {
+  academicLevelSchema,
   eventCategorySchema,
   instantSchema,
   type Event,
   type Exam,
   type Organization,
 } from "./models";
-import { isEventRelevant } from "./relevance";
+import {
+  ALL_LEVELS,
+  eventAudienceMatch,
+  examAudienceMatch,
+} from "./planning-audience";
 import { addCalendarDays, easternDayStart } from "../time/eastern";
 
 export const proposalSchema = z
@@ -15,6 +20,8 @@ export const proposalSchema = z
     start: instantSchema,
     end: instantSchema,
     category: eventCategorySchema.optional(),
+    academicLevels: z.array(academicLevelSchema).min(1).optional(),
+    clusterIds: z.array(z.string().min(1)).optional(),
     majorIds: z
       .array(z.string().min(1))
       .min(1, "Select at least one planning major."),
@@ -51,7 +58,7 @@ export function isExamRelevant(
   exam: Exam,
   majorIds: readonly string[],
 ): boolean {
-  return exam.relevantMajorIds.some((id) => majorIds.includes(id));
+  return examAudienceMatch(exam, { majorIds }).relevant;
 }
 
 /** Analysis takes the complete planning context, never calendar display filters. */
@@ -66,11 +73,7 @@ export function analyzeProposal(
   for (const event of events) {
     if (
       event.status !== "published" ||
-      !isEventRelevant(
-        event,
-        { mode: "recommended", majorIds: proposal.majorIds },
-        organizations,
-      )
+      !eventAudienceMatch(event, proposal, organizations).relevant
     )
       continue;
     const interval = event.allDay
@@ -90,15 +93,23 @@ export function analyzeProposal(
       majorIds: event.collegeWide
         ? [...proposal.majorIds]
         : proposal.majorIds.filter((id) => audience.includes(id)),
-      reason: event.collegeWide
-        ? "College-wide programming applies to the entire planning audience."
-        : event.targeting === "explicit"
-          ? "The event explicitly targets part of your planning audience."
-          : "Audience relevance is inferred from the hosts’ documented majors.",
+      reason: eventAudienceMatch(event, proposal, organizations).cluster
+        ? "The event explicitly targets a selected organization cluster; host membership alone is not used."
+        : event.collegeWide
+          ? "College-wide programming applies to the entire planning audience."
+          : event.targeting === "explicit"
+            ? "The event explicitly targets part of your planning audience."
+            : "Audience relevance is inferred from the hosts’ documented majors.",
     });
   }
   for (const exam of exams) {
-    if (!isExamRelevant(exam, proposal.majorIds)) continue;
+    if (
+      !examAudienceMatch(exam, {
+        ...proposal,
+        academicLevels: proposal.academicLevels ?? ALL_LEVELS,
+      }).relevant
+    )
+      continue;
     const interval = exam.timeKnown
       ? exam
       : {
@@ -113,8 +124,7 @@ export function analyzeProposal(
       majorIds: proposal.majorIds.filter((id) =>
         exam.relevantMajorIds.includes(id),
       ),
-      reason:
-        "The course-to-major mapping includes part of your planning audience; it is an approximation, not enrollment data.",
+      reason: `The course-to-major mapping includes part of your planning audience; it is an approximation, not enrollment data. ${examAudienceMatch(exam, proposal).explanation}`,
     });
   }
   return conflicts;
