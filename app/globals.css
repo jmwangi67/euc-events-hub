@@ -713,7 +713,7 @@ button.control[aria-pressed="true"] {
   border-bottom: 0;
 }
 .mobile-calendar .fc .fc-list-event {
-  background: var(--color-surface);
+  background: transparent;
 }
 .mobile-calendar .fc .fc-list-day:not(:first-child) th {
   border-top: 12px solid var(--color-background);
@@ -728,7 +728,18 @@ button.control[aria-pressed="true"] {
   font-weight: 600;
 }
 .mobile-calendar .fc .fc-list-event-title {
+  padding: 8px 0 0;
+  border: 0;
+}
+.mobile-calendar .fc .mobile-list-event {
   padding: 12px 14px;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.mobile-calendar .fc .fc-list-event:hover td {
+  background: transparent;
+}
+.mobile-calendar .fc .mobile-list-event:hover {
+  background: var(--color-surface-muted);
 }

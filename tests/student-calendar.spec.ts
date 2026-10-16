@@ -547,8 +547,16 @@ for (const width of [320, 375, 430, 768]) {
         time: style(".list-event-times").fontSize,
         timeWeight: style(".list-event-times").fontWeight,
         metadata: style(".event-category").fontSize,
-        divider: style(".fc-list-event-title").borderTopWidth,
-        bottomBorder: style(".fc-list-event-title").borderBottomWidth,
+        divider: style(".mobile-list-event").borderTopWidth,
+        bottomBorder: style(".mobile-list-event").borderBottomWidth,
+        leftBorder: style(".mobile-list-event").borderLeftWidth,
+        rightBorder: style(".mobile-list-event").borderRightWidth,
+        radius: style(".mobile-list-event").borderRadius,
+        cardPadding: style(".mobile-list-event").padding,
+        itemGap: style(".fc-list-event-title").paddingTop,
+        cardSurface: style(".mobile-list-event").backgroundColor,
+        pageSurface: style(".fc-list").backgroundColor,
+        shadow: style(".mobile-list-event").boxShadow,
       };
     });
     expect(styles).toEqual({
@@ -560,8 +568,26 @@ for (const width of [320, 375, 430, 768]) {
       timeWeight: "500",
       metadata: "12px",
       divider: "1px",
-      bottomBorder: "0px",
+      bottomBorder: "1px",
+      leftBorder: "1px",
+      rightBorder: "1px",
+      radius: "4px",
+      cardPadding: "12px 14px",
+      itemGap: "8px",
+      cardSurface: "rgb(255, 255, 255)",
+      pageSurface: "rgb(248, 250, 252)",
+      shadow: "none",
     });
+    const panelBox = await rows.nth(1).boundingBox();
+    const workshopBox = await rows.nth(2).boundingBox();
+    expect(workshopBox!.y - (panelBox!.y + panelBox!.height)).toBe(8);
+    const previousDayBox = await rows.nth(0).boundingBox();
+    const nextHeaderBox = await group
+      .locator(".fc-list-day-cushion")
+      .boundingBox();
+    expect(
+      nextHeaderBox!.y - (previousDayBox!.y + previousDayBox!.height),
+    ).toBe(12);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
