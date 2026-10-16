@@ -554,3 +554,114 @@ button.control[aria-pressed="true"] {
 .fc .fc-timegrid-slot {
   height: 40px;
 }
+
+/* Disclosure controls preserve the compact sidebar and its selected inputs. */
+.filter-group {
+  border-bottom: 1px solid var(--color-border);
+}
+.filter-group summary {
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.filter-group fieldset {
+  border: 0;
+  margin: 0;
+  padding-top: 0;
+}
+.filter-count {
+  color: var(--color-foreground-muted);
+  font-size: 13px;
+  margin-left: 12px;
+}
+.discovery-search {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+.range-heading {
+  margin: 0 0 16px;
+}
+.calendar-toolbar {
+  justify-content: flex-start;
+  gap: 12px 20px;
+  margin-bottom: 12px;
+}
+.view-controls {
+  margin-left: auto;
+}
+.date-jump {
+  font-size: 13px;
+  color: var(--color-foreground-muted);
+}
+.fc .fc-list-event-time,
+.fc .fc-list-event-graphic {
+  display: none;
+}
+.list-event-trigger {
+  display: grid;
+  grid-template-columns: 106px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 44px;
+}
+.list-event-times {
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.list-event-times > span,
+.list-event-times .time-part {
+  display: block;
+}
+.list-event-times .time-part {
+  white-space: nowrap;
+}
+.time-to {
+  color: var(--color-foreground-muted);
+  font-weight: 400;
+}
+@media (max-width: 1023px) {
+  .discovery-layout {
+    display: block;
+  }
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 6px 0 18px;
+    width: 100%;
+    text-align: left;
+  }
+  .filter-body {
+    display: none;
+  }
+  .filter-body.is-open {
+    display: block;
+  }
+  .discovery-search {
+    margin-top: 22px;
+  }
+}
+@media (max-width: 767px) {
+  .range-heading {
+    display: block;
+    margin-top: 0;
+  }
+  .timezone-label {
+    display: block;
+    margin-top: 4px;
+  }
+  .calendar-toolbar {
+    gap: 10px;
+  }
+  .date-jump {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .list-event-trigger {
+    grid-template-columns: 98px minmax(0, 1fr);
+    gap: 8px;
+  }
+}

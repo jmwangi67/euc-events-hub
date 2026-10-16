@@ -82,8 +82,16 @@ export function EventCalendar({
   const datesSet = (range: DatesSetArg) => setTitle(range.view.title);
   return (
     <section className="calendar-region" aria-label="Student events calendar">
+      <div className="range-heading">
+        <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
+        <span className="timezone-label">Eastern Time · EST / EDT</span>
+      </div>
       <div className="calendar-toolbar">
-        <div className="calendar-navigation">
+        <div
+          className="calendar-navigation"
+          role="group"
+          aria-label="Date navigation"
+        >
           <button
             className="control arrow-control"
             aria-label="Previous date range"
@@ -118,19 +126,6 @@ export function EventCalendar({
               </button>
             ))}
         </div>
-      </div>
-      <div className="range-heading">
-        <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
-        <span className="timezone-label">Eastern Time · EST / EDT</span>
-      </div>
-      <div className="calendar-summary">
-        <p role="status">
-          {error
-            ? "Unable to load events."
-            : count === null
-              ? "Loading events…"
-              : `${count} ${count === 1 ? "event" : "events"} in this range`}
-        </p>
         <label className="date-jump">
           Go to date{" "}
           <input
@@ -145,6 +140,15 @@ export function EventCalendar({
             }}
           />
         </label>
+      </div>
+      <div className="calendar-summary">
+        <p role="status">
+          {error
+            ? "Unable to load events."
+            : count === null
+              ? "Loading events…"
+              : `${count} ${count === 1 ? "event" : "events"} in this range`}
+        </p>
       </div>
       {error && (
         <p role="alert">
@@ -223,6 +227,23 @@ export function EventCalendar({
                   onEventSelect(info.event.id);
                 }}
               >
+                <span className="list-event-times" aria-hidden="true">
+                  {(info.event.extendedProps.listTimes as string[]).map(
+                    (time, index) => (
+                      <span key={time + index}>
+                        {time.split(", ").map((part, partIndex) => (
+                          <span className="time-part" key={partIndex}>
+                            {index === 1 &&
+                              partIndex === time.split(", ").length - 1 && (
+                                <span className="time-to">to </span>
+                              )}
+                            {part}
+                          </span>
+                        ))}
+                      </span>
+                    ),
+                  )}
+                </span>
                 {content}
               </button>
             ) : (

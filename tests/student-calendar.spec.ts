@@ -216,7 +216,7 @@ for (const width of [320, 375, 430, 768, 1440]) {
     await page.setViewportSize({ width, height: 1100 });
     await page.goto("/?date=2026-10-19");
     await expect(event(page, "Engineering welcome")).toBeVisible();
-    if (width < 768) {
+    if (width < 1024) {
       await expect(page.locator(".fc-listMonth-view")).toBeVisible();
       await page.getByRole("button", { name: "Show filters" }).click();
       await page.getByLabel("Recommended Events", { exact: true }).check();
@@ -249,5 +249,140 @@ for (const width of [320, 375, 430, 768, 1440]) {
     await page.keyboard.press("Escape");
     await expect(dialog).not.toBeVisible();
     expect(errors).toEqual([]);
+  });
+}
+
+for (const width of [1024, 1440]) {
+  test(`desktop disclosures preserve selections at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1100 });
+    await page.goto(sample);
+    await expect(
+      page.getByRole("button", { name: /Show filters|Hide filters/ }),
+    ).toBeHidden();
+    const majors = page
+      .locator("details")
+      .filter({ has: page.locator("summary", { hasText: "Majors" }) });
+    const organizations = page
+      .locator("details")
+      .filter({ has: page.locator("summary", { hasText: "Organizations" }) });
+    const categories = page.locator("details").filter({
+      has: page.locator("summary", { hasText: "Event categories" }),
+    });
+    await page
+      .getByLabel("Biomedical Engineering (BME)", { exact: true })
+      .check();
+    await page
+      .getByLabel("Example Process Engineering Society (synthetic)", {
+        exact: true,
+      })
+      .check();
+    await page.getByLabel("Corporate recruiting", { exact: true }).check();
+    for (const group of [majors, organizations, categories]) {
+      await group.locator("summary").focus();
+      await page.keyboard.press("Enter");
+      await expect(group).not.toHaveAttribute("open", "");
+    }
+    await expect(page.getByLabel("All Events", { exact: true })).toBeVisible();
+    await expect(
+      page.getByLabel("Recommended Events", { exact: true }),
+    ).toBeVisible();
+    await majors.locator("summary").click();
+    await expect(
+      page.getByLabel("Biomedical Engineering (BME)", { exact: true }),
+    ).toBeChecked();
+    await expect(organizations).not.toHaveAttribute("open", "");
+    await expect(categories).not.toHaveAttribute("open", "");
+    await organizations.locator("summary").click();
+    await categories.locator("summary").click();
+    await expect(
+      page.getByLabel("Example Process Engineering Society (synthetic)", {
+        exact: true,
+      }),
+    ).toBeChecked();
+    await expect(
+      page.getByLabel("Corporate recruiting", { exact: true }),
+    ).toBeChecked();
+  });
+}
+
+for (const width of [320, 375, 430, 768, 1023]) {
+  test(`collapsed filters, navigation and readable full time ranges at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1100 });
+    await page.goto(sample);
+    const panel = page.locator("#filter-controls");
+    await expect(panel).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Show filters 0 active filters" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: /Show filters/ }).click();
+    await page
+      .getByLabel("Biomedical Engineering (BME)", { exact: true })
+      .check();
+    await expect(page.locator(".filter-count")).toHaveText("0 active filters");
+    await page.locator("summary").filter({ hasText: "Majors" }).click();
+    await page.getByLabel("Recommended Events", { exact: true }).check();
+    await page.getByLabel("Corporate recruiting", { exact: true }).check();
+    await expect(
+      page.getByLabel("Biomedical Engineering (BME)", { exact: true }),
+    ).toBeHidden();
+    if (width === 375)
+      await page.screenshot({
+        path: "work/filters-mobile-expanded.png",
+        fullPage: true,
+      });
+    await page.getByRole("button", { name: /Hide filters/ }).click();
+    await expect(panel).toBeHidden();
+    await expect(page.locator(".filter-count")).toHaveText("3 active filters");
+    await page.getByRole("button", { name: /Show filters/ }).click();
+    await page.locator("summary").filter({ hasText: "Majors" }).click();
+    await expect(
+      page.getByLabel("Biomedical Engineering (BME)", { exact: true }),
+    ).toBeChecked();
+    await page
+      .getByRole("button", { name: "Clear filters", exact: true })
+      .first()
+      .click();
+    await page.getByRole("button", { name: /Hide filters/ }).click();
+    await expect(page.locator(".filter-count")).toHaveText("0 active filters");
+    await page.getByLabel("Go to date", { exact: true }).fill("2026-10-26");
+    await page.getByRole("button", { name: "Day", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: /October 26, 2026/ }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Next date range" }).click();
+    await expect(page.getByLabel("Go to date", { exact: true })).toHaveValue(
+      "2026-10-27",
+    );
+    await page.getByRole("button", { name: "List", exact: true }).click();
+    await expect(
+      event(page, "Design exploration days").locator(".list-event-times"),
+    ).toHaveText("All day");
+    const overnight = event(page, "Late design session").locator(
+      ".list-event-times",
+    );
+    await expect(overnight).toContainText("Oct 26");
+    await expect(overnight).toContainText("Oct 27");
+    await expect(overnight).toContainText("11:30 PM EDT");
+    await expect(overnight).toContainText("12:30 AM EDT");
+    // Every date/time token fits on one line, with intentional breaks between tokens.
+    const fits = await page
+      .locator(".time-part")
+      .evaluateAll((nodes) =>
+        nodes.every(
+          (node) =>
+            node.scrollWidth <= node.clientWidth &&
+            node.getBoundingClientRect().height < 25,
+        ),
+      );
+    expect(fits).toBe(true);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
   });
 }

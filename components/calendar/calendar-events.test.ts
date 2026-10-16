@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getEventById, getEvents } from "../../lib/data/fixtures";
 import { eventSchema } from "../../lib/domain/models";
-import { toCalendarEvent } from "./calendar-events";
+import { listEventTimes, toCalendarEvent } from "./calendar-events";
 
 describe("FullCalendar data mapping", () => {
   it("preserves occurrence IDs and timed instants", () => {
@@ -52,4 +52,24 @@ describe("FullCalendar data mapping", () => {
       ),
     ).toEqual([]);
   });
+});
+
+it("formats compact Eastern list ranges without losing overnight dates or all-day semantics", () => {
+  expect(listEventTimes(getEventById("example-industry")!)).toEqual([
+    "4:00 PM EDT",
+    "5:00 PM EDT",
+  ]);
+  expect(listEventTimes(getEventById("example-design-days")!)).toEqual([
+    "All day",
+  ]);
+  expect(listEventTimes(getEventById("example-night-build")!)).toEqual([
+    "Oct 26, 11:30 PM EDT",
+    "Oct 27, 12:30 AM EDT",
+  ]);
+  const repeatedHour = {
+    ...getEventById("example-industry")!,
+    start: "2026-11-01T01:30:00-04:00",
+    end: "2026-11-01T01:30:00-05:00",
+  };
+  expect(listEventTimes(repeatedHour)).toEqual(["1:30 AM EDT", "1:30 AM EST"]);
 });
