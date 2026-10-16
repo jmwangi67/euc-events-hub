@@ -1,5 +1,79 @@
 import { test, expect } from "@playwright/test";
 
+// Temporary diagnostics for the CI-only keyboard lifecycle failure.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    const log: unknown[] = [];
+    const ids = new WeakMap<Element, number>();
+    let nextId = 0;
+    const identify = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return null;
+      if (!ids.has(target)) ids.set(target, ++nextId);
+      return {
+        id: ids.get(target),
+        tag: target.tagName,
+        label:
+          target.getAttribute("aria-label") ?? target.textContent?.slice(0, 50),
+        connected: target.isConnected,
+      };
+    };
+    Object.assign(window, { keyboardDiagnostic: log });
+    for (const type of [
+      "keydown",
+      "keyup",
+      "click",
+      "focusin",
+      "focusout",
+      "close",
+      "cancel",
+    ]) {
+      document.addEventListener(
+        type,
+        (event) => {
+          const record = {
+            type,
+            time: performance.now(),
+            key: event instanceof KeyboardEvent ? event.key : null,
+            target: identify(event.target),
+            active: identify(document.activeElement),
+            prevented: false,
+          };
+          log.push(record);
+          queueMicrotask(() => {
+            record.prevented = event.defaultPrevented;
+          });
+        },
+        true,
+      );
+    }
+    new MutationObserver((records) => {
+      for (const record of records)
+        for (const node of record.removedNodes) {
+          if (!(node instanceof Element)) continue;
+          for (const element of [node, ...node.querySelectorAll("button, a")]) {
+            if (ids.has(element))
+              log.push({
+                type: "removed",
+                time: performance.now(),
+                target: identify(element),
+                active: identify(document.activeElement),
+              });
+          }
+        }
+    }).observe(document, { childList: true, subtree: true });
+  });
+});
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    console.log(
+      "KEYBOARD DIAGNOSTIC",
+      JSON.stringify(
+        await page.evaluate(() => Reflect.get(window, "keyboardDiagnostic")),
+      ),
+    );
+  }
+});
+
 const sample = "/?date=2026-10-19&view=listMonth";
 const event = (page: import("@playwright/test").Page, title: string) =>
   page.getByRole("button", { name: new RegExp(title) }).first();
@@ -122,6 +196,31 @@ test("supports four views, date navigation, Eastern time and keyboard details", 
     "No description has been provided.",
   );
 });
+
+for (const view of [
+  "dayGridMonth",
+  "timeGridWeek",
+  "timeGridDay",
+  "listMonth",
+]) {
+  test(`keyboard details reopen and restore focus in ${view}`, async ({
+    page,
+  }) => {
+    await page.goto(`/?date=2026-10-19&view=${view}`);
+    const trigger = event(page, "Engineering welcome");
+    await trigger.focus();
+    for (const key of ["Enter", "Space", "Enter", "Space"]) {
+      await test.step(`${key} opens, Escape closes and restores the original event`, async () => {
+        await expect(trigger).toBeFocused();
+        await page.keyboard.press(key);
+        await expect(page.getByRole("dialog")).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("dialog")).not.toBeVisible();
+        await expect(trigger).toBeFocused();
+      });
+    }
+  });
+}
 
 for (const width of [320, 375, 430, 768, 1440]) {
   test(`responsive calendar and dialog at ${width}px`, async ({ page }) => {

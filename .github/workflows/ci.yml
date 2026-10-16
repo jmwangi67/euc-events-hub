@@ -25,3 +25,9 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: chromium-failure-details
+          path: test-results/
+          retention-days: 7
