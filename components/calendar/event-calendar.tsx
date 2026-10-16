@@ -7,10 +7,10 @@ import listPlugin from "@fullcalendar/list";
 import luxonPlugin from "@fullcalendar/luxon3";
 import type { EventSourceFunc, DatesSetArg } from "@fullcalendar/core";
 import type { EventFilters } from "../../lib/data/fixtures";
-import { getEvents } from "../../lib/data/fixtures";
+import { getEvents, getOrganizations } from "../../lib/data/fixtures";
 import { DISPLAY_TIME_ZONE, easternDate } from "../../lib/time/eastern";
 import type { CalendarView } from "../../lib/domain/calendar-state";
-import { toCalendarEvent } from "./calendar-events";
+import { listRangeCrossesYears, toCalendarEvent } from "./calendar-events";
 
 type Props = {
   date: string;
@@ -42,6 +42,7 @@ export function EventCalendar({
 }: Props) {
   const calendar = useRef<FullCalendar>(null);
   const [title, setTitle] = useState("");
+  const [showGroupYear, setShowGroupYear] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [error, setError] = useState(false);
   const plugins = useMemo(
@@ -58,7 +59,22 @@ export function EventCalendar({
         });
         setCount(events.length);
         setError(false);
-        success(events.map(toCalendarEvent));
+        const organizations = getOrganizations();
+        success(
+          events.map((event) => {
+            const mapped = toCalendarEvent(event);
+            return {
+              ...mapped,
+              extendedProps: {
+                ...mapped.extendedProps,
+                hosts: organizations
+                  .filter((org) => event.hostOrganizationIds.includes(org.id))
+                  .map((org) => org.name)
+                  .join(", "),
+              },
+            };
+          }),
+        );
       } catch (cause) {
         setError(true);
         failure(
@@ -79,11 +95,30 @@ export function EventCalendar({
     api[direction]();
     onDateChange(easternDate(api.getDate().toISOString()));
   };
-  const datesSet = (range: DatesSetArg) => setTitle(range.view.title);
+  const datesSet = (range: DatesSetArg) => {
+    setTitle(range.view.title);
+    setShowGroupYear(
+      listRangeCrossesYears(
+        range.startStr.slice(0, 10),
+        range.endStr.slice(0, 10),
+      ),
+    );
+  };
   return (
-    <section className="calendar-region" aria-label="Student events calendar">
+    <section
+      className={`calendar-region ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
+      aria-label="Student events calendar"
+    >
+      <div className="range-heading">
+        <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
+        <span className="timezone-label">All Times Eastern (ET)</span>
+      </div>
       <div className="calendar-toolbar">
-        <div className="calendar-navigation">
+        <div
+          className="calendar-navigation"
+          role="group"
+          aria-label="Date navigation"
+        >
           <button
             className="control arrow-control"
             aria-label="Previous date range"
@@ -118,19 +153,6 @@ export function EventCalendar({
               </button>
             ))}
         </div>
-      </div>
-      <div className="range-heading">
-        <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
-        <span className="timezone-label">Eastern Time · EST / EDT</span>
-      </div>
-      <div className="calendar-summary">
-        <p role="status">
-          {error
-            ? "Unable to load events."
-            : count === null
-              ? "Loading events…"
-              : `${count} ${count === 1 ? "event" : "events"} in this range`}
-        </p>
         <label className="date-jump">
           Go to date{" "}
           <input
@@ -145,6 +167,15 @@ export function EventCalendar({
             }}
           />
         </label>
+      </div>
+      <div className="calendar-summary">
+        <p role="status">
+          {error
+            ? "Unable to load events."
+            : count === null
+              ? "Loading events…"
+              : `${count} ${count === 1 ? "event" : "events"} in this range`}
+        </p>
       </div>
       {error && (
         <p role="alert">
@@ -172,14 +203,24 @@ export function EventCalendar({
           eventTimeFormat={{
             hour: "numeric",
             minute: "2-digit",
-            meridiem: "short",
           }}
           slotLabelFormat={{
             hour: "numeric",
             minute: "2-digit",
-            meridiem: "short",
           }}
+          listDayFormat={
+            mobile
+              ? {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: showGroupYear ? "numeric" : undefined,
+                }
+              : undefined
+          }
+          listDaySideFormat={mobile ? false : undefined}
           eventOrder="start,title"
+          eventOrderStrict={mobile && view.startsWith("list")}
           eventInteractive
           navLinks={false}
           allDayText="All day"
@@ -199,10 +240,19 @@ export function EventCalendar({
             onEventSelect(info.event.id);
           }}
           eventContent={(info) => {
+            const cardTimes = (
+              info.event.extendedProps.listTimes as string[]
+            ).map((label) =>
+              label === "Next day" && !info.isStart ? "From prev day" : label,
+            );
             const content = (
               <span className="calendar-event-content">
                 <span className="event-time">
-                  {info.event.allDay ? "All day" : info.timeText}
+                  {cardTimes.map((part, index) => (
+                    <span className="time-part" key={index}>
+                      {part}
+                    </span>
+                  ))}
                 </span>
                 <span className="event-title">
                   {info.event.title.replace(/^Synthetic example: /, "")}
@@ -215,15 +265,51 @@ export function EventCalendar({
             return info.view.type.startsWith("list") ? (
               <button
                 type="button"
-                className="list-event-trigger"
+                className={`list-event-trigger ${mobile ? "mobile-list-event" : ""}`}
                 data-calendar-event-id={info.event.id}
-                aria-label={`${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. Fictional example. Open event details.`}
+                aria-label={`${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. ${mobile && info.event.extendedProps.hosts ? `${info.event.extendedProps.hosts}. ` : ""}Fictional example. Open event details.`}
                 onClick={(click) => {
                   click.stopPropagation();
                   onEventSelect(info.event.id);
                 }}
               >
-                {content}
+                {mobile ? (
+                  <span className="mobile-list-content">
+                    <span className="event-title">
+                      {info.event.title.replace(/^Synthetic example: /, "")}
+                    </span>
+                    <span className="list-event-times" aria-hidden="true">
+                      {cardTimes.map((part, index) => {
+                        const isNote =
+                          /Next day|From prev day|^\+\d+ days$/.test(part);
+                        return (
+                          <span
+                            className={`time-part ${isNote ? "time-note" : ""}`}
+                            key={index}
+                          >
+                            {isNote ? `(${part})` : part}
+                          </span>
+                        );
+                      })}
+                    </span>
+                    <span className="event-category">
+                      {info.event.extendedProps.category}
+                      {info.event.extendedProps.hosts &&
+                        ` · ${info.event.extendedProps.hosts}`}
+                    </span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="list-event-times" aria-hidden="true">
+                      {cardTimes.map((time, index) => (
+                        <span key={time + index}>
+                          <span className="time-part">{time}</span>
+                        </span>
+                      ))}
+                    </span>
+                    {content}
+                  </>
+                )}
               </button>
             ) : (
               content

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { DiscoveryState } from "../../lib/domain/calendar-state";
 import type {
   Major,
@@ -19,6 +19,22 @@ const toggle = (values: string[], id: string) =>
   values.includes(id)
     ? values.filter((value) => value !== id)
     : [...values, id];
+// Native disclosures retain their mounted, controlled inputs while collapsed.
+function FilterGroup({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="filter-group" open>
+      <summary>{title}</summary>
+      {children}
+    </details>
+  );
+}
+
 export function DiscoveryFilters({
   state,
   majors,
@@ -27,6 +43,11 @@ export function DiscoveryFilters({
   onReset,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const activeCount =
+    state.organizationIds.length +
+    state.categories.length +
+    (state.mode === "recommended" ? 1 + state.majorIds.length : 0) +
+    (state.search.trim() ? 1 : 0);
   return (
     <aside className="filters-panel" aria-labelledby="filters-title">
       <div className="filter-heading">
@@ -42,6 +63,9 @@ export function DiscoveryFilters({
         onClick={() => setOpen(!open)}
       >
         {open ? "Hide filters" : "Show filters"}
+        <span className="filter-count">
+          {activeCount} active {activeCount === 1 ? "filter" : "filters"}
+        </span>
       </button>
       <div
         id="filter-controls"
@@ -68,55 +92,61 @@ export function DiscoveryFilters({
             Recommended Events
           </label>
         </fieldset>
-        <fieldset aria-describedby="major-help">
-          <legend>Your engineering majors</legend>
-          <p id="major-help" className="field-help">
-            {state.mode === "all"
-              ? "Used in Recommended Events. Select one or more."
-              : "College-wide events are always included."}
-          </p>
-          {majors.map((major) => (
-            <label className="choice" key={major.id}>
-              <input
-                type="checkbox"
-                checked={state.majorIds.includes(major.id)}
-                onChange={() =>
-                  onChange({
-                    ...state,
-                    majorIds: toggle(state.majorIds, major.id),
-                  })
-                }
-              />
-              <span>
-                {major.name}{" "}
-                <span className="muted">({major.abbreviation})</span>
-              </span>
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>Organizations</legend>
-          <p className="field-help">Any host unless selected.</p>
-          {organizations.map((org) => (
-            <label className="choice" key={org.id}>
-              <input
-                type="checkbox"
-                checked={state.organizationIds.includes(org.id)}
-                onChange={() =>
-                  onChange({
-                    ...state,
-                    organizationIds: toggle(state.organizationIds, org.id),
-                  })
-                }
-              />
-              {org.name}
-            </label>
-          ))}
-        </fieldset>
-        <fieldset>
-          <legend>Event categories</legend>
-          {(Object.entries(EVENT_CATEGORIES) as [EventCategory, string][]).map(
-            ([id, label]) => (
+        <FilterGroup title="Majors">
+          <fieldset aria-describedby="major-help">
+            <legend className="sr-only">Your engineering majors</legend>
+            <p id="major-help" className="field-help">
+              {state.mode === "all"
+                ? "Used in Recommended Events. Select one or more."
+                : "College-wide events are always included."}
+            </p>
+            {majors.map((major) => (
+              <label className="choice" key={major.id}>
+                <input
+                  type="checkbox"
+                  checked={state.majorIds.includes(major.id)}
+                  onChange={() =>
+                    onChange({
+                      ...state,
+                      majorIds: toggle(state.majorIds, major.id),
+                    })
+                  }
+                />
+                <span>
+                  {major.name}{" "}
+                  <span className="muted">({major.abbreviation})</span>
+                </span>
+              </label>
+            ))}
+          </fieldset>
+        </FilterGroup>
+        <FilterGroup title="Organizations">
+          <fieldset>
+            <legend className="sr-only">Organizations</legend>
+            <p className="field-help">Any host unless selected.</p>
+            {organizations.map((org) => (
+              <label className="choice" key={org.id}>
+                <input
+                  type="checkbox"
+                  checked={state.organizationIds.includes(org.id)}
+                  onChange={() =>
+                    onChange({
+                      ...state,
+                      organizationIds: toggle(state.organizationIds, org.id),
+                    })
+                  }
+                />
+                {org.name}
+              </label>
+            ))}
+          </fieldset>
+        </FilterGroup>
+        <FilterGroup title="Event categories">
+          <fieldset>
+            <legend className="sr-only">Event categories</legend>
+            {(
+              Object.entries(EVENT_CATEGORIES) as [EventCategory, string][]
+            ).map(([id, label]) => (
               <label className="choice" key={id}>
                 <input
                   type="checkbox"
@@ -133,9 +163,9 @@ export function DiscoveryFilters({
                 />
                 {label}
               </label>
-            ),
-          )}
-        </fieldset>
+            ))}
+          </fieldset>
+        </FilterGroup>
       </div>
     </aside>
   );

@@ -22,7 +22,6 @@ export function formatTimedInstant(instant: string): string {
     year: "numeric",
     hour: "numeric",
     minute: "2-digit",
-    timeZoneName: "short",
   }).format(new Date(instant));
 }
 
@@ -111,5 +110,45 @@ export function formatEventTime(event: {
       ? `${formatAllDayDate(event.start)} · All day`
       : `${formatAllDayDate(event.start)} – ${formatAllDayDate(last)} · All day`;
   }
+  if (easternDate(event.start) === easternDate(event.end))
+    return `${formatAllDayDate(easternDate(event.start))} · ${formatEventClockRange(event)}`;
   return `${formatTimedInstant(event.start)} – ${formatTimedInstant(event.end)}`;
+}
+
+/** Presentation only: use institution-local clocks, never the browser's zone. */
+export function formatEventClockRange(event: {
+  start: string;
+  end: string;
+}): string {
+  const clock = new Intl.DateTimeFormat("en-US", {
+    timeZone: DISPLAY_TIME_ZONE,
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+  const start = clock.format(new Date(event.start));
+  const end = clock.format(new Date(event.end));
+  const samePeriod = start.slice(-2) === end.slice(-2);
+  const range = `${samePeriod ? start.slice(0, -3) : start}–${end}`;
+  // Fall-back can repeat or reverse wall-clock labels. State elapsed time to
+  // distinguish those instants without exposing zone abbreviations or offsets.
+  if (easternDate(event.start) === easternDate(event.end)) {
+    const minutes = (instant: string) => {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: DISPLAY_TIME_ZONE,
+        hour: "numeric",
+        minute: "numeric",
+        hourCycle: "h23",
+      }).formatToParts(new Date(instant));
+      return (
+        Number(parts.find((p) => p.type === "hour")!.value) * 60 +
+        Number(parts.find((p) => p.type === "minute")!.value)
+      );
+    };
+    if (minutes(event.end) <= minutes(event.start)) {
+      const elapsed = (Date.parse(event.end) - Date.parse(event.start)) / 60000;
+      return `${range} (${elapsed} min elapsed)`;
+    }
+  }
+  return range;
 }

@@ -10,6 +10,8 @@
   --color-surface: #ffffff;
   --color-surface-muted: #f1f5f9;
   --color-border: #e2e8f0;
+  --color-day-group: #e8eff7;
+  --color-event-card-border: #d1dce9;
   --color-foreground: #001e44;
   --color-foreground-muted: #475569;
   --color-foreground-inverse: #ffffff;
@@ -553,4 +555,204 @@ button.control[aria-pressed="true"] {
 /* Keep timed event titles readable without stretching the whole page. */
 .fc .fc-timegrid-slot {
   height: 40px;
+}
+
+/* Disclosure controls preserve the compact sidebar and its selected inputs. */
+.filter-group {
+  border-bottom: 1px solid var(--color-border);
+}
+.filter-group summary {
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.filter-group fieldset {
+  border: 0;
+  margin: 0;
+  padding-top: 0;
+}
+.filter-count {
+  color: var(--color-foreground-muted);
+  font-size: 13px;
+  margin-left: 12px;
+}
+.discovery-search {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+.range-heading {
+  margin: 0 0 16px;
+}
+.calendar-toolbar {
+  justify-content: flex-start;
+  gap: 12px 20px;
+  margin-bottom: 12px;
+}
+.view-controls {
+  margin-left: auto;
+}
+.date-jump {
+  font-size: 13px;
+  color: var(--color-foreground-muted);
+}
+.fc .fc-list-event-time,
+.fc .fc-list-event-graphic {
+  display: none;
+}
+.list-event-trigger {
+  display: grid;
+  grid-template-columns: 106px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-height: 44px;
+}
+.list-event-times {
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.list-event-times > span,
+.list-event-times .time-part {
+  display: block;
+}
+.list-event-times .time-part {
+  white-space: nowrap;
+}
+
+@media (max-width: 1023px) {
+  .discovery-layout {
+    display: block;
+  }
+  .filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 6px 0 18px;
+    width: 100%;
+    text-align: left;
+  }
+  .filter-body {
+    display: none;
+  }
+  .filter-body.is-open {
+    display: block;
+  }
+  .discovery-search {
+    margin-top: 22px;
+  }
+}
+@media (max-width: 767px) {
+  .range-heading {
+    display: block;
+    margin-top: 0;
+  }
+  .timezone-label {
+    display: block;
+    margin-top: 4px;
+  }
+  .calendar-toolbar {
+    gap: 10px;
+  }
+  .date-jump {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .list-event-trigger {
+    grid-template-columns: 98px minmax(0, 1fr);
+    gap: 8px;
+  }
+}
+
+.event-time .time-part {
+  white-space: nowrap;
+}
+
+/* The mobile chronological list uses FullCalendar's shared day headers. */
+.fc .mobile-list-event {
+  display: block;
+}
+.fc .mobile-list-content,
+.fc .mobile-list-content > span {
+  display: block;
+}
+.fc .mobile-list-content .event-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.fc .mobile-list-content .list-event-times {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.fc .mobile-list-content .time-part {
+  display: inline-block;
+  white-space: nowrap;
+}
+.fc .mobile-list-content .event-category {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.fc .mobile-list-content .time-note {
+  margin-left: 4px;
+}
+
+/* Shared day groups use the same hierarchy and separation through tablet. */
+.mobile-calendar .fc .fc-list {
+  border: 0;
+  background: var(--color-background);
+}
+.mobile-calendar .fc .fc-list-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.mobile-calendar .fc .fc-list-day th {
+  background: var(--color-day-group);
+  border-bottom: 0;
+}
+.mobile-calendar .fc .fc-list-event {
+  background: var(--color-day-group);
+}
+.mobile-calendar .fc .fc-list-day:not(:first-child) th {
+  border-top: 16px solid var(--color-background);
+}
+.mobile-calendar .fc .fc-list-day-cushion {
+  background: var(--color-day-group);
+  padding: 8px 8px 0;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.mobile-calendar .fc .fc-list-day-text {
+  font-weight: 600;
+}
+.mobile-calendar .fc .fc-list-event-title {
+  padding: 8px 8px 0;
+  border: 0;
+}
+.mobile-calendar .fc .mobile-list-event {
+  padding: 12px 14px;
+  border: 1px solid var(--color-event-card-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+}
+.mobile-calendar .fc .fc-list-event:hover td {
+  background: transparent;
+}
+.mobile-calendar .fc .mobile-list-event:hover {
+  background: var(--color-surface-muted);
+}
+
+/* Shared row backgrounds form one day section without changing table semantics. */
+.mobile-calendar .fc .fc-list-day + .fc-list-event .fc-list-event-title {
+  padding-top: 4px;
+}
+.mobile-calendar .fc .fc-list-event:has(+ .fc-list-day) .fc-list-event-title,
+.mobile-calendar .fc .fc-list-event:last-child .fc-list-event-title {
+  padding-bottom: 8px;
 }
