@@ -304,7 +304,7 @@ export function EventCalendar(props: EventCalendarProps) {
             minute: "2-digit",
           }}
           listDayFormat={
-            mobile
+            mobile || planning
               ? {
                   weekday: "long",
                   month: "long",
@@ -313,7 +313,7 @@ export function EventCalendar(props: EventCalendarProps) {
                 }
               : undefined
           }
-          listDaySideFormat={mobile ? false : undefined}
+          listDaySideFormat={mobile || planning ? false : undefined}
           eventOrder="start,title"
           eventOrderStrict={mobile && view.startsWith("list")}
           eventInteractive

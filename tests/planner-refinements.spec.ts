@@ -69,6 +69,18 @@ test("planner has five distinct views with hourly grids only in 1 Week and Day",
         "Awaiting methodology review",
       );
     if (name === "Month" || name === "2 Weeks") await aligned(page);
+    if (name === "List") {
+      await expect(page.locator(".fc-list-day").first()).toContainText(
+        "Monday, October 19",
+      );
+      expect(
+        await page
+          .locator(".fc-list-day")
+          .evaluateAll((headers) =>
+            headers.every((header) => Boolean(header.textContent?.trim())),
+          ),
+      ).toBe(true);
+    }
     await noOverflow(page);
     await page.locator(".calendar-region").screenshot({
       path: `work/refined-${name.replaceAll(" ", "-").toLowerCase()}-1440.png`,
