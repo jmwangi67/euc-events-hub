@@ -37,9 +37,17 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
     heading.current?.focus();
     return () => {
       element.close();
-      if (previousFocus?.isConnected) previousFocus.focus();
+      // FullCalendar may replace the opener during a responsive view change.
+      const trigger =
+        previousFocus?.isConnected &&
+        previousFocus.dataset.calendarEventId === event.id
+          ? previousFocus
+          : document.querySelector<HTMLElement>(
+              `[data-calendar-event-id="${CSS.escape(event.id)}"]`,
+            );
+      trigger?.focus();
     };
-  }, []);
+  }, [event.id]);
   return (
     <dialog
       ref={dialog}
@@ -71,6 +79,12 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
           first.focus();
         }
       }}
+      onCancel={(cancel) => {
+        // Native dismissal restores focus before its queued close notification.
+        // Clear React's selection now, so immediate reactivation is not a no-op.
+        cancel.preventDefault();
+        onClose();
+      }}
       onClose={onClose}
       onClick={(e) => {
         if (e.target !== e.currentTarget) return;
@@ -81,14 +95,14 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
           e.clientY < box.top ||
           e.clientY > box.bottom
         )
-          e.currentTarget.close();
+          onClose();
       }}
     >
       <div className="dialog-top">
         <span className="eyebrow">Event details</span>
         <button
           className="control"
-          onClick={() => dialog.current?.close()}
+          onClick={onClose}
           aria-label="Close event details"
         >
           Close ×

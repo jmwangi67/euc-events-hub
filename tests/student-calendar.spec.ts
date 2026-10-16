@@ -1,79 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-// Temporary diagnostics for the CI-only keyboard lifecycle failure.
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    const log: unknown[] = [];
-    const ids = new WeakMap<Element, number>();
-    let nextId = 0;
-    const identify = (target: EventTarget | null) => {
-      if (!(target instanceof Element)) return null;
-      if (!ids.has(target)) ids.set(target, ++nextId);
-      return {
-        id: ids.get(target),
-        tag: target.tagName,
-        label:
-          target.getAttribute("aria-label") ?? target.textContent?.slice(0, 50),
-        connected: target.isConnected,
-      };
-    };
-    Object.assign(window, { keyboardDiagnostic: log });
-    for (const type of [
-      "keydown",
-      "keyup",
-      "click",
-      "focusin",
-      "focusout",
-      "close",
-      "cancel",
-    ]) {
-      document.addEventListener(
-        type,
-        (event) => {
-          const record = {
-            type,
-            time: performance.now(),
-            key: event instanceof KeyboardEvent ? event.key : null,
-            target: identify(event.target),
-            active: identify(document.activeElement),
-            prevented: false,
-          };
-          log.push(record);
-          queueMicrotask(() => {
-            record.prevented = event.defaultPrevented;
-          });
-        },
-        true,
-      );
-    }
-    new MutationObserver((records) => {
-      for (const record of records)
-        for (const node of record.removedNodes) {
-          if (!(node instanceof Element)) continue;
-          for (const element of [node, ...node.querySelectorAll("button, a")]) {
-            if (ids.has(element))
-              log.push({
-                type: "removed",
-                time: performance.now(),
-                target: identify(element),
-                active: identify(document.activeElement),
-              });
-          }
-        }
-    }).observe(document, { childList: true, subtree: true });
-  });
-});
-test.afterEach(async ({ page }, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    console.log(
-      "KEYBOARD DIAGNOSTIC",
-      JSON.stringify(
-        await page.evaluate(() => Reflect.get(window, "keyboardDiagnostic")),
-      ),
-    );
-  }
-});
-
 const sample = "/?date=2026-10-19&view=listMonth";
 const event = (page: import("@playwright/test").Page, title: string) =>
   page.getByRole("button", { name: new RegExp(title) }).first();
@@ -195,6 +121,67 @@ test("supports four views, date navigation, Eastern time and keyboard details", 
   await expect(page.getByRole("dialog")).toContainText(
     "No description has been provided.",
   );
+});
+
+test("Escape synchronizes dismissal before a queued native close notification", async ({
+  page,
+}) => {
+  await page.goto(sample);
+  const trigger = event(page, "Engineering welcome");
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  const previousDialog = await dialog.elementHandle();
+  // A browser may restore focus before dispatching its asynchronous close event.
+  // Hold that notification so reopening cannot depend on its timing.
+  await dialog.evaluate((element) => {
+    element.addEventListener(
+      "close",
+      (close) => close.stopImmediatePropagation(),
+      { capture: true, once: true },
+    );
+  });
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(dialog).toBeVisible();
+  // A late notification from the old dialog must not close the new one.
+  await previousDialog!.evaluate((element) =>
+    element.dispatchEvent(new Event("close")),
+  );
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+});
+
+test("restores the same event after FullCalendar replaces its responsive view", async ({
+  page,
+}) => {
+  await page.goto("/?date=2026-10-19&view=dayGridMonth");
+  const trigger = event(page, "Engineering welcome");
+  await trigger.focus();
+  const originalTrigger = await trigger.elementHandle();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.setViewportSize({ width: 375, height: 1100 });
+  await expect(
+    page
+      .locator(".fc-list-event .list-event-trigger")
+      .filter({ hasText: "Engineering welcome" }),
+  ).toBeAttached();
+  expect(
+    await originalTrigger!.evaluate((element) => element.isConnected),
+  ).toBe(false);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(trigger).toBeFocused();
 });
 
 for (const view of [

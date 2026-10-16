@@ -216,6 +216,7 @@ export function EventCalendar({
               <button
                 type="button"
                 className="list-event-trigger"
+                data-calendar-event-id={info.event.id}
                 aria-label={`${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. Fictional example. Open event details.`}
                 onClick={(click) => {
                   click.stopPropagation();
@@ -232,6 +233,7 @@ export function EventCalendar({
             // List titles use native buttons; retain the table's row semantics.
             if (info.view.type.startsWith("list")) return;
             const trigger = info.el;
+            trigger.dataset.calendarEventId = info.event.id;
             trigger.tabIndex = 0;
             trigger.setAttribute("role", "button");
             trigger.onkeydown = (key) => {
