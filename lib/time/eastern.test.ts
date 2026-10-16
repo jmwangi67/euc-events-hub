@@ -6,25 +6,22 @@ import {
   easternWeekWindow,
   formatAllDayDate,
   formatEventTime,
+  formatEventClockRange,
   formatTimedInstant,
 } from "./eastern";
 
 describe("Eastern Time", () => {
-  it("displays EST and EDT irrespective of the system time zone", () => {
-    expect(formatTimedInstant("2026-01-15T17:00:00Z")).toContain(
-      "12:00 PM EST",
-    );
-    expect(formatTimedInstant("2026-07-15T16:00:00Z")).toContain(
-      "12:00 PM EDT",
-    );
+  it("displays Eastern clocks without zone abbreviations", () => {
+    expect(formatTimedInstant("2026-01-15T17:00:00Z")).toContain("12:00 PM");
+    expect(formatTimedInstant("2026-07-15T16:00:00Z")).toContain("12:00 PM");
   });
   it("handles the spring DST jump", () => {
-    expect(formatTimedInstant("2026-03-08T06:59:00Z")).toContain("1:59 AM EST");
-    expect(formatTimedInstant("2026-03-08T07:00:00Z")).toContain("3:00 AM EDT");
+    expect(formatTimedInstant("2026-03-08T06:59:00Z")).toContain("1:59 AM");
+    expect(formatTimedInstant("2026-03-08T07:00:00Z")).toContain("3:00 AM");
   });
-  it("distinguishes repeated fall times", () => {
-    expect(formatTimedInstant("2026-11-01T05:30:00Z")).toContain("1:30 AM EDT");
-    expect(formatTimedInstant("2026-11-01T06:30:00Z")).toContain("1:30 AM EST");
+  it("converts both repeated fall instants to their correct Eastern clocks", () => {
+    expect(formatTimedInstant("2026-11-01T05:30:00Z")).toContain("1:30 AM");
+    expect(formatTimedInstant("2026-11-01T06:30:00Z")).toContain("1:30 AM");
   });
   it.each([
     ["2026-03-08", 23],
@@ -69,3 +66,27 @@ describe("Eastern Time", () => {
     expect(() => formatTimedInstant("2026-10-19T17:00:00")).toThrow();
   });
 });
+
+it.each([
+  ["2026-10-19T17:00:00-04:00", "2026-10-19T18:00:00-04:00", "5:00–6:00 PM"],
+  [
+    "2026-10-19T11:30:00-04:00",
+    "2026-10-19T12:30:00-04:00",
+    "11:30 AM–12:30 PM",
+  ],
+  ["2026-10-19T00:00:00-04:00", "2026-10-19T01:00:00-04:00", "12:00–1:00 AM"],
+  ["2026-03-08T01:30:00-05:00", "2026-03-08T03:30:00-04:00", "1:30–3:30 AM"],
+  [
+    "2026-11-01T01:30:00-04:00",
+    "2026-11-01T01:30:00-05:00",
+    "1:30–1:30 AM (60 min elapsed)",
+  ],
+])(
+  "formats concise ranges across periods and DST: %s",
+  (start, end, expected) => {
+    expect(formatEventClockRange({ start, end })).toBe(expected);
+    expect(formatEventTime({ allDay: false, start, end })).not.toMatch(
+      /\b(?:EST|EDT)\b/,
+    );
+  },
+);

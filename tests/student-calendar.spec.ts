@@ -91,7 +91,8 @@ test("supports four views, date navigation, Eastern time and keyboard details", 
   await page.keyboard.press("Enter");
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText("5:00 PM EDT");
+  await expect(dialog).toContainText("5:00–6:00 PM");
+  await expect(dialog).not.toContainText(/\b(?:EST|EDT)\b/);
   await expect(dialog).toContainText("Fictional development example");
   await expect(dialog).toContainText("Example meeting room");
   await page.keyboard.press("Tab");
@@ -116,11 +117,16 @@ test("supports four views, date navigation, Eastern time and keyboard details", 
   await page.getByRole("button", { name: "Close event details" }).click();
   await event(page, "Late design session").click();
   await expect(page.getByRole("dialog")).toContainText("Oct 27, 2026");
-  await expect(page.getByRole("dialog")).toContainText("11:30 PM EDT");
+  await expect(page.getByRole("dialog")).toContainText("11:30 PM");
   await expect(page.getByRole("dialog")).toContainText("Location not provided");
   await expect(page.getByRole("dialog")).toContainText(
     "No description has been provided.",
   );
+  await expect(page.getByRole("dialog")).not.toContainText(/\b(?:EST|EDT)\b/);
+  await page.screenshot({
+    path: "work/overnight-detail-desktop.png",
+    fullPage: true,
+  });
 });
 
 test("Escape synchronizes dismissal before a queued native close notification", async ({
@@ -195,6 +201,7 @@ for (const view of [
   }) => {
     await page.goto(`/?date=2026-10-19&view=${view}`);
     const trigger = event(page, "Engineering welcome");
+    await expect(trigger.locator(".event-time")).toHaveText("5:00–6:00 PM");
     await trigger.focus();
     for (const key of ["Enter", "Space", "Enter", "Space"]) {
       await test.step(`${key} opens, Escape closes and restores the original event`, async () => {
@@ -230,6 +237,10 @@ for (const width of [320, 375, 430, 768, 1440]) {
         .first()
         .click();
     }
+    await expect(page.locator(".timezone-label")).toHaveText(
+      "All Times Eastern (ET)",
+    );
+    await expect(page.locator("body")).not.toContainText(/\b(?:EST|EDT)\b/);
     await page.evaluate(() => document.fonts.ready);
     expect(
       await page.evaluate(
@@ -364,10 +375,30 @@ for (const width of [320, 375, 430, 768, 1023]) {
     const overnight = event(page, "Late design session").locator(
       ".list-event-times",
     );
-    await expect(overnight).toContainText("Oct 26");
-    await expect(overnight).toContainText("Oct 27");
-    await expect(overnight).toContainText("11:30 PM EDT");
-    await expect(overnight).toContainText("12:30 AM EDT");
+    await expect(overnight).toContainText("Next day");
+    await expect(
+      page
+        .getByRole("button", { name: /Late design session/ })
+        .nth(1)
+        .locator(".list-event-times"),
+    ).toContainText("From prev day");
+    await expect(overnight).toContainText("11:30 PM");
+    await expect(overnight).toContainText("12:30 AM");
+    if (width === 375) {
+      await event(page, "Late design session").click();
+      await expect(page.locator(".detail-time")).toHaveText(
+        "Oct 26, 2026, 11:30 PM – Oct 27, 2026, 12:30 AM",
+      );
+      await expect(page.getByRole("dialog")).not.toContainText(
+        /\b(?:EST|EDT)\b/,
+      );
+      await page.screenshot({
+        path: "work/overnight-detail-mobile.png",
+        fullPage: true,
+      });
+      await page.keyboard.press("Escape");
+    }
+
     // Every date/time token fits on one line, with intentional breaks between tokens.
     const fits = await page
       .locator(".time-part")

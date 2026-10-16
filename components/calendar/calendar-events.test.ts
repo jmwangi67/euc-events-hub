@@ -30,15 +30,21 @@ describe("FullCalendar data mapping", () => {
     const mapped = toCalendarEvent(getEventById("example-night-build")!);
     expect(mapped.extendedProps?.timeLabel).toContain("Oct 26, 2026");
     expect(mapped.extendedProps?.timeLabel).toContain("Oct 27, 2026");
-    expect(mapped.extendedProps?.timeLabel).toContain("EDT");
+    expect(mapped.extendedProps?.timeLabel).not.toMatch(/\b(?:EST|EDT)\b/);
   });
-  it("retains EST/EDT distinctions during the repeated fall hour", () => {
+  it("preserves repeated fall instants and disambiguates elapsed time", () => {
     const event = eventSchema.parse({
       ...getEventById("example-industry"),
       start: "2026-11-01T01:30:00-04:00",
       end: "2026-11-01T01:30:00-05:00",
     });
-    expect(toCalendarEvent(event).extendedProps?.timeLabel).toMatch(/EDT.*EST/);
+    expect(toCalendarEvent(event)).toMatchObject({
+      start: event.start,
+      end: event.end,
+    });
+    expect(toCalendarEvent(event).extendedProps?.timeLabel).toContain(
+      "1:30–1:30 AM (60 min elapsed)",
+    );
   });
   it("maps only published query results and handles empty ranges", () => {
     expect(
@@ -54,22 +60,25 @@ describe("FullCalendar data mapping", () => {
   });
 });
 
-it("formats compact Eastern list ranges without losing overnight dates or all-day semantics", () => {
+it("formats compact Eastern ranges with date-rollover and all-day cues", () => {
   expect(listEventTimes(getEventById("example-industry")!)).toEqual([
-    "4:00 PM EDT",
-    "5:00 PM EDT",
+    "4:00–5:00 PM",
   ]);
   expect(listEventTimes(getEventById("example-design-days")!)).toEqual([
     "All day",
   ]);
   expect(listEventTimes(getEventById("example-night-build")!)).toEqual([
-    "Oct 26, 11:30 PM EDT",
-    "Oct 27, 12:30 AM EDT",
+    "11:30 PM–",
+    "12:30 AM",
+    "Next day",
   ]);
   const repeatedHour = {
     ...getEventById("example-industry")!,
     start: "2026-11-01T01:30:00-04:00",
     end: "2026-11-01T01:30:00-05:00",
   };
-  expect(listEventTimes(repeatedHour)).toEqual(["1:30 AM EDT", "1:30 AM EST"]);
+  expect(listEventTimes(repeatedHour)).toEqual([
+    "1:30–1:30 AM",
+    "(60 min elapsed)",
+  ]);
 });

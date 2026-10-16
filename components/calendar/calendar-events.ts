@@ -2,7 +2,7 @@ import type { EventInput } from "@fullcalendar/core";
 import type { Event } from "../../lib/domain/models";
 import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
 import {
-  DISPLAY_TIME_ZONE,
+  formatEventClockRange,
   easternDate,
   formatEventTime,
 } from "../../lib/time/eastern";
@@ -24,21 +24,19 @@ export function toCalendarEvent(event: Event): EventInput {
   };
 }
 
-/** Full occurrence range; dates stay explicit when an event crosses midnight. */
+/** Compact cards retain full occurrence clocks, with a short date-rollover cue. */
 export function listEventTimes(
   event: Pick<Event, "allDay" | "start" | "end">,
 ): string[] {
   if (event.allDay) return ["All day"];
-  const crossesDate = easternDate(event.start) !== easternDate(event.end);
-  const format = new Intl.DateTimeFormat("en-US", {
-    timeZone: DISPLAY_TIME_ZONE,
-    ...(crossesDate ? ({ month: "short", day: "numeric" } as const) : {}),
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short",
-  });
-  return [
-    format.format(new Date(event.start)),
-    format.format(new Date(event.end)),
-  ];
+  const [range, elapsed] = formatEventClockRange(event).split(" (");
+  const days =
+    (Date.parse(easternDate(event.end)) -
+      Date.parse(easternDate(event.start))) /
+    86400000;
+  // Same-period ranges fit as a unit; otherwise break only between full clocks.
+  const labels = /AM.*PM|PM.*AM/.test(range) ? range.split(/(?<=–)/) : [range];
+  if (elapsed) labels.push(`(${elapsed}`);
+  if (days > 0) labels.push(days === 1 ? "Next day" : `+${days} days`);
+  return labels;
 }

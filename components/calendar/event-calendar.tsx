@@ -84,7 +84,7 @@ export function EventCalendar({
     <section className="calendar-region" aria-label="Student events calendar">
       <div className="range-heading">
         <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
-        <span className="timezone-label">Eastern Time · EST / EDT</span>
+        <span className="timezone-label">All Times Eastern (ET)</span>
       </div>
       <div className="calendar-toolbar">
         <div
@@ -176,12 +176,10 @@ export function EventCalendar({
           eventTimeFormat={{
             hour: "numeric",
             minute: "2-digit",
-            meridiem: "short",
           }}
           slotLabelFormat={{
             hour: "numeric",
             minute: "2-digit",
-            meridiem: "short",
           }}
           eventOrder="start,title"
           eventInteractive
@@ -203,10 +201,19 @@ export function EventCalendar({
             onEventSelect(info.event.id);
           }}
           eventContent={(info) => {
+            const cardTimes = (
+              info.event.extendedProps.listTimes as string[]
+            ).map((label) =>
+              label === "Next day" && !info.isStart ? "From prev day" : label,
+            );
             const content = (
               <span className="calendar-event-content">
                 <span className="event-time">
-                  {info.event.allDay ? "All day" : info.timeText}
+                  {cardTimes.map((part, index) => (
+                    <span className="time-part" key={index}>
+                      {part}
+                    </span>
+                  ))}
                 </span>
                 <span className="event-title">
                   {info.event.title.replace(/^Synthetic example: /, "")}
@@ -228,21 +235,11 @@ export function EventCalendar({
                 }}
               >
                 <span className="list-event-times" aria-hidden="true">
-                  {(info.event.extendedProps.listTimes as string[]).map(
-                    (time, index) => (
-                      <span key={time + index}>
-                        {time.split(", ").map((part, partIndex) => (
-                          <span className="time-part" key={partIndex}>
-                            {index === 1 &&
-                              partIndex === time.split(", ").length - 1 && (
-                                <span className="time-to">to </span>
-                              )}
-                            {part}
-                          </span>
-                        ))}
-                      </span>
-                    ),
-                  )}
+                  {cardTimes.map((time, index) => (
+                    <span key={time + index}>
+                      <span className="time-part">{time}</span>
+                    </span>
+                  ))}
                 </span>
                 {content}
               </button>

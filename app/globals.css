@@ -618,10 +618,7 @@ button.control[aria-pressed="true"] {
 .list-event-times .time-part {
   white-space: nowrap;
 }
-.time-to {
-  color: var(--color-foreground-muted);
-  font-weight: 400;
-}
+
 @media (max-width: 1023px) {
   .discovery-layout {
     display: block;
@@ -664,4 +661,8 @@ button.control[aria-pressed="true"] {
     grid-template-columns: 98px minmax(0, 1fr);
     gap: 8px;
   }
+}
+
+.event-time .time-part {
+  white-space: nowrap;
 }
