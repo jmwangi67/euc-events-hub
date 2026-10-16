@@ -562,6 +562,13 @@ for (const width of [320, 375, 430, 768]) {
         cardSurface: style(".mobile-list-event").backgroundColor,
         pageSurface: style(".fc-list").backgroundColor,
         shadow: style(".mobile-list-event").boxShadow,
+        groupSurface: style(".fc-list-event").backgroundColor,
+        headerSurface: style(".fc-list-day-cushion").backgroundColor,
+        cardBorderColor: style(".mobile-list-event").borderTopColor,
+        groupInset: style(".fc-list-event-title").paddingLeft,
+        groupBottom: style(".fc-list-event:last-child .fc-list-event-title")
+          .paddingBottom,
+        headerPadding: style(".fc-list-day-cushion").paddingTop,
       };
     });
     expect(styles).toEqual({
@@ -577,13 +584,19 @@ for (const width of [320, 375, 430, 768]) {
       leftBorder: "1px",
       rightBorder: "1px",
       radius: "4px",
-      attachedTopRadius: "0px",
+      attachedTopRadius: "4px",
       cardPadding: "12px 14px",
       itemGap: "8px",
-      headerGap: "0px",
+      headerGap: "4px",
       cardSurface: "rgb(255, 255, 255)",
       pageSurface: "rgb(248, 250, 252)",
       shadow: "none",
+      groupSurface: "rgb(232, 239, 247)",
+      headerSurface: "rgb(232, 239, 247)",
+      cardBorderColor: "rgb(209, 220, 233)",
+      groupInset: "8px",
+      groupBottom: "8px",
+      headerPadding: "8px",
     });
     const panelBox = await rows.nth(1).boundingBox();
     const workshopBox = await rows.nth(2).boundingBox();
@@ -594,15 +607,26 @@ for (const width of [320, 375, 430, 768]) {
       .boundingBox();
     expect(
       nextHeaderBox!.y - (previousDayBox!.y + previousDayBox!.height),
+    ).toBe(24);
+    const previousGroupRowBox = await rows
+      .nth(0)
+      .locator("xpath=ancestor::tr")
+      .boundingBox();
+    expect(
+      nextHeaderBox!.y - (previousGroupRowBox!.y + previousGroupRowBox!.height),
     ).toBe(16);
+    expect(panelBox!.x - nextHeaderBox!.x).toBe(8);
+    expect(
+      nextHeaderBox!.x + nextHeaderBox!.width - (panelBox!.x + panelBox!.width),
+    ).toBe(8);
     const firstHeaderBox = await headers
       .nth(0)
       .locator(".fc-list-day-cushion")
       .boundingBox();
     expect(
       previousDayBox!.y - (firstHeaderBox!.y + firstHeaderBox!.height),
-    ).toBe(0);
-    expect(panelBox!.y - (nextHeaderBox!.y + nextHeaderBox!.height)).toBe(0);
+    ).toBe(4);
+    expect(panelBox!.y - (nextHeaderBox!.y + nextHeaderBox!.height)).toBe(4);
 
     expect(
       await page.evaluate(

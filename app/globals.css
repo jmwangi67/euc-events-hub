@@ -10,6 +10,8 @@
   --color-surface: #ffffff;
   --color-surface-muted: #f1f5f9;
   --color-border: #e2e8f0;
+  --color-day-group: #e8eff7;
+  --color-event-card-border: #d1dce9;
   --color-foreground: #001e44;
   --color-foreground-muted: #475569;
   --color-foreground-inverse: #ffffff;
@@ -710,16 +712,18 @@ button.control[aria-pressed="true"] {
   border-spacing: 0;
 }
 .mobile-calendar .fc .fc-list-day th {
+  background: var(--color-day-group);
   border-bottom: 0;
 }
 .mobile-calendar .fc .fc-list-event {
-  background: transparent;
+  background: var(--color-day-group);
 }
 .mobile-calendar .fc .fc-list-day:not(:first-child) th {
   border-top: 16px solid var(--color-background);
 }
 .mobile-calendar .fc .fc-list-day-cushion {
-  padding: 12px 14px;
+  background: var(--color-day-group);
+  padding: 8px 8px 0;
   font-size: 16px;
   line-height: 1.4;
   font-weight: 600;
@@ -728,12 +732,12 @@ button.control[aria-pressed="true"] {
   font-weight: 600;
 }
 .mobile-calendar .fc .fc-list-event-title {
-  padding: 8px 0 0;
+  padding: 8px 8px 0;
   border: 0;
 }
 .mobile-calendar .fc .mobile-list-event {
   padding: 12px 14px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-event-card-border);
   border-radius: var(--radius-control);
   background: var(--color-surface);
 }
@@ -744,11 +748,11 @@ button.control[aria-pressed="true"] {
   background: var(--color-surface-muted);
 }
 
-/* Attach the first card to its shared header; later cards retain their gap. */
+/* Shared row backgrounds form one day section without changing table semantics. */
 .mobile-calendar .fc .fc-list-day + .fc-list-event .fc-list-event-title {
-  padding-top: 0;
+  padding-top: 4px;
 }
-.mobile-calendar .fc .fc-list-day + .fc-list-event .mobile-list-event {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+.mobile-calendar .fc .fc-list-event:has(+ .fc-list-day) .fc-list-event-title,
+.mobile-calendar .fc .fc-list-event:last-child .fc-list-event-title {
+  padding-bottom: 8px;
 }
