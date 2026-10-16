@@ -5,11 +5,23 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import luxonPlugin from "@fullcalendar/luxon3";
-import type { EventSourceFunc, DatesSetArg } from "@fullcalendar/core";
+import type {
+  EventSourceFunc,
+  DatesSetArg,
+  EventApi,
+  EventInput,
+} from "@fullcalendar/core";
 import type { EventFilters } from "../../lib/data/fixtures";
-import { getEvents, getOrganizations } from "../../lib/data/fixtures";
+import { getEvents, getExams, getOrganizations } from "../../lib/data/fixtures";
 import { DISPLAY_TIME_ZONE, easternDate } from "../../lib/time/eastern";
 import type { CalendarView } from "../../lib/domain/calendar-state";
+import type { Exam } from "../../lib/domain/models";
+import {
+  isExamRelevant,
+  intervalsOverlap,
+  type Proposal,
+} from "../../lib/domain/planning";
+import { toExamCalendarItem, toProposalCalendarItem } from "./planner-events";
 import { listRangeCrossesYears, toCalendarEvent } from "./calendar-events";
 
 type Props = {
@@ -21,6 +33,14 @@ type Props = {
   onEventSelect: (id: string) => void;
   onReset: () => void;
   mobile: boolean;
+  planning?: {
+    majorIds: string[];
+    proposal: Proposal | null;
+    showEvents: boolean;
+    showExams: boolean;
+    onExamSelect: (exam: Exam) => void;
+    onProposalSelect: () => void;
+  };
 };
 const views: [CalendarView, string][] = [
   ["dayGridMonth", "Month"],
@@ -39,6 +59,7 @@ export function EventCalendar({
   onEventSelect,
   onReset,
   mobile,
+  planning,
 }: Props) {
   const calendar = useRef<FullCalendar>(null);
   const [title, setTitle] = useState("");
@@ -52,29 +73,46 @@ export function EventCalendar({
   const source: EventSourceFunc = useCallback(
     (range, success, failure) => {
       try {
-        const events = getEvents({
-          start: range.startStr.slice(0, 10),
-          end: range.endStr.slice(0, 10),
-          filters,
-        });
-        setCount(events.length);
+        const events =
+          planning && !planning.showEvents
+            ? []
+            : getEvents({
+                start: range.startStr.slice(0, 10),
+                end: range.endStr.slice(0, 10),
+                filters,
+              });
         setError(false);
         const organizations = getOrganizations();
-        success(
-          events.map((event) => {
-            const mapped = toCalendarEvent(event);
-            return {
-              ...mapped,
-              extendedProps: {
-                ...mapped.extendedProps,
-                hosts: organizations
-                  .filter((org) => event.hostOrganizationIds.includes(org.id))
-                  .map((org) => org.name)
-                  .join(", "),
-              },
-            };
-          }),
-        );
+        const items: EventInput[] = events.map((event) => {
+          const mapped = toCalendarEvent(event);
+          return {
+            ...mapped,
+            extendedProps: {
+              ...mapped.extendedProps,
+              hosts: organizations
+                .filter((org) => event.hostOrganizationIds.includes(org.id))
+                .map((org) => org.name)
+                .join(", "),
+            },
+          };
+        });
+        if (planning?.showExams) {
+          const exams = getExams({
+            start: range.startStr.slice(0, 10),
+            end: range.endStr.slice(0, 10),
+          }).filter((exam) => isExamRelevant(exam, planning.majorIds));
+          items.push(...exams.map(toExamCalendarItem));
+        }
+        if (
+          planning?.proposal &&
+          intervalsOverlap(planning.proposal, {
+            start: range.startStr,
+            end: range.endStr,
+          })
+        )
+          items.push(toProposalCalendarItem(planning.proposal));
+        setCount(items.length);
+        success(items);
       } catch (cause) {
         setError(true);
         failure(
@@ -82,7 +120,7 @@ export function EventCalendar({
         );
       }
     },
-    [filters],
+    [filters, planning],
   );
   useEffect(() => {
     const api = calendar.current?.getApi();
@@ -95,6 +133,15 @@ export function EventCalendar({
     api[direction]();
     onDateChange(easternDate(api.getDate().toISOString()));
   };
+  const selectItem = (event: EventApi) => {
+    if (event.extendedProps.kind === "exam")
+      planning?.onExamSelect(event.extendedProps.exam as Exam);
+    else if (event.extendedProps.kind === "proposal")
+      planning?.onProposalSelect();
+    else onEventSelect(event.id);
+  };
+  const itemLabel = (event: EventApi) =>
+    `${event.title}. ${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${mobile && event.extendedProps.hosts ? `${event.extendedProps.hosts}. ` : ""}${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional example. Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
     setShowGroupYear(
@@ -107,7 +154,11 @@ export function EventCalendar({
   return (
     <section
       className={`calendar-region ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
-      aria-label="Student events calendar"
+      aria-label={
+        planning
+          ? "Planning calendar with academic exams"
+          : "Student events calendar"
+      }
     >
       <div className="range-heading">
         <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
@@ -174,7 +225,7 @@ export function EventCalendar({
             ? "Unable to load events."
             : count === null
               ? "Loading events…"
-              : `${count} ${count === 1 ? "event" : "events"} in this range`}
+              : `${count} ${planning ? "calendar items" : count === 1 ? "event" : "events"} in this range`}
         </p>
       </div>
       {error && (
@@ -226,18 +277,24 @@ export function EventCalendar({
           allDayText="All day"
           noEventsContent={() => (
             <div className="empty-state">
-              <h3>No published events in this range</h3>
+              <h3>
+                {planning
+                  ? "No visible planning items in this range"
+                  : "No published events in this range"}
+              </h3>
               <p>
-                Try another date, adjust your search, or clear your filters.
+                {planning
+                  ? "Try another date or restore the calendar display. Analysis remains tied to the proposal."
+                  : "Try another date, adjust your search, or clear your filters."}
               </p>
               <button className="control" onClick={onReset}>
-                Clear filters
+                {planning ? "Restore calendar display" : "Clear filters"}
               </button>
             </div>
           )}
           eventClick={(info) => {
             info.jsEvent.preventDefault();
-            onEventSelect(info.event.id);
+            selectItem(info.event);
           }}
           eventContent={(info) => {
             const cardTimes = (
@@ -258,7 +315,8 @@ export function EventCalendar({
                   {info.event.title.replace(/^Synthetic example: /, "")}
                 </span>
                 <span className="event-category">
-                  {info.event.extendedProps.category} · Example
+                  {info.event.extendedProps.category}
+                  {!info.event.extendedProps.kind && " · Example"}
                 </span>
               </span>
             );
@@ -267,10 +325,10 @@ export function EventCalendar({
                 type="button"
                 className={`list-event-trigger ${mobile ? "mobile-list-event" : ""}`}
                 data-calendar-event-id={info.event.id}
-                aria-label={`${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. ${mobile && info.event.extendedProps.hosts ? `${info.event.extendedProps.hosts}. ` : ""}Fictional example. Open event details.`}
+                aria-label={itemLabel(info.event)}
                 onClick={(click) => {
                   click.stopPropagation();
-                  onEventSelect(info.event.id);
+                  selectItem(info.event);
                 }}
               >
                 {mobile ? (
@@ -325,21 +383,22 @@ export function EventCalendar({
             trigger.onkeydown = (key) => {
               if (key.key === "Enter" || key.key === " ") {
                 key.preventDefault();
-                onEventSelect(info.event.id);
+                selectItem(info.event);
               }
             };
-            trigger.setAttribute(
-              "aria-label",
-              `${info.event.title}. ${info.event.extendedProps.timeLabel}. ${info.event.extendedProps.category}. Fictional example. Open event details.`,
-            );
+            trigger.setAttribute("aria-label", itemLabel(info.event));
           }}
         />
       </div>
       {count === 0 && view !== "listMonth" && (
         <div className="empty-state">
-          <p>No published events match this range and filters.</p>
+          <p>
+            {planning
+              ? "No visible planning items match this range and display selection."
+              : "No published events match this range and filters."}
+          </p>
           <button className="control" onClick={onReset}>
-            Clear filters
+            {planning ? "Restore calendar display" : "Clear filters"}
           </button>
         </div>
       )}
