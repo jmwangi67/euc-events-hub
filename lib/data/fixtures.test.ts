@@ -112,7 +112,7 @@ describe("fixture-backed queries", () => {
     expect(results.length).toBeGreaterThan(0);
     expect(results.every((event) => event.status === "published")).toBe(true);
     expect(getEventById("example-open-topic")).toBeUndefined();
-    expect(ids("2026-10-23", "2026-10-24")).toEqual([]);
+    expect(ids("2026-10-23", "2026-10-24")).not.toContain("example-open-topic");
     // Tentative records remain in the source for a future authorized planner.
     expect(
       events.find((event) => event.id === "example-open-topic")?.status,

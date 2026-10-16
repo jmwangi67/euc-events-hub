@@ -1,4 +1,4 @@
-import { events, exams, organizations } from "../../data/fixtures";
+import { events, exams, organizations, majors } from "../../data/fixtures";
 import { dateOnlySchema } from "../domain/models";
 import type { Event, EventCategory } from "../domain/models";
 import { isEventRelevant } from "../domain/relevance";
@@ -10,6 +10,7 @@ export type EventFilters = {
   audience?: MajorSelection;
   organizationIds?: readonly string[];
   categories?: readonly EventCategory[];
+  search?: string;
 };
 
 /** Public query windows are Eastern date-only boundaries [start, end). */
@@ -43,6 +44,7 @@ export function getEvents(
   eventFixtures: readonly Event[] = events,
 ): Event[] {
   const window = parseWindow({ start, end });
+  const search = filters.search?.trim().toLowerCase() ?? "";
   return structuredClone(
     eventFixtures
       .filter(
@@ -59,7 +61,11 @@ export function getEvents(
               event.hostOrganizationIds.includes(id),
             )) &&
           (!filters.categories?.length ||
-            filters.categories.includes(event.category)),
+            filters.categories.includes(event.category)) &&
+          (!search ||
+            `${event.title} ${event.description ?? ""}`
+              .toLowerCase()
+              .includes(search)),
       )
       .sort(
         (a, b) =>
@@ -76,6 +82,9 @@ export function getEventById(
     (event) => event.id === id && event.status === "published",
   );
   return event ? structuredClone(event) : undefined;
+}
+export function getMajors() {
+  return structuredClone(majors);
 }
 export function getOrganizations() {
   return structuredClone(organizations);
