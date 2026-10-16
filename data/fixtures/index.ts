@@ -129,6 +129,44 @@ export const events = eventSchema.array().parse([
     description:
       "Fictional open studio for exchanging project ideas. The intended major audience has not yet been classified.",
   },
+  // Year-end visual-review scenario: one all-day group, then three distinct
+  // same-day rows, including an overnight occurrence across the year boundary.
+  {
+    ...base,
+    id: "example-visual-all-day",
+    title: "Synthetic example: Project showcase",
+    hostOrganizationIds: ["example-design"],
+    allDay: true,
+    start: "2026-12-30",
+    end: "2026-12-31",
+    category: "competition",
+  },
+  {
+    ...base,
+    id: "example-visual-panel",
+    title: "Synthetic example: Engineering career panel",
+    hostOrganizationIds: ["example-council"],
+    start: "2026-12-31T10:00:00-05:00",
+    end: "2026-12-31T11:00:00-05:00",
+    category: "professional-development",
+  },
+  {
+    ...base,
+    id: "example-visual-workshop",
+    title: "Synthetic example: Biomedical design workshop",
+    hostOrganizationIds: ["example-process"],
+    start: "2026-12-31T14:00:00-05:00",
+    end: "2026-12-31T15:30:00-05:00",
+    category: "technical-workshop",
+  },
+  {
+    ...base,
+    id: "example-visual-night",
+    title: "Synthetic example: Late-night build session",
+    hostOrganizationIds: ["example-design"],
+    start: "2026-12-31T23:30:00-05:00",
+    end: "2027-01-01T00:30:00-05:00",
+  },
 ]);
 export const exams = examSchema.array().parse([
   {

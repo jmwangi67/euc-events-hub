@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { getEventById, getEvents } from "../../lib/data/fixtures";
 import { eventSchema } from "../../lib/domain/models";
-import { listEventTimes, toCalendarEvent } from "./calendar-events";
+import {
+  listEventTimes,
+  listRangeCrossesYears,
+  toCalendarEvent,
+} from "./calendar-events";
 
 describe("FullCalendar data mapping", () => {
   it("preserves occurrence IDs and timed instants", () => {
@@ -53,7 +57,7 @@ describe("FullCalendar data mapping", () => {
         .map((event) => event.id),
     ).not.toContain("example-open-topic");
     expect(
-      getEvents({ start: "2027-01-01", end: "2027-01-02" }).map(
+      getEvents({ start: "2027-02-01", end: "2027-02-02" }).map(
         toCalendarEvent,
       ),
     ).toEqual([]);
@@ -119,4 +123,10 @@ it("keeps accurate, chronological ranges for multiple events sharing one Eastern
     ["2:00–3:30 PM"],
     ["11:30 PM–", "12:30 AM", "Next day"],
   ]);
+});
+
+it("adds years only when the displayed days span years, respecting exclusive ends", () => {
+  expect(listRangeCrossesYears("2026-12-01", "2027-01-01")).toBe(false);
+  expect(listRangeCrossesYears("2026-12-31", "2027-01-02")).toBe(true);
+  expect(listRangeCrossesYears("2027-01-01", "2027-02-01")).toBe(false);
 });

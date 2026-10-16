@@ -418,7 +418,7 @@ for (const width of [320, 375, 430, 768, 1023]) {
   });
 }
 
-for (const width of [320, 375, 430]) {
+for (const width of [320, 375, 430, 768]) {
   test(`mobile day groups have shared dates and title-first event rows at ${width}px`, async ({
     page,
   }) => {
@@ -429,7 +429,7 @@ for (const width of [320, 375, 430]) {
     );
     const headers = page.locator(".fc-list-day");
     await expect(headers).toHaveCount(9);
-    await expect(headers.first()).toHaveText("Monday, Oct 19");
+    await expect(headers.first()).toHaveText("Monday, October 19");
     await expect(
       page.locator('.fc-list-day[data-date="2026-10-26"]'),
     ).toHaveCount(1);
@@ -484,5 +484,112 @@ for (const width of [320, 375, 430]) {
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
+  });
+}
+
+for (const width of [320, 375, 430, 768]) {
+  test(`same-day visual scenario, day separation and year rollover at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1100 });
+    await page.goto("/?date=2026-12-31&view=listMonth");
+    await expect(
+      page.getByRole("heading", { name: "December 2026", exact: true }),
+    ).toBeVisible();
+    const headers = page.locator(".fc-list-day");
+    await expect(headers).toHaveCount(2);
+    await expect(headers.nth(0)).toHaveText("Wednesday, December 30");
+    await expect(headers.nth(1)).toHaveText("Thursday, December 31");
+    const group = page.locator('.fc-list-day[data-date="2026-12-31"]');
+    await expect(group).toHaveCount(1);
+    const rows = page.locator(".mobile-list-event");
+    await expect(rows).toHaveCount(4);
+    await expect(rows.locator(".event-title")).toHaveText([
+      "Project showcase",
+      "Engineering career panel",
+      "Biomedical design workshop",
+      "Late-night build session",
+    ]);
+    await expect(rows.nth(0).locator(".list-event-times")).toHaveText(
+      "All day",
+    );
+    await expect(rows.nth(1).locator(".list-event-times")).toHaveText(
+      "10:00–11:00 AM",
+    );
+    await expect(rows.nth(2).locator(".list-event-times")).toHaveText(
+      "2:00–3:30 PM",
+    );
+    await expect(rows.nth(3).locator(".list-event-times")).toContainText(
+      "11:30 PM–12:30 AM",
+    );
+    await expect(rows.nth(3).locator(".list-event-times")).toContainText(
+      "Next day",
+    );
+    await expect(rows.nth(1).locator(".event-category")).toContainText(
+      "Professional development · Example Engineering Council",
+    );
+    await expect(rows.nth(2).locator(".event-category")).toContainText(
+      "Technical workshop · Example Process Engineering Society",
+    );
+    await expect(rows.nth(3).locator(".event-category")).toContainText(
+      "Student organization · Example Design Collective",
+    );
+    // Three sibling rows belong to the same single FullCalendar day header.
+    await expect(group.locator("xpath=following-sibling::tr")).toHaveCount(3);
+    const styles = await page.locator(".mobile-calendar").evaluate((root) => {
+      const style = (selector: string) =>
+        getComputedStyle(root.querySelector(selector)!);
+      return {
+        header: style(".fc-list-day-cushion").fontSize,
+        headerWeight: style(".fc-list-day-text").fontWeight,
+        gap: style(".fc-list-day:not(:first-child) th").borderTopWidth,
+        title: style(".event-title").fontSize,
+        time: style(".list-event-times").fontSize,
+        timeWeight: style(".list-event-times").fontWeight,
+        metadata: style(".event-category").fontSize,
+        divider: style(".fc-list-event-title").borderTopWidth,
+        bottomBorder: style(".fc-list-event-title").borderBottomWidth,
+      };
+    });
+    expect(styles).toEqual({
+      header: "16px",
+      headerWeight: "600",
+      gap: "12px",
+      title: "15px",
+      time: "14px",
+      timeWeight: "500",
+      metadata: "12px",
+      divider: "1px",
+      bottomBorder: "0px",
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({
+      path: `work/same-day-${width}.png`,
+      fullPage: true,
+    });
+    await rows.nth(3).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator(".detail-time")).toHaveText(
+      "Dec 31, 2026, 11:30 PM – Jan 1, 2027, 12:30 AM",
+    );
+    await page.keyboard.press("Escape");
+    await expect(rows.nth(3)).toBeFocused();
+    await page.getByLabel("Go to date", { exact: true }).fill("2027-01-01");
+    await expect(
+      page.getByRole("heading", { name: "January 2027", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".fc-list-day")).toHaveText("Friday, January 1");
+    await expect(page.locator(".list-event-times")).toContainText(
+      "From prev day",
+    );
+    await expect(page.locator(".timezone-label")).toHaveText(
+      "All Times Eastern (ET)",
+    );
+    await expect(page.locator("body")).not.toContainText(/\b(?:EST|EDT)\b/);
   });
 }

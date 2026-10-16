@@ -10,7 +10,7 @@ import type { EventFilters } from "../../lib/data/fixtures";
 import { getEvents, getOrganizations } from "../../lib/data/fixtures";
 import { DISPLAY_TIME_ZONE, easternDate } from "../../lib/time/eastern";
 import type { CalendarView } from "../../lib/domain/calendar-state";
-import { toCalendarEvent } from "./calendar-events";
+import { listRangeCrossesYears, toCalendarEvent } from "./calendar-events";
 
 type Props = {
   date: string;
@@ -42,6 +42,7 @@ export function EventCalendar({
 }: Props) {
   const calendar = useRef<FullCalendar>(null);
   const [title, setTitle] = useState("");
+  const [showGroupYear, setShowGroupYear] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [error, setError] = useState(false);
   const plugins = useMemo(
@@ -94,9 +95,20 @@ export function EventCalendar({
     api[direction]();
     onDateChange(easternDate(api.getDate().toISOString()));
   };
-  const datesSet = (range: DatesSetArg) => setTitle(range.view.title);
+  const datesSet = (range: DatesSetArg) => {
+    setTitle(range.view.title);
+    setShowGroupYear(
+      listRangeCrossesYears(
+        range.startStr.slice(0, 10),
+        range.endStr.slice(0, 10),
+      ),
+    );
+  };
   return (
-    <section className="calendar-region" aria-label="Student events calendar">
+    <section
+      className={`calendar-region ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
+      aria-label="Student events calendar"
+    >
       <div className="range-heading">
         <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
         <span className="timezone-label">All Times Eastern (ET)</span>
@@ -198,7 +210,12 @@ export function EventCalendar({
           }}
           listDayFormat={
             mobile
-              ? { weekday: "long", month: "short", day: "numeric" }
+              ? {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: showGroupYear ? "numeric" : undefined,
+                }
               : undefined
           }
           listDaySideFormat={mobile ? false : undefined}

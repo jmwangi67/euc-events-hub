@@ -683,7 +683,7 @@ button.control[aria-pressed="true"] {
 .fc .mobile-list-content .list-event-times {
   margin-top: 4px;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
 }
 .fc .mobile-list-content .time-part {
   display: inline-block;
@@ -698,4 +698,37 @@ button.control[aria-pressed="true"] {
 
 .fc .mobile-list-content .time-note {
   margin-left: 4px;
+}
+
+/* Shared day groups use the same hierarchy and separation through tablet. */
+.mobile-calendar .fc .fc-list {
+  border: 0;
+  background: var(--color-background);
+}
+.mobile-calendar .fc .fc-list-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.mobile-calendar .fc .fc-list-day th {
+  border-bottom: 0;
+}
+.mobile-calendar .fc .fc-list-event {
+  background: var(--color-surface);
+}
+.mobile-calendar .fc .fc-list-day:not(:first-child) th {
+  border-top: 12px solid var(--color-background);
+}
+.mobile-calendar .fc .fc-list-day-cushion {
+  padding: 12px 14px;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+.mobile-calendar .fc .fc-list-day-text {
+  font-weight: 600;
+}
+.mobile-calendar .fc .fc-list-event-title {
+  padding: 12px 14px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
 }
