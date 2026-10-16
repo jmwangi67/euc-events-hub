@@ -118,6 +118,17 @@ export const events = eventSchema.array().parse([
     start: "2026-10-26T23:30:00-04:00",
     end: "2026-10-27T00:30:00-04:00",
   },
+  {
+    ...base,
+    id: "example-open-studio",
+    title: "Synthetic example: Open engineering studio",
+    hostOrganizationIds: ["example-council"],
+    category: "networking",
+    start: "2026-10-23T12:00:00-04:00",
+    end: "2026-10-23T13:00:00-04:00",
+    description:
+      "Fictional open studio for exchanging project ideas. The intended major audience has not yet been classified.",
+  },
 ]);
 export const exams = examSchema.array().parse([
   {

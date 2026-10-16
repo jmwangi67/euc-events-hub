@@ -6,9 +6,9 @@ import "./globals.css";
 import { SiteHeader } from "../components/site-header";
 
 export const metadata: Metadata = {
-  title: "EUC Events Hub — Foundation",
+  title: "EUC Events Hub — Student Calendar",
   description:
-    "Development foundation for engineering event discovery. All example data is synthetic.",
+    "Discover engineering events by major, organization, and category. All example data is synthetic.",
 };
 export default function RootLayout({
   children,
@@ -24,7 +24,7 @@ export default function RootLayout({
         </a>
         <SiteHeader />
         {children}
-        <footer className="mx-auto max-w-5xl border-t border-border px-5 py-6 text-sm text-foreground-muted sm:px-8">
+        <footer className="mx-auto max-w-[1440px] border-t border-border px-5 py-6 text-sm text-foreground-muted sm:px-8">
           Student-led development prototype. No official events or university
           endorsement.
         </footer>

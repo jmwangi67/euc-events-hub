@@ -1,10 +1,10 @@
 # EUC Events Hub
 
-A student-led foundation for engineering event discovery and organization planning at Penn State. Milestone 1A contains a running development shell and fixture-backed domain logic. All example events, organizations, and exams are fictional, visibly labeled synthetic, and are not official Penn State programming.
+A student-led foundation for engineering event discovery and organization planning at Penn State. Milestone 1B adds a public student calendar on the Milestone 1A fixture-backed foundation. All example events, organizations, and exams are fictional, visibly labeled synthetic, and are not official Penn State programming.
 
 ## Local development
 
-Use Node.js 22.13 or newer (Node 22 LTS is used in CI) and npm. No credentials, environment variables, database, or external service account are required.
+Use Node.js 22.13 or newer (Node 22 LTS is used in CI) and npm. No credentials, database, or external service account are required. The optional browser-test executable variable is described below.
 
 ```sh
 npm ci
@@ -21,7 +21,34 @@ npm run format:check
 npm run build
 ```
 
-`npm run typecheck` generates Next.js route types before checking TypeScript, including on a clean checkout. `npm run test:watch` runs interactive unit tests; `npm run format` formats application and configuration files without rewriting the preserved architecture documentation. GitHub Actions runs clean installation, formatting, lint, type checking, unit tests, and production build on pull requests to main and pushes to main.
+`npm run typecheck` generates Next.js route types before checking TypeScript, including on a clean checkout. `npm run test:watch` runs interactive unit tests; `npm run format` formats application and configuration files without rewriting the preserved architecture documentation. GitHub Actions runs clean installation, formatting, lint, type checking, unit tests, and production build on pull requests to main and pushes to main. It also runs the focused Chromium suite after building.
+
+## Student calendar
+
+The home page supports month, week, day, and chronological list views; previous/next/today navigation; a date jump; and published-only event details. Below 1024px, the default is a chronological month list with an optional day view. Below 768px, filters collapse behind a labeled mobile control. All displayed dates, times, week boundaries, and navigation use `America/New_York`, independently of the browser time zone.
+
+Use All Events to browse every published event, including unclassified examples. Recommended Events uses the selected majors and includes college-wide, explicitly targeted, and inherited host-audience events. Organization and category selections narrow results independently; search matches event titles and descriptions, ignoring case and surrounding whitespace. Clear filters returns to All Events and clears major, host, category, and search selections while preserving date and view.
+
+Dates, selected view, discovery mode, majors, organizations, categories, and search are reflected in shareable URL parameters. For example:
+
+```text
+/?date=2026-10-19&view=listMonth&mode=recommended&majors=bme,che
+/?date=2026-10-19&view=dayGridMonth&organizations=example-process&categories=corporate-recruiting
+```
+
+The calendar opens on the current Eastern date. “View sample dates” navigates to October 19, 2026, where the fixed synthetic fixtures are available. The published unclassified open-studio example is separate from the preserved tentative fixture, which never appears in public results. Native event dialogs support Escape, focus containment, focus restoration, and missing-detail messages. No unavailable location, description, or registration details are invented.
+
+## Browser verification
+
+A small Playwright suite exercises complete student discovery workflows against a production build. It uses a Los Angeles browser time zone to verify Eastern display and reviews 320, 375, 430, 768, and 1440px layouts, including native dialogs and keyboard behavior.
+
+```sh
+npm run build
+npx playwright install chromium
+npm run test:browser
+```
+
+To use an existing Chromium installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its executable path. The test runner starts the local production server automatically and writes screenshots to gitignored `work/` and failure artifacts to `test-results/`. Only Chromium is configured; this does not constitute formal WCAG certification or cross-browser validation.
 
 ## Selected versions
 
@@ -41,14 +68,19 @@ Exact dependency versions are pinned in `package.json` and resolved in `package-
 
 The font copyright and SIL license are preserved in `public/fonts/IBM-Plex-Sans-LICENSE.txt` and the font package's LICENSE file. Fonts are served locally; builds do not fetch Google Fonts. ESLint 9 is pinned because the current Next.js React, accessibility, and import plugins declare ESLint 9 peer compatibility; revisit the major version when those plugins support ESLint 10. No repository-wide license is introduced because project licensing and stewardship remain pending decisions.
 
+FullCalendar's React, core, day-grid, time-grid, list, and Luxon 3 connector packages are pinned together at **6.1.22**, with **Luxon 3.7.2** for named-zone calculations. This matched stable standard-plugin line supports the existing React 19 foundation and `America/New_York` without UTC coercion or fixed offsets. No premium plugin is installed. **@playwright/test 1.64.1** is a development dependency for the completed student workflows. Existing foundation dependency pins and documented vulnerability findings are retained.
+
 ## Structure
 
-- `app/`: Next.js App Router layout, minimal landing page, and semantic Tailwind tokens.
+- `app/`: Next.js App Router layout, student discovery page, and semantic Tailwind tokens.
+- `components/calendar/`: FullCalendar adapter, event mapping, student discovery composition, and accessible details.
+- `components/filters/`: Independent mode, major, organization, and category controls.
 - `components/`: Shared site header used by the application shell.
-- `lib/domain/`: Zod models and pure intended-audience relevance logic.
+- `lib/domain/`: Zod models, pure intended-audience relevance, category labels, and validated shareable calendar state.
 - `lib/data/`: Simple synchronous fixture-backed queries, detached return values, and public status filtering.
 - `lib/time/`: Eastern Time display and IANA-aware calendar boundaries.
-- `data/fixtures/`: Validated fictional majors, organizations, events, and exams.
+- `data/fixtures/`: Validated fictional majors, organizations, events, and exams. Exams remain unused by the public calendar.
+- `tests/`: Focused Chromium discovery, navigation, dialog, and responsive tests.
 - `data/local/`: Gitignored private local data; never place real datasets in fixtures.
 - `docs/`: Preserved product specification, architecture, design system, and decisions. Next.js agent-rule generation is disabled to keep the repository-owned `AGENTS.md` unchanged.
 
@@ -78,7 +110,7 @@ All timed labels use `America/New_York`, including EST/EDT. All-day labels prese
 
 ## Scope and limitations
 
-This milestone supplies a development shell, not a working calendar or planner. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, scoring, or priority allocation. Fixture IDs and academic audience mappings are development examples. Final source formats, calendar cancellation behavior, and production ownership remain future decisions. The shell is not a claim of formal WCAG compliance or university endorsement.
+This milestone supplies a fixture-backed public student calendar; organization planning is deferred. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, scoring, or priority allocation. Fixture IDs and academic audience mappings are development examples. Final source formats, calendar cancellation behavior, and production ownership remain future decisions. No exam overlays, calendar imports, or officer functionality are included. The shell is not a claim of formal WCAG compliance or university endorsement.
 
 ### Development dependency review (October 15, 2026)
 
@@ -95,3 +127,7 @@ eslint-config-next 16.4.1
 A non-breaking `eslint-config-next` 16.4.2 patch is available, but its Next.js lint plugin still pins `fast-glob` 3.3.1. Even `fast-glob` 3.3.3 (latest) still depends on `micromatch` ^4.0.8, whose latest release remains 4.0.8 and depends on `braces` ^3.0.3. The latest published `braces` is still 3.0.3, which is affected. Thus no compatible update currently resolves this advisory. The available Vitest 5.0.5 patch is outside the affected dependency chain. Dependency versions and the lockfile are retained; no forced upgrades or overrides were applied. The audit's proposed `eslint-config-next` 14.2.35 downgrade would change major versions and is not an appropriate automatic fix for this Next.js 16 foundation.
 
 The impact is potential stack-exhaustion denial of service when development tooling processes maliciously deeply nested glob patterns, potentially failing a local lint run or CI. This code is not in the production runtime, and the production-only audit reports zero vulnerabilities. ESLint 9.39.5 remains the latest 9.x release and is past upstream support; ESLint 10 is outside the declared peer ranges of the current React, accessibility, and import plugins. Recheck upstream tooling releases for a compatible fix; the unresolved development-tooling risk remains documented rather than being hidden by an incompatible upgrade.
+
+## Preview screenshots
+
+Rendered synthetic examples at [desktop width](docs/previews/student-calendar-desktop.png) and [mobile width](docs/previews/student-calendar-mobile.png). These are local test captures, not a hosted deployment.
