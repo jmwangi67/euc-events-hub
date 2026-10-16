@@ -25,6 +25,8 @@ The sole FullCalendar adapter retains seven day columns, then renders a planner-
 
 For an exam on date D, choose the **strictly preceding Saturday S** (Saturday exams use the previous Saturday). No contribution before S. Let C(t) be an Eastern calendar-day coordinate: the UTC date ordinal plus the fraction of actual elapsed time between that date's IANA-resolved Eastern midnights. A civil day has one model unit even when DST gives it 23 or 25 elapsed hours. The normalized elapsed fraction remains monotonic through repeated fall clocks; it is not a fixed-offset conversion.
 
+In the Desmos reference coordinate, `x(t) = 1 + C(t) − C(S)`: Saturday midnight is 1, Sunday 2, Monday 3, through Friday 7. The remaining-day difference is invariant to this shift.
+
 For a known start T, remaining model days r = max(0, C(T) − C(t)). While S ≤ date(t) and t < T:
 
 `P_i(t) = 10 × relevanceWeight × exp(−decay × r^exponent)`
