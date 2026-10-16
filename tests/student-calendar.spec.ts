@@ -551,9 +551,14 @@ for (const width of [320, 375, 430, 768]) {
         bottomBorder: style(".mobile-list-event").borderBottomWidth,
         leftBorder: style(".mobile-list-event").borderLeftWidth,
         rightBorder: style(".mobile-list-event").borderRightWidth,
-        radius: style(".mobile-list-event").borderRadius,
+        radius: style(".fc-list-event + .fc-list-event .mobile-list-event")
+          .borderRadius,
+        attachedTopRadius: style(".mobile-list-event").borderTopLeftRadius,
         cardPadding: style(".mobile-list-event").padding,
-        itemGap: style(".fc-list-event-title").paddingTop,
+        itemGap: style(".fc-list-event + .fc-list-event .fc-list-event-title")
+          .paddingTop,
+        headerGap: style(".fc-list-day + .fc-list-event .fc-list-event-title")
+          .paddingTop,
         cardSurface: style(".mobile-list-event").backgroundColor,
         pageSurface: style(".fc-list").backgroundColor,
         shadow: style(".mobile-list-event").boxShadow,
@@ -562,7 +567,7 @@ for (const width of [320, 375, 430, 768]) {
     expect(styles).toEqual({
       header: "16px",
       headerWeight: "600",
-      gap: "12px",
+      gap: "16px",
       title: "15px",
       time: "14px",
       timeWeight: "500",
@@ -572,8 +577,10 @@ for (const width of [320, 375, 430, 768]) {
       leftBorder: "1px",
       rightBorder: "1px",
       radius: "4px",
+      attachedTopRadius: "0px",
       cardPadding: "12px 14px",
       itemGap: "8px",
+      headerGap: "0px",
       cardSurface: "rgb(255, 255, 255)",
       pageSurface: "rgb(248, 250, 252)",
       shadow: "none",
@@ -587,7 +594,16 @@ for (const width of [320, 375, 430, 768]) {
       .boundingBox();
     expect(
       nextHeaderBox!.y - (previousDayBox!.y + previousDayBox!.height),
-    ).toBe(12);
+    ).toBe(16);
+    const firstHeaderBox = await headers
+      .nth(0)
+      .locator(".fc-list-day-cushion")
+      .boundingBox();
+    expect(
+      previousDayBox!.y - (firstHeaderBox!.y + firstHeaderBox!.height),
+    ).toBe(0);
+    expect(panelBox!.y - (nextHeaderBox!.y + nextHeaderBox!.height)).toBe(0);
+
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

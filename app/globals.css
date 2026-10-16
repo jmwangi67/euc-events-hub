@@ -716,7 +716,7 @@ button.control[aria-pressed="true"] {
   background: transparent;
 }
 .mobile-calendar .fc .fc-list-day:not(:first-child) th {
-  border-top: 12px solid var(--color-background);
+  border-top: 16px solid var(--color-background);
 }
 .mobile-calendar .fc .fc-list-day-cushion {
   padding: 12px 14px;
@@ -742,4 +742,13 @@ button.control[aria-pressed="true"] {
 }
 .mobile-calendar .fc .mobile-list-event:hover {
   background: var(--color-surface-muted);
+}
+
+/* Attach the first card to its shared header; later cards retain their gap. */
+.mobile-calendar .fc .fc-list-day + .fc-list-event .fc-list-event-title {
+  padding-top: 0;
+}
+.mobile-calendar .fc .fc-list-day + .fc-list-event .mobile-list-event {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
