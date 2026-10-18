@@ -145,7 +145,12 @@ test("BME + CHE preparation is per subgroup and unmapped exams add no numerical 
     "Cells are never added or population averaged",
   );
   await factors
-    .getByText("Inspect 6 affected audience cells", { exact: true })
+    .getByText("Advanced methodology & sources", { exact: true })
+    .click();
+  await factors
+    .getByText("Inspect all distinct subgroup estimates (2 groups)", {
+      exact: true,
+    })
     .first()
     .click();
   const bme = factors
@@ -175,7 +180,7 @@ test("eligibility explanations and preparation stay independent of display layer
   await sample(page);
   await analyze(page);
   await expect(page.locator(".proposal-factors")).toContainText(
-    "Context only, excluded from analytical factors: Synthetic major concert",
+    "Context only, excluded from analytical factors: Example major concert",
   );
   await page.getByRole("button", { name: "1 Week", exact: true }).click();
   await expect(page.locator(".overall-pressure-pending")).toHaveAttribute(
@@ -194,13 +199,13 @@ test("eligibility explanations and preparation stay independent of display layer
     "Show published events",
     "Show academic exams",
     "Show PSU-wide commitments",
-    "Show campus / local commitments",
+    "Show Local commitments",
     "Show national commitments",
   ])
     await page.getByLabel(label, { exact: true }).uncheck();
   await expect(page.locator(".preparation-value")).toHaveText(values);
   await expect(page.locator(".proposal-factors")).toContainText(
-    "Synthetic major concert",
+    "Example major concert",
   );
   await expect(page.locator(".overall-pressure-pending")).not.toContainText(
     /Overall.*\d+\s*\/\s*10|Low pressure|Moderate pressure|High pressure/,
@@ -235,7 +240,7 @@ test("Sunday week controls provide logical keyboard access and restore focus acr
     /College-wide.*PSU-wide.*audience-uncertain/,
   );
   await page
-    .getByRole("button", { name: /^Focus calendar week: Oct 18, 2026/ })
+    .getByRole("button", { name: /^Focus this week in calendar: Oct 18, 2026/ })
     .click();
   await expect(trigger).toBeFocused();
   await page.keyboard.press("Enter");

@@ -126,7 +126,7 @@ export function AudienceControls({
           </label>
         ))}
         <p className="field-help">
-          Synthetic curated memberships. {organization.name} belongs to:{" "}
+          Example organization memberships. {organization.name} belongs to:{" "}
           {clusters
             .filter((cluster) => organization.clusterIds?.includes(cluster.id))
             .map((cluster) => cluster.name)

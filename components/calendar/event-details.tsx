@@ -8,6 +8,7 @@ import type {
   OrganizationCluster,
 } from "../../lib/domain/models";
 import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
+import { sourceLabel, verificationLabel } from "../../lib/domain/source-labels";
 import { formatEventTime } from "../../lib/time/eastern";
 
 type Props = {
@@ -56,14 +57,16 @@ export function EventDetails({
     >
       {event.source.verification === "synthetic" && (
         <p className="example-note" id="event-example-note">
-          Fictional development example. This is not an official Penn State
-          event.
+          Example scenario — not a real or verified event. This is not an
+          official Penn State schedule.
         </p>
       )}
       <p className="detail-time">{formatEventTime(event)}</p>
       <dl className="event-facts">
         <div>
-          <dt>Host organization</dt>
+          <dt>
+            {hosts.length > 1 ? "Host organizations" : "Host organization"}
+          </dt>
           <dd>
             {hosts.map((host) => host.name).join(", ") ||
               "Host details not provided"}
@@ -91,9 +94,26 @@ export function EventDetails({
                 Inferred from the host organizations’ documented audience.
               </span>
             )}
-            {event.audienceEligibility && <p>{event.audienceEligibility}</p>}
           </dd>
         </div>
+        {event.audienceEligibility && (
+          <div>
+            <dt>Audience eligibility</dt>
+            <dd>{event.audienceEligibility}</dd>
+          </div>
+        )}
+        {(planningClusters || !!event.targetAcademicLevels?.length) && (
+          <div>
+            <dt>Academic-year audience</dt>
+            <dd>
+              {event.targetAcademicLevels?.length
+                ? event.targetAcademicLevels
+                    .map((level) => ACADEMIC_LEVELS[level])
+                    .join(", ")
+                : "No documented academic-year restriction."}
+            </dd>
+          </div>
+        )}
         {planningClusters && (
           <>
             <div>
@@ -110,16 +130,6 @@ export function EventDetails({
                   : "Unspecified; host membership does not imply event targeting."}
               </dd>
             </div>
-            <div>
-              <dt>Academic-level targeting</dt>
-              <dd>
-                {event.targetAcademicLevels?.length
-                  ? event.targetAcademicLevels
-                      .map((level) => ACADEMIC_LEVELS[level])
-                      .join(", ")
-                  : "No documented academic-level restriction."}
-              </dd>
-            </div>
           </>
         )}
         <div>
@@ -127,14 +137,26 @@ export function EventDetails({
           <dd>
             {event.source.url ? (
               <a href={event.source.url} rel="noreferrer" target="_blank">
-                {event.source.label} (opens a new tab)
+                {sourceLabel(event.source)} (opens a new tab)
               </a>
             ) : (
-              event.source.label
+              sourceLabel(event.source)
             )}
             <span className="field-help">
-              Verification: {event.source.verification} · Status: published
+              Verification: {verificationLabel(event.source.verification)}
             </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Record status</dt>
+          <dd>
+            {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
+            {event.source.verification === "synthetic" && (
+              <span className="field-help">
+                Example record status only; this demo has not published an
+                actual event.
+              </span>
+            )}
           </dd>
         </div>
       </dl>

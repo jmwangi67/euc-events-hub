@@ -7,6 +7,8 @@ export const EVENT_CATEGORIES: Record<EventCategory, string> = {
   networking: "Networking",
   "career-fair": "Career fair",
   "student-organization": "Student organization",
+  "general-body-meeting": "General Body Meeting (GBM)",
+  "social-recreational": "Social & Recreational",
   research: "Research",
   competition: "Competition",
 };

@@ -14,28 +14,28 @@ export const majors = majorSchema.array().parse([
 export const organizations = organizationSchema.array().parse([
   {
     id: "example-council",
-    name: "Example Engineering Council (synthetic)",
+    name: "Example Engineering Council",
     defaultMajorIds: [],
     classification: "college-wide",
     clusterIds: ["example-careers"],
   },
   {
     id: "example-process",
-    name: "Example Process Engineering Society (synthetic)",
+    name: "Example Process Engineering Society",
     defaultMajorIds: ["che"],
     classification: "academic",
     clusterIds: ["example-makers", "example-careers"],
   },
   {
     id: "example-design",
-    name: "Example Design Collective (synthetic)",
+    name: "Example Design Collective",
     defaultMajorIds: ["me", "bme"],
     classification: "project",
     clusterIds: ["example-makers"],
   },
 ]);
 const source = {
-  label: "Fictional Milestone 1A fixture",
+  label: "Example development fixture — not a real or verified event",
   verification: "synthetic" as const,
 };
 const base = {
@@ -51,7 +51,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-welcome",
-    title: "Synthetic example: Engineering welcome",
+    title: "Example Event: Engineering welcome",
     hostOrganizationIds: ["example-council"],
     collegeWide: true,
     start: "2026-10-19T17:00:00-04:00",
@@ -62,7 +62,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-process-lab",
-    title: "Synthetic example: Process lab workshop",
+    title: "Example Event: Process lab workshop",
     hostOrganizationIds: ["example-process"],
     targeting: "explicit",
     targetMajorIds: ["che"],
@@ -75,7 +75,7 @@ export const events = eventSchema.array().parse([
     id: "example-industry",
     targetClusterIds: ["example-makers", "example-careers"],
     targetAcademicLevels: ["third", "fourth", "fifth-plus"],
-    title: "Synthetic example: Bioprocess industry discussion",
+    title: "Example Event: Bioprocess industry discussion",
     hostOrganizationIds: ["example-process"],
     targeting: "explicit",
     targetMajorIds: ["che", "bme"],
@@ -87,7 +87,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-design-meeting",
-    title: "Synthetic example: Design collective meeting",
+    title: "Example Event: Design collective meeting",
     hostOrganizationIds: ["example-design"],
     targeting: "inherited",
     seriesId: "example-design-series",
@@ -97,7 +97,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-open-topic",
-    title: "Synthetic example: Topic to be announced",
+    title: "Example Event: Topic to be announced",
     hostOrganizationIds: ["example-process"],
     status: "tentative",
     start: "2026-10-23T15:00:00-04:00",
@@ -106,7 +106,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-design-days",
-    title: "Synthetic example: Design exploration days",
+    title: "Example Event: Design exploration days",
     hostOrganizationIds: ["example-design"],
     targeting: "inherited",
     allDay: true,
@@ -117,7 +117,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-night-build",
-    title: "Synthetic example: Late design session",
+    title: "Example Event: Late design session",
     hostOrganizationIds: ["example-design"],
     targeting: "inherited",
     start: "2026-10-26T23:30:00-04:00",
@@ -126,7 +126,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-open-studio",
-    title: "Synthetic example: Open engineering studio",
+    title: "Example Event: Open engineering studio",
     hostOrganizationIds: ["example-council"],
     category: "networking",
     start: "2026-10-23T12:00:00-04:00",
@@ -134,12 +134,52 @@ export const events = eventSchema.array().parse([
     description:
       "Fictional open studio for exchanging project ideas. The intended major audience has not yet been classified.",
   },
+  {
+    ...base,
+    id: "example-gbm",
+    title: "Example Event: Engineering general body meeting",
+    hostOrganizationIds: ["example-council"],
+    collegeWide: true,
+    category: "general-body-meeting",
+    start: "2026-10-21T18:00:00-04:00",
+    end: "2026-10-21T19:00:00-04:00",
+    location: "Example engineering meeting room",
+    audienceEligibility:
+      "Open to engineering students in this fictional scenario.",
+    description:
+      "Example organization meeting with member updates, project announcements, and questions. This demonstration is not a real or verified event.",
+    registrationUrl: "https://example.com/events/engineering-gbm",
+    source: {
+      ...source,
+      url: "https://example.com/events/engineering-gbm/source",
+    },
+  },
+  {
+    ...base,
+    id: "example-social",
+    title: "Example Event: Design community game night",
+    hostOrganizationIds: ["example-design"],
+    targeting: "explicit",
+    targetMajorIds: ["bme", "che", "me"],
+    targetAcademicLevels: ["first", "second", "third", "fourth", "fifth-plus"],
+    targetClusterIds: ["example-makers"],
+    category: "social-recreational",
+    start: "2026-10-21T18:30:00-04:00",
+    end: "2026-10-21T20:00:00-04:00",
+    location: "Example student activity room",
+    audienceEligibility:
+      "All listed engineering majors and academic years; no membership restriction in this example.",
+    description:
+      "A fictional community-building game night hosted by the Example Design Collective. The physical gathering and optional virtual welcome are demonstration details only.",
+    virtualMeetingUrl: "https://example.com/meetings/design-welcome",
+    registrationUrl: "https://example.com/events/design-game-night",
+  },
   // Year-end visual-review scenario: one all-day group, then three distinct
   // same-day rows, including an overnight occurrence across the year boundary.
   {
     ...base,
     id: "example-visual-all-day",
-    title: "Synthetic example: Project showcase",
+    title: "Example Event: Project showcase",
     hostOrganizationIds: ["example-design"],
     allDay: true,
     start: "2026-12-30",
@@ -149,7 +189,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-visual-panel",
-    title: "Synthetic example: Engineering career panel",
+    title: "Example Event: Engineering career panel",
     hostOrganizationIds: ["example-council"],
     start: "2026-12-31T10:00:00-05:00",
     end: "2026-12-31T11:00:00-05:00",
@@ -158,7 +198,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-visual-workshop",
-    title: "Synthetic example: Biomedical design workshop",
+    title: "Example Event: Biomedical design workshop",
     hostOrganizationIds: ["example-process"],
     start: "2026-12-31T14:00:00-05:00",
     end: "2026-12-31T15:30:00-05:00",
@@ -167,7 +207,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-visual-night",
-    title: "Synthetic example: Late-night build session",
+    title: "Example Event: Late-night build session",
     hostOrganizationIds: ["example-design"],
     start: "2026-12-31T23:30:00-05:00",
     end: "2027-01-01T00:30:00-05:00",

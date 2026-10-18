@@ -1,6 +1,11 @@
 "use client";
 import type { Exam, Major } from "../../lib/domain/models";
 import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
+import {
+  academicExamTitle,
+  sourceLabel,
+  verificationLabel,
+} from "../../lib/domain/source-labels";
 import { DetailsDialog } from "../calendar/details-dialog";
 import { examTimeLabel } from "../calendar/planner-events";
 export function ExamDetails({
@@ -15,7 +20,7 @@ export function ExamDetails({
   return (
     <DetailsDialog
       triggerId={`exam:${exam.id}`}
-      title={`Academic exam: ${exam.courseId}`}
+      title={academicExamTitle(exam.courseId)}
       titleId="exam-detail-title"
       label="Exam details"
       onClose={onClose}
@@ -75,13 +80,13 @@ export function ExamDetails({
           <dd>
             {exam.source.url ? (
               <a href={exam.source.url} target="_blank" rel="noreferrer">
-                {exam.source.label} (opens a new tab)
+                {sourceLabel(exam.source)} (opens a new tab)
               </a>
             ) : (
-              exam.source.label
+              sourceLabel(exam.source)
             )}
             <span className="field-help">
-              Verification: {exam.source.verification}
+              Verification: {verificationLabel(exam.source.verification)}
             </span>
           </dd>
         </div>

@@ -24,7 +24,7 @@ test("discovers published events, combines filters, searches, resets, and restor
   await page.getByLabel("Chemical Engineering (CHE)", { exact: true }).check();
   await expect(event(page, "Process lab workshop")).toBeVisible();
   await page
-    .getByLabel("Example Process Engineering Society (synthetic)", {
+    .getByLabel("Example Process Engineering Society", {
       exact: true,
     })
     .check();
@@ -93,7 +93,9 @@ test("supports four views, date navigation, Eastern time and keyboard details", 
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText("5:00–6:00 PM");
   await expect(dialog).not.toContainText(/\b(?:EST|EDT)\b/);
-  await expect(dialog).toContainText("Fictional development example");
+  await expect(dialog).toContainText(
+    "Example scenario — not a real or verified event",
+  );
   await expect(dialog).toContainText("Example meeting room");
   await page.keyboard.press("Tab");
   await expect(
@@ -285,7 +287,7 @@ for (const width of [1024, 1440]) {
       .getByLabel("Biomedical Engineering (BME)", { exact: true })
       .check();
     await page
-      .getByLabel("Example Process Engineering Society (synthetic)", {
+      .getByLabel("Example Process Engineering Society", {
         exact: true,
       })
       .check();
@@ -308,7 +310,7 @@ for (const width of [1024, 1440]) {
     await organizations.locator("summary").click();
     await categories.locator("summary").click();
     await expect(
-      page.getByLabel("Example Process Engineering Society (synthetic)", {
+      page.getByLabel("Example Process Engineering Society", {
         exact: true,
       }),
     ).toBeChecked();
@@ -436,7 +438,7 @@ for (const width of [320, 375, 430, 768]) {
     for (const header of await headers.all())
       await expect(header).not.toContainText("2026");
     const rows = page.locator(".mobile-list-event");
-    await expect(rows).toHaveCount(9);
+    await expect(rows).toHaveCount(11);
     const expected = [
       [
         "Engineering welcome",
@@ -526,13 +528,13 @@ for (const width of [320, 375, 430, 768]) {
       "Next day",
     );
     await expect(rows.nth(1).locator(".event-category")).toContainText(
-      "Professional development · Example Engineering Council",
+      "Professional development · Engineering · Example Event · Example Engineering Council",
     );
     await expect(rows.nth(2).locator(".event-category")).toContainText(
-      "Technical workshop · Example Process Engineering Society",
+      "Technical workshop · Engineering · Example Event · Example Process Engineering Society",
     );
     await expect(rows.nth(3).locator(".event-category")).toContainText(
-      "Student organization · Example Design Collective",
+      "Student organization · Engineering · Example Event · Example Design Collective",
     );
     // Three sibling rows belong to the same single FullCalendar day header.
     await expect(group.locator("xpath=following-sibling::tr")).toHaveCount(3);
@@ -593,7 +595,7 @@ for (const width of [320, 375, 430, 768]) {
       shadow: "none",
       groupSurface: "rgb(232, 239, 247)",
       headerSurface: "rgb(232, 239, 247)",
-      cardBorderColor: "rgb(209, 220, 233)",
+      cardBorderColor: "rgb(154, 169, 186)",
       groupInset: "8px",
       groupBottom: "8px",
       headerPadding: "8px",

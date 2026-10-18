@@ -43,13 +43,13 @@ test("planner navigation, independent display and explanatory synthetic conflict
   );
   await expect(panel(page)).toContainText("explicitly targets");
   await expect(panel(page)).toContainText("Only the exam date is known");
-  await expect(panel(page)).toContainText("Verification: synthetic");
+  await expect(panel(page)).toContainText(
+    "Verification: Demo data — not verified",
+  );
   await page.getByLabel("Show published events", { exact: true }).uncheck();
   await page.getByLabel("Show academic exams", { exact: true }).uncheck();
   await page.getByLabel("Show PSU-wide commitments", { exact: true }).uncheck();
-  await page
-    .getByLabel("Show campus / local commitments", { exact: true })
-    .uncheck();
+  await page.getByLabel("Show Local commitments", { exact: true }).uncheck();
   await page.getByLabel("Show national commitments", { exact: true }).uncheck();
   await expect(page.locator(".calendar-region .fc-event")).toHaveCount(1); // local proposal only
   await expect(panel(page)).toContainText(
@@ -80,7 +80,7 @@ test("exam overlays preserve unknown clocks and keyboard dialog focus", async ({
   await page.getByRole("button", { name: "List", exact: true }).click();
   const trigger = page
     .locator(".calendar-region")
-    .getByRole("button", { name: /Academic exam: EXAMPLE-MATH/ });
+    .getByRole("button", { name: /Academic Exam EXAMPLE-MATH/ });
   await expect(trigger).toContainText("Time unknown");
   await expect(trigger).not.toContainText(/12:00|00:00/);
   for (const key of ["Enter", "Space"]) {
@@ -89,7 +89,9 @@ test("exam overlays preserve unknown clocks and keyboard dialog focus", async ({
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toContainText("not a confirmed timed overlap");
-    await expect(dialog).toContainText("Verification: synthetic");
+    await expect(dialog).toContainText(
+      "Verification: Demo data — not verified",
+    );
     await page.keyboard.press("Tab");
     await expect(
       page.getByRole("button", { name: "Close exam details" }),
@@ -112,7 +114,7 @@ test("organization defaults, explicit audience requirement, overrides and known 
 }) => {
   await sample(page);
   await page
-    .getByLabel("Synthetic organization", { exact: true })
+    .getByLabel("Example organization", { exact: true })
     .selectOption("example-council");
   await expect(page.locator("#audience-help")).toContainText(
     "No default audience",
@@ -123,7 +125,7 @@ test("organization defaults, explicit audience requirement, overrides and known 
   );
   await expect(page.locator(".proposal-form").getByRole("alert")).toBeFocused();
   await page
-    .getByLabel("Synthetic organization", { exact: true })
+    .getByLabel("Example organization", { exact: true })
     .selectOption("example-design");
   await expect(
     page.getByLabel("Biomedical Engineering (BME)", { exact: true }),
@@ -216,7 +218,7 @@ for (const width of [320, 375, 430, 768, 1440]) {
       fullPage: true,
     });
     const trigger = panel(page).getByRole("button", {
-      name: "Academic exam: EXAMPLE-MATH",
+      name: "Academic Exam EXAMPLE-MATH",
       exact: true,
     });
     await trigger.focus();
@@ -241,7 +243,7 @@ test("exam focus stays in the calendar after responsive rerendering with a dupli
   await analyze(page);
   const trigger = page
     .locator(".calendar-region")
-    .getByRole("button", { name: /Academic exam: EXAMPLE-MATH/ });
+    .getByRole("button", { name: /Academic Exam EXAMPLE-MATH/ });
   await trigger.focus();
   const original = await trigger.elementHandle();
   await page.keyboard.press("Enter");
@@ -257,7 +259,7 @@ test("exam focus stays in the calendar after responsive rerendering with a dupli
   await expect(trigger).toBeFocused();
   await expect(
     panel(page).getByRole("button", {
-      name: "Academic exam: EXAMPLE-MATH",
+      name: "Academic Exam EXAMPLE-MATH",
       exact: true,
     }),
   ).not.toBeFocused();

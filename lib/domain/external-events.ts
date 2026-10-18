@@ -11,6 +11,8 @@ export const EXTERNAL_CATEGORIES = {
   homecoming: "Homecoming scenario",
   football: "Football scenario",
   concert: "Major concert scenario",
+  festival: "Music festival scenario",
+  "academic-break": "Academic break scenario",
   "state-college": "State College event scenario",
   election: "Major election scenario",
   "super-bowl": "Super Bowl scenario",
@@ -35,6 +37,9 @@ const fields = {
   targetMajorIds: z.array(z.string().min(1)).optional(),
   targetAcademicLevels: z.array(academicLevelSchema).optional(),
   targetClusterIds: z.array(z.string().min(1)).optional(),
+  // Explicit source-backed policy metadata; an event title never selects a policy.
+  impactPolicy: z.enum(["major-local-music", "academic-break"]).optional(),
+  policyRationale: z.string().min(1).optional(),
   geography: z.string().min(1),
   audience: z.string().min(1),
   source: sourceSchema,
@@ -80,9 +85,12 @@ export const externalEventSchema = z
       });
     const national =
       event.category === "election" || event.category === "super-bowl";
-    const universityWide = ["thon", "homecoming", "football"].includes(
-      event.category,
-    );
+    const universityWide = [
+      "thon",
+      "homecoming",
+      "football",
+      "academic-break",
+    ].includes(event.category);
     if (universityWide !== (event.scope === "psu-wide"))
       ctx.addIssue({
         code: "custom",
@@ -117,6 +125,33 @@ export const externalEventSchema = z
         code: "custom",
         path: ["end"],
         message: "End must follow start.",
+      });
+    if (event.impactPolicy && !event.policyRationale)
+      ctx.addIssue({
+        code: "custom",
+        path: ["policyRationale"],
+        message: "A scheduling policy requires its documented rationale.",
+      });
+    if (
+      event.impactPolicy === "major-local-music" &&
+      (event.scope !== "campus-local" ||
+        !["concert", "festival"].includes(event.category))
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["impactPolicy"],
+        message:
+          "The major Local music policy requires an explicitly classified Local concert or festival.",
+      });
+    if (
+      event.impactPolicy === "academic-break" &&
+      event.category !== "academic-break"
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["impactPolicy"],
+        message:
+          "Early-departure policy requires a documented academic-break record, not an ordinary holiday.",
       });
   });
 export type ExternalEvent = z.infer<typeof externalEventSchema>;

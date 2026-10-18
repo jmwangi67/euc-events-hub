@@ -1,4 +1,3 @@
-
 # EUC Events Hub: Product Specification
 
 **Status:** Draft for final architecture review  
@@ -502,7 +501,6 @@ The product will be developed incrementally.
 - Visible event source and status information.
 - Basic text search across event titles and descriptions using local fixture data.
 
-
 #### Acceptance Criteria
 
 - Calendar navigation functions.
@@ -643,3 +641,22 @@ Planner desktop views are Month, 2 Weeks (date grid), 1 Week (hourly), Day (hour
 Week/Day lead with overall scoring unavailable pending methodology review (`score: null`). Optional experimental preparation reports evening references, exact daily/proposal interval maxima and affected cells; known start cutoffs and unknown-hour ranges are distinct from direct overlaps. Saturday preparation may come from an exam in the following week without changing factual weekly exam counts. No overall score, thresholds, attendance probability or dark mode is introduced.
 
 **Future enhancement: Smart Scheduling Recommendations.** Comparing prospective dates and suggesting lower-conflict alternatives is deferred; no recommendation algorithm or UI is authorized in PR #5. See the review reconciliation and updated Claude handoff before independent re-review and any merge decision.
+
+## PR #5 master refinement: discovery and independent scheduling guidance
+
+The owner's master PR #5 request authorizes the focused refinements in [ADR 004](decisions/004-independent-scheduling-indicators.md). Student event discovery retains published-only visibility, existing major/organization/category filtering, search, keyboard activation, and source-backed details. **GBM** and **Social & Recreational** are explicit discoverable categories. Fictional records remain labeled as examples/demo data, including records that resemble PSU-wide or national commitments. The calendar-level time label remains **All Times Eastern (ET)**.
+
+Planner scheduling information has two independent sections:
+
+- **Exam Preparation** uses only the existing experimental academic model. It presents lower/upper relative estimates with solid-and-striped uncertainty bars, selected subgroup attribution, contributing/upcoming exams, and visible meaningful uncertainty. Optional **Advanced methodology & sources** preserves complete cell, timing, mapping, and contribution details. The approved mathematics and exam-source conflict handling remain unchanged.
+- **Other Scheduling Constraints** presents an unavailable numerical indicator, applicable non-exam commitments, actual overlaps, all-day context, timing uncertainty, and explicitly provisional policy advice. **Events & scheduling constraints** replaces raw factor IDs with meaningful titles, times, relevance, sources, and verification. Academic exams and exam-derived conflicts are excluded.
+
+Overall and non-exam numerical scores remain `null`. No combined score, attendance percentage, population weighting, or automatic ranking of proposed dates is approved.
+
+The optional planner **Show scheduling density** toggle starts off. Its visual bands report **0, 1, 2, or 3+ simultaneous known-time commitments** in the most affected selected major × academic-level cell. Counts do not establish validated risk levels. Disjoint majors/years are not pooled, sequential events are not simultaneous, and duplicated canonical records count once. Unknown clocks and conflicting sources do not acquire invented hours; genuine all-day events and date cautions remain separate information. A zero timed count does not establish general availability. Month/2 Weeks retain their date grids and weekly summaries; only 1 Week/Day are hourly. Compact/List layouts retain chronological groups and text cues.
+
+Specific policy guidance is authorized as a local prototype: THON avoidance covers the preceding calendar day, every event day, and the following day; a seven-day lead-up caution is weaker and never double-counted with avoidance. Explicit audience-relevant major Local music receives two elapsed hours before/after known event times. Documented fictional break scenarios caution about early departures on the preceding two calendar days. Relevant career fairs apply from Eastern midnight through their documented finish. Ordinary engineering events use actual intervals. These configurable assumptions do not predict universal participation, fabricate unknown clocks, or prohibit event creation. Only documented break classifications qualify; real official break dates must not be invented.
+
+Eligible **Avoid scheduling** guidance takes priority over ordinary **Scheduling caution** and **Review conflicts** reasons, with additional sources and uncertainty available accessibly. Cautions remain visible when density is off. Local context stays analytically excluded without explicit selected-audience applicability. Host cluster membership alone does not establish event targeting. Calendar show/hide controls do not narrow analysis or change either indicator's results.
+
+The application remains a synthetic-data prototype without authentication, live ingestion, database persistence, publication, or new paid infrastructure. Final owner visual acceptance remains required before any merge. Later numerical scoring needs an approved relevance/weighting and normalization model, source-coverage review, calibration data, uncertainty treatment, and representative validation; factual counts and policy priorities do not substitute for those decisions.

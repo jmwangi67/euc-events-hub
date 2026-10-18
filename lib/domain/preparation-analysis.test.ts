@@ -312,11 +312,23 @@ describe("exact interval and daily preparation (H2/M1/M2)", () => {
   });
 });
 describe("external eligibility and gated overall analysis", () => {
-  it("includes explicitly designated PSU-wide/national context but excludes nearby local events", () => {
-    for (const event of externalEvents)
-      expect(externalEligibility(event, audience).eligible).toBe(
-        event.scope !== "campus-local",
-      );
+  it("includes explicit PSU-wide, National and audience-targeted Local commitments but excludes nearby Local context", () => {
+    expect(
+      externalEvents
+        .filter((event) => externalEligibility(event, audience).eligible)
+        .map((event) => event.id),
+    ).toEqual([
+      "scenario-homecoming",
+      "scenario-football",
+      "scenario-thon",
+      "scenario-election",
+      "scenario-super-bowl",
+      "scenario-targeted-concert",
+      "scenario-targeted-festival",
+      "scenario-academic-break",
+      "scenario-psu-kickoff",
+      "scenario-national-forum",
+    ]);
     const renamed = {
       ...externalEvents.find((e) => e.category === "concert")!,
       title: "THON Super Bowl Election",

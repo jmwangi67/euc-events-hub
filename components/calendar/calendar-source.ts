@@ -18,6 +18,21 @@ import {
   toProposalCalendarItem,
 } from "./planner-events";
 import type { PlanningCalendarOptions } from "./calendar-types";
+import { analyzeNonExamScheduling } from "../../lib/domain/non-exam-scheduling";
+import { getWeeklyPlanningContext } from "../../lib/data/weekly-planning";
+import type { PlanningAudience } from "../../lib/domain/planning-audience";
+import { easternDayStart } from "../../lib/time/eastern";
+
+/** Analysis inputs are loaded independently of every calendar display toggle. */
+export function loadCalendarScheduling(
+  range: { start: string; end: string },
+  audience: PlanningAudience,
+) {
+  return analyzeNonExamScheduling(getWeeklyPlanningContext(range), audience, {
+    start: easternDayStart(range.start),
+    end: easternDayStart(range.end),
+  });
+}
 export function loadCalendarItems(
   range: { startStr: string; endStr: string },
   filters: EventFilters,

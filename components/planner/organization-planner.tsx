@@ -91,6 +91,7 @@ export function OrganizationPlanner({
   const [showPsuWide, setShowPsuWide] = useState(true);
   const [showCampusLocal, setShowCampusLocal] = useState(true);
   const [showNational, setShowNational] = useState(true);
+  const [showDensity, setShowDensity] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const errorSummary = useRef<HTMLDivElement>(null);
@@ -134,6 +135,7 @@ export function OrganizationPlanner({
       showPsuWide,
       showCampusLocal,
       showNational,
+      showDensity,
       onExamSelect: setSelectedExam,
       onProposalSelect: focusProposal,
     }),
@@ -145,6 +147,7 @@ export function OrganizationPlanner({
       showPsuWide,
       showCampusLocal,
       showNational,
+      showDensity,
       focusProposal,
     ],
   );
@@ -248,8 +251,8 @@ export function OrganizationPlanner({
     <>
       <div className="development-notice">
         <p>
-          <strong>Synthetic planner prototype.</strong> Fictional events and
-          exams only. Nothing is saved, approved, or submitted.
+          <strong>Demo planner — not a real schedule.</strong> Fictional events
+          and exams only. Nothing is saved, approved, or submitted.
         </p>
         <button className="text-button" onClick={sample}>
           Load sample scenario
@@ -290,10 +293,10 @@ export function OrganizationPlanner({
             </div>
           )}
           <label className="planner-field">
-            Synthetic organization
+            Example organization
             <select
               className="control"
-              aria-label="Synthetic organization"
+              aria-label="Example organization"
               value={organizationId}
               onChange={(e) => {
                 const org = organizations.find(
@@ -492,7 +495,7 @@ export function OrganizationPlanner({
                   checked={showCampusLocal}
                   onChange={(e) => setShowCampusLocal(e.target.checked)}
                 />
-                Show campus / local commitments
+                Show Local commitments
               </label>
               <label className="choice">
                 <input
@@ -503,6 +506,19 @@ export function OrganizationPlanner({
                 Show national commitments
               </label>
             </fieldset>
+            <label className="choice density-toggle">
+              <input
+                type="checkbox"
+                checked={showDensity}
+                onChange={(e) => setShowDensity(e.target.checked)}
+              />
+              Show scheduling density
+            </label>
+            <p className="field-help">
+              Density shows factual non-exam overlaps for the selected audience,
+              not attendance pressure. Turning the overlay off leaves scheduling
+              cautions and analysis intact.
+            </p>
             <p className="field-help">
               Visibility and calendar navigation do not change the proposal’s
               analysis. Academic exams use a distinct border and explicit

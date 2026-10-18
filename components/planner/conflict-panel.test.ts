@@ -65,8 +65,9 @@ describe("canonical timing uncertainty presentation", () => {
     expect(html).toContain("Time unknown");
     expect(html).toContain("Synthetic Monday source");
     expect(html).toContain("https://example.edu/synthetic-monday");
-    expect(html).toContain("Verification: unverified");
-    expect(html).toContain("Synthetic Tuesday source");
+    expect(html).toContain("Verification: Unverified");
+    expect(html).toContain("Example Tuesday source");
+    expect(html).toContain("Verification: Demo data — not verified");
     expect(html).toContain("Example BME section");
     expect(html).toContain("Example CHE section");
     expect(html).toContain("Mapped majors: BME");
@@ -82,6 +83,7 @@ describe("canonical timing uncertainty presentation", () => {
     const html = render([tuesday]);
     expect(html).toContain("Date-level academic warning · Time unknown");
     expect(html).not.toContain("Inspect conflicting exam sources");
-    expect(html).toContain("Synthetic Tuesday source");
+    expect(html).toContain("Example Tuesday source");
+    expect(html).toContain("Verification: Demo data — not verified");
   });
 });

@@ -10,7 +10,7 @@ it("maps unknown-time exams to date-only entries without invented clocks", () =>
     end: "2026-10-22",
     extendedProps: {
       listTimes: ["Time unknown"],
-      category: "Academic exam · Time unknown · synthetic",
+      category: "Academic Exam · Time unknown · Demo data — not verified",
     },
   });
 });

@@ -1,4 +1,3 @@
-
 # EUC Events Hub: Architecture Proposal
 
 **Status:** Draft for review  
@@ -596,3 +595,15 @@ Planner desktop views are Month, 2 Weeks (date grid), 1 Week (hourly), Day (hour
 Week/Day lead with overall scoring unavailable pending methodology review (`score: null`). Optional experimental preparation reports evening references, exact daily/proposal interval maxima and affected cells; known start cutoffs and unknown-hour ranges are distinct from direct overlaps. Saturday preparation may come from an exam in the following week without changing factual weekly exam counts. No overall score, thresholds, attendance probability or dark mode is introduced.
 
 **Future enhancement: Smart Scheduling Recommendations.** Comparing prospective dates and suggesting lower-conflict alternatives is deferred; no recommendation algorithm or UI is authorized in PR #5. See the review reconciliation and updated Claude handoff before independent re-review and any merge decision.
+
+## PR #5 master refinement: independent scheduling indicators
+
+[ADR 004](decisions/004-independent-scheduling-indicators.md) adds a pure non-exam scheduling module alongside the preserved ADR 003 exam-preparation model. `analyzeNonExamScheduling` accepts non-exam events, organizations, a selected audience, an exact instant range, and centralized provisional policy parameters. It accepts neither exams nor display filters. Its source-aware constraints, per-cell concurrency segments, date summaries, all-day counts, timing uncertainties, and cautions remain separate from preparation calculations. Both its numerical score and the overall score remain `null`.
+
+Factual density measures the maximum **0/1/2/3+ simultaneous known-time commitments within one selected major × academic-level cell**, never a pooled population or attendance estimate. Unknown clocks, conflicting source alternatives, all-day engineering records, academic-break departures, and context-only Local events do not generate fabricated timed density. Their appropriate separate counts, date-level cautions, and provenance remain available. Timing and audience metadata stay associated within source alternatives before identity deduplication.
+
+Policy configuration defines THON avoidance and preparation-week precedence, explicit major Local music buffers, documented academic-break departure cautions, relevant career-fair windows, and ordinary actual intervals. Day policies use Eastern calendar arithmetic; hour buffers use elapsed instants. The data layer calls `policySourceWindow` for sufficient source lookaround and retains the separate exam lookahead. Calculation windows intersect exact proposed hours; calendar callers provide Eastern day boundaries. See ADR 004 for default values and uncertainty semantics.
+
+The existing FullCalendar adapter adds optional noninteractive density backgrounds, count legends, and accessible policy reasons. Event-scope classification, non-exam density, and experimental preparation use separate semantic tokens and presentations. Event cards and dialog activation remain interactive above overlays. Planner caution visibility, density visibility, ordinary display filters, and analytical audience eligibility are distinct controls. The student calendar continues to use its approved views and published-only discovery; it does not automatically acquire planner density.
+
+Preparation-range bars show a solid lower bound and striped uncertainty to the upper bound without inventing a midpoint. Equivalent cell results may be grouped only for presentation; complete sources and methodology remain in optional disclosures. This refinement introduces no new infrastructure, service, dependency, persistence, or ingestion pathway. Specific provisional policy advice is now authorized; automated candidate-date ranking and numerical overall/non-exam scoring remain deferred.

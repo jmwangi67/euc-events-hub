@@ -12,6 +12,7 @@ import {
   externalAudienceCells,
   externalEligibility,
 } from "./scheduling-eligibility";
+import { analyzeNonExamScheduling } from "./non-exam-scheduling";
 export function analyzePlanningProposal(
   proposal: Proposal,
   context: PlanningContext,
@@ -67,6 +68,10 @@ export function analyzePlanningProposal(
   return {
     conflicts,
     preparation,
+    nonExam: analyzeNonExamScheduling(context, proposal, {
+      start: proposal.start,
+      end: proposal.end,
+    }),
     externalConstraints,
     cells,
     contextOnlyExternalEvents: context.externalEvents.filter(

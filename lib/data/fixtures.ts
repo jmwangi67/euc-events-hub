@@ -40,38 +40,51 @@ function overlaps(
 }
 /** Published-only public queries; optional local fixtures keep tests isolated. */
 export function getEvents(
-  { start, end, filters = {} }: DateWindow & { filters?: EventFilters },
+  {
+    start,
+    end,
+    filters = {},
+    includeIdentityAlternatives = false,
+  }: DateWindow & {
+    filters?: EventFilters;
+    includeIdentityAlternatives?: boolean;
+  },
   eventFixtures: readonly Event[] = events,
 ): Event[] {
   const window = parseWindow({ start, end });
   const search = filters.search?.trim().toLowerCase() ?? "";
+  const matching = eventFixtures.filter(
+    (event) =>
+      event.status === "published" &&
+      overlaps(eventInterval(event), window) &&
+      isEventRelevant(
+        event,
+        filters.audience ?? { mode: "all" },
+        organizations,
+      ) &&
+      (!filters.organizationIds?.length ||
+        filters.organizationIds.some((id) =>
+          event.hostOrganizationIds.includes(id),
+        )) &&
+      (!filters.categories?.length ||
+        filters.categories.includes(event.category)) &&
+      (!search ||
+        `${event.title} ${event.description ?? ""}`
+          .toLowerCase()
+          .includes(search)),
+  );
+  const matchingIds = new Set(matching.map((event) => event.id));
   return structuredClone(
-    eventFixtures
-      .filter(
-        (event) =>
-          event.status === "published" &&
-          overlaps(eventInterval(event), window) &&
-          isEventRelevant(
-            event,
-            filters.audience ?? { mode: "all" },
-            organizations,
-          ) &&
-          (!filters.organizationIds?.length ||
-            filters.organizationIds.some((id) =>
-              event.hostOrganizationIds.includes(id),
-            )) &&
-          (!filters.categories?.length ||
-            filters.categories.includes(event.category)) &&
-          (!search ||
-            `${event.title} ${event.description ?? ""}`
-              .toLowerCase()
-              .includes(search)),
-      )
-      .sort(
-        (a, b) =>
-          eventInterval(a).start - eventInterval(b).start ||
-          a.id.localeCompare(b.id),
-      ),
+    (includeIdentityAlternatives
+      ? eventFixtures.filter(
+          (event) => event.status === "published" && matchingIds.has(event.id),
+        )
+      : matching
+    ).sort(
+      (a, b) =>
+        eventInterval(a).start - eventInterval(b).start ||
+        a.id.localeCompare(b.id),
+    ),
   );
 }
 export function getEventById(

@@ -1,4 +1,10 @@
 import type { EventApi, EventContentArg } from "@fullcalendar/core";
+import {
+  externalScopeLabel,
+  verificationLabel,
+} from "../../lib/domain/source-labels";
+const compactTitle = (title: string) =>
+  title.replace(/^(?:Synthetic example: |Example Event: )/, "");
 export function CalendarItemContent({
   info,
   mobile,
@@ -10,18 +16,22 @@ export function CalendarItemContent({
   itemLabel: (event: EventApi) => string;
   selectItem: (event: EventApi) => void;
 }) {
+  if (info.event.extendedProps.kind === "density") return null;
   if (
     info.event.extendedProps.kind === "external" &&
-    info.view.type.startsWith("dayGrid") &&
-    info.event.extendedProps.externalEvent.scope !== "campus-local"
+    info.view.type.startsWith("dayGrid")
   )
     return (
       <span className="external-indicator">
         <span aria-hidden="true">◆</span>{" "}
-        {info.event.title.replace(/^Synthetic /, "")}
+        {info.event.title.replace(/^(?:Synthetic |Example )/, "")}
+        <span className="event-scope-label">
+          {externalScopeLabel(info.event.extendedProps.externalEvent.scope)} ·
+          Example Event
+        </span>
         <span className="sr-only">
           {" "}
-          · Synthetic scenario · See weekly summary
+          · {info.event.extendedProps.timeLabel} · See weekly summary
         </span>
       </span>
     );
@@ -32,7 +42,7 @@ export function CalendarItemContent({
   const categoryLabel =
     info.event.extendedProps.kind === "exam" &&
     info.view.type.startsWith("dayGrid")
-      ? `Academic exam${!info.event.extendedProps.exam.relevantMajorIds.length ? " · Audience unknown" : ""} · ${info.event.extendedProps.exam.source.verification}`
+      ? `Academic Exam${!info.event.extendedProps.exam.relevantMajorIds.length ? " · Audience unknown" : ""} · ${verificationLabel(info.event.extendedProps.exam.source.verification)}`
       : info.event.extendedProps.category;
   const content = (
     <span className="calendar-event-content">
@@ -43,12 +53,10 @@ export function CalendarItemContent({
           </span>
         ))}
       </span>
-      <span className="event-title">
-        {info.event.title.replace(/^Synthetic example: /, "")}
-      </span>
+      <span className="event-title">{compactTitle(info.event.title)}</span>
       <span className="event-category">
         {categoryLabel}
-        {!info.event.extendedProps.kind && " · Example"}
+        {!info.event.extendedProps.kind && " · Engineering · Example Event"}
       </span>
     </span>
   );
@@ -65,9 +73,7 @@ export function CalendarItemContent({
     >
       {mobile ? (
         <span className="mobile-list-content">
-          <span className="event-title">
-            {info.event.title.replace(/^Synthetic example: /, "")}
-          </span>
+          <span className="event-title">{compactTitle(info.event.title)}</span>
           <span className="list-event-times" aria-hidden="true">
             {cardTimes.map((part, index) => {
               const isNote = /Next day|From prev day|^\+\d+ days$/.test(part);
@@ -83,6 +89,7 @@ export function CalendarItemContent({
           </span>
           <span className="event-category">
             {info.event.extendedProps.category}
+            {!info.event.extendedProps.kind && " · Engineering · Example Event"}
             {info.event.extendedProps.hosts &&
               ` · ${info.event.extendedProps.hosts}`}
           </span>

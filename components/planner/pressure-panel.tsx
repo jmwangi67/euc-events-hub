@@ -1,21 +1,24 @@
 "use client";
 import { useMemo, useState } from "react";
 import type { PlanningContext } from "../../lib/domain/weekly-planning";
-import {
-  dayPressureBreakdown,
-  weekForInstant,
-} from "../../lib/domain/weekly-planning";
+import { weekForInstant } from "../../lib/domain/weekly-planning";
+import { dailyPreparation } from "../../lib/domain/preparation-sampling";
 import type { PlanningAudience } from "../../lib/domain/planning-audience";
 import {
   addCalendarDays,
   formatAllDayDate,
   easternDayStart,
+  formatTimedInstant,
 } from "../../lib/time/eastern";
 import {
   PreparationCells,
-  preparationLabel,
+  PreparationMethodology,
   AudienceUncertainty,
 } from "./preparation-details";
+import { PreparationRange } from "./preparation-range";
+import { OtherSchedulingConstraints } from "./other-scheduling-constraints";
+import styles from "./preparation.module.css";
+
 export function PressurePanel({
   start,
   days,
@@ -31,22 +34,19 @@ export function PressurePanel({
   const daily = useMemo(
     () =>
       Array.from({ length: days }, (_, i) =>
-        dayPressureBreakdown(addCalendarDays(start, i), audience, context),
+        dailyPreparation(context.exams, addCalendarDays(start, i), audience),
       ),
-    [start, days, audience, context],
+    [start, days, audience, context.exams],
   );
   const uncertain = [
     ...new Map(
       daily
-        .flatMap((day) => day.preparation.maximum.audienceUncertainExams)
+        .flatMap((day) => day.maximum.audienceUncertainExams)
         .map((exam) => [exam.id, exam]),
     ).values(),
   ];
   return (
-    <section
-      className="pressure-preview"
-      aria-label="Scheduling-pressure factors"
-    >
+    <section className="pressure-preview" aria-label="Scheduling information">
       <div
         className="overall-pressure-pending"
         data-overall-status="awaiting-methodology-review"
@@ -56,120 +56,142 @@ export function PressurePanel({
           <strong>Unavailable · Awaiting methodology review</strong>
         </p>
         <p className="field-help">
-          No numerical overall score or rating is approved. Factual commitments
-          and experimental exam preparation remain separate; preparation is
-          already a proposed contributor, not an extra value to add to a total.
+          No numerical overall score or rating is approved. Exam Preparation and
+          Other Scheduling Constraints are independent indicators. They are
+          never combined, summed or averaged into a shared result.
         </p>
       </div>
-      <label className="choice">
-        <input
-          type="checkbox"
-          checked={enabled}
-          onChange={(e) => setEnabled(e.target.checked)}
-        />
-        Preview experimental exam preparation
-      </label>
-      <p className="field-help">
-        Uncalibrated relative model units, never percentages of students
-        unavailable. Broad commitments do not affect everyone equally.
-      </p>
-      <div
-        className={`pressure-days ${days === 1 ? "single-pressure-day" : ""}`}
-      >
-        {daily.map((day) => {
-          const prep = day.preparation;
-          const nextWeek = context.exams.filter(
-            (exam) =>
-              prep.upcomingExamIds.includes(exam.id) &&
-              exam.date >= weekForInstant(easternDayStart(day.date)).end,
-          );
-          return (
-            <div className="pressure-day" key={day.date}>
-              <h4>{formatAllDayDate(day.date)}</h4>
-              <p>
-                {day.knownTimedConstraints.length} eligible known-time
-                commitments
-                <br />
-                {day.dateOnlyConstraints} date-level cautions
+      <div className={styles.indicators}>
+        <section className={styles.section} aria-label="Exam Preparation">
+          <h3>Exam Preparation</h3>
+          <label className="choice">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
+            />
+            Preview experimental exam preparation
+          </label>
+          <p className={styles.note}>
+            Academic exams only. Uncalibrated relative model units, never
+            percentages of students unavailable. Each selected major ×
+            academic-year subgroup is calculated independently.
+          </p>
+          {enabled && (
+            <>
+              <p className={styles.legend}>
+                Experimental relative preparation estimates: solid navy shows
+                the lower bound; diagonal stripes extend to the upper bound.
+                Stripes mean uncertainty, not probability.
               </p>
-              {day.allDayConstraints.length > 0 && (
-                <p>
-                  {day.allDayConstraints.length} recorded all-day engineering
-                  intervals
-                </p>
-              )}
-              <p>
-                PSU-wide {day.counts.psuWide} · National {day.counts.national}
+              <p className={styles.note}>
+                Peak may be a limit just before an exam starts. It is not
+                pressure after an exam, a daily average, or a whole-audience
+                score.
               </p>
-              {day.contextOnlyExternalEvents.length > 0 && (
-                <p>
-                  {day.contextOnlyExternalEvents.length} local context-only
-                  records · excluded from analysis
-                </p>
-              )}
-              {enabled && (
-                <div className="experimental-day-preparation">
-                  <p className="preparation-value">
-                    <strong>Experimental day peak</strong>
-                    <br />
-                    {preparationLabel(prep.maximum.range)}
-                  </p>
-                  <div className="preparation-track" aria-hidden="true">
-                    <span style={{ width: `${prep.maximum.range[1] * 10}%` }} />
-                  </div>
-                  <p>
-                    10 PM Eastern reference
-                    <br />
-                    {preparationLabel(prep.evening.range)}
-                  </p>
-                  <div className="preparation-track" aria-hidden="true">
-                    <span style={{ width: `${prep.evening.range[1] * 10}%` }} />
-                  </div>
-                  <p className="field-help">
-                    Peak may be a limit just before an exam starts. It is not
-                    pressure after an exam, a daily average, or a whole-audience
-                    score.
-                  </p>
-                  {nextWeek.length > 0 && (
-                    <p className="cross-week-note">
-                      Preparation for next week:{" "}
-                      {nextWeek
-                        .map(
-                          (exam) =>
-                            `${exam.courseId} (${formatAllDayDate(exam.date)})`,
+              <div
+                className={`pressure-days ${styles.days} ${days === 1 ? "single-pressure-day" : ""}`}
+              >
+                {daily.map((prep) => {
+                  const nextWeek = context.exams.filter(
+                    (exam) =>
+                      prep.upcomingExamIds.includes(exam.id) &&
+                      exam.date >=
+                        weekForInstant(easternDayStart(prep.date)).end,
+                  );
+                  const upcoming = [
+                    ...new Map(
+                      context.exams
+                        .filter((exam) =>
+                          prep.upcomingExamIds.includes(exam.id),
                         )
-                        .join(", ")}
-                      . Those exams are not counted as occurring this week.
+                        .map((exam) => [exam.id, exam]),
+                    ).values(),
+                  ];
+                  return (
+                    <div
+                      className={`pressure-day ${styles.day}`}
+                      key={prep.date}
+                    >
+                      <h4>{formatAllDayDate(prep.date)}</h4>
+                      <div className="experimental-day-preparation">
+                        <PreparationCells
+                          analysis={prep.maximum}
+                          exams={context.exams}
+                          label="Experimental day peak"
+                        />
+                        {upcoming.length > 0 && (
+                          <p className="field-help">
+                            Upcoming:{" "}
+                            {upcoming
+                              .map(
+                                (exam) =>
+                                  `${exam.courseId} (${formatAllDayDate(exam.date)})`,
+                              )
+                              .join("; ")}
+                            .
+                          </p>
+                        )}
+                        {nextWeek.length > 0 && (
+                          <p className="cross-week-note">
+                            Preparation for next week:{" "}
+                            {nextWeek.map((exam) => exam.courseId).join("; ")}.
+                            Those exams are not counted as occurring this week.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <details className={styles.advanced}>
+                <summary>Advanced methodology &amp; sources</summary>
+                <p>
+                  These are experimental relative preparation estimates on a
+                  0–10 scale. Each cell retains its source mappings, typical or
+                  atypical academic-year relationship and uncertainty. No
+                  enrollment or attendance probability is established.
+                </p>
+                {daily.map((prep) => (
+                  <section className={styles.advancedDay} key={prep.date}>
+                    <h4>{formatAllDayDate(prep.date)}</h4>
+                    <p>
+                      Daily maximum over the Eastern date: inclusive start,
+                      exclusive end. Exact transition limits are retained.
                     </p>
-                  )}
-                  <PreparationCells
-                    analysis={prep.maximum}
-                    exams={context.exams}
-                  />
-                  <details>
-                    <summary>Inspect 10 PM contributions</summary>
-                    <PreparationCells
-                      analysis={prep.evening}
+                    <PreparationMethodology
+                      analysis={prep.maximum}
                       exams={context.exams}
                     />
-                  </details>
-                </div>
-              )}
-              <details>
-                <summary>Recorded factors</summary>
-                <ul>
-                  {[...day.knownTimedConstraints, ...day.allDayConstraints].map(
-                    (item) => (
-                      <li key={item.id}>{item.id}</li>
-                    ),
-                  )}
-                </ul>
+                    <details>
+                      <summary>Inspect 10 PM contributions</summary>
+                      <p>
+                        10 PM Eastern reference ·{" "}
+                        {formatTimedInstant(prep.eveningInstant)}
+                      </p>
+                      <PreparationRange
+                        range={prep.evening.range}
+                        label="10 PM experimental relative preparation estimate"
+                      />
+                      <PreparationMethodology
+                        analysis={prep.evening}
+                        exams={context.exams}
+                      />
+                    </details>
+                  </section>
+                ))}
               </details>
-            </div>
-          );
-        })}
+            </>
+          )}
+          <AudienceUncertainty exams={uncertain} sourceExams={context.exams} />
+        </section>
+        <OtherSchedulingConstraints
+          start={start}
+          days={days}
+          audience={audience}
+          context={context}
+        />
       </div>
-      <AudienceUncertainty exams={uncertain} />
     </section>
   );
 }

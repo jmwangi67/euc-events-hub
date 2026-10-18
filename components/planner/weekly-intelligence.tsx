@@ -15,6 +15,11 @@ import { EXTERNAL_CATEGORIES } from "../../lib/domain/external-events";
 import { AudienceUncertainty } from "./preparation-details";
 import { DetailsDialog } from "../calendar/details-dialog";
 import { examTimeLabel } from "../calendar/planner-events";
+import {
+  sourceLabel,
+  verificationLabel,
+  externalScopeLabel,
+} from "../../lib/domain/source-labels";
 export function weekLabel(week: { start: string; end: string }) {
   return `${formatAllDayDate(week.start)} – ${formatAllDayDate(addCalendarDays(week.end, -1))}`;
 }
@@ -50,7 +55,7 @@ export function WeeklySummaryCell({
         data-calendar-event-id={`week:${week.start}`}
         onClick={() => onSelect(week)}
         aria-haspopup="dialog"
-        aria-label={`Weekly summary: ${weekLabel(week)}. ${c.uniqueTotal} unique commitments: ${c.collegeWide} College-wide, ${c.otherEvents} other relevant events, ${c.exams} mapped exams, ${c.psuWide} PSU-wide, ${c.campusLocal} local context, ${c.national} national; ${c.uncertainExams} audience-uncertain exams. Open details.`}
+        aria-label={`Weekly summary: ${weekLabel(week)}. ${c.uniqueTotal} unique commitments: ${c.collegeWide} College-wide, ${c.otherEvents} other relevant events, ${c.exams} mapped exams, ${c.psuWide} PSU-wide, ${c.campusLocal} Local, ${c.national} National; ${c.uncertainExams} audience-uncertain exams. Open details.`}
       >
         <span className="week-summary-date">{compactWeekLabel(week)}</span>
         <span>
@@ -71,7 +76,7 @@ export function WeeklySummaryCell({
               PSU-wide <b>{c.psuWide}</b>
             </span>
             <span>
-              Local context <b>{c.campusLocal}</b>
+              Local <b>{c.campusLocal}</b>
             </span>
             <span>
               National <b>{c.national}</b>
@@ -94,9 +99,9 @@ export function WeeklySummaryCell({
           type="button"
           className="focus-week-control"
           onClick={() => onFocusWeek(week)}
-          aria-label={`Focus calendar week: ${weekLabel(week)}`}
+          aria-label={`Focus this week in calendar: ${weekLabel(week)}`}
         >
-          Go to calendar week ↑
+          Focus this week in calendar ↑
         </button>
       )}
     </div>
@@ -122,8 +127,8 @@ export function WeeklyDetails({
       onClose={onClose}
     >
       <p className="example-note">
-        Synthetic scenarios, not confirmed schedules. Counts describe available
-        records, not expected attendance or pressure.
+        Example scenarios, not real or verified schedules. Counts describe
+        available records, not expected attendance or pressure.
       </p>
       <p>
         <strong>{week.counts.uniqueTotal} unique commitments.</strong> Each
@@ -147,7 +152,8 @@ export function WeeklyDetails({
               {event.collegeWide
                 ? "College-wide"
                 : "Other relevant engineering / organization"}{" "}
-              · {event.source.label} · {event.source.verification}
+              · {sourceLabel(event.source)} ·{" "}
+              {verificationLabel(event.source.verification)}
             </span>
             {event.source.url && (
               <a href={event.source.url} target="_blank" rel="noreferrer">
@@ -165,7 +171,8 @@ export function WeeklyDetails({
             <span>{examTimeLabel(exam)}</span>
             <span>{examAudienceMatch(exam, audience).explanation}</span>
             <span>
-              {exam.source.label} · {exam.source.verification} ·{" "}
+              {sourceLabel(exam.source)} ·{" "}
+              {verificationLabel(exam.source.verification)} ·{" "}
               {exam.sectionScope.join(", ") || "Section coverage unknown"}
             </span>
             {exam.source.url && (
@@ -184,11 +191,7 @@ export function WeeklyDetails({
             <strong>{event.title}</strong>
             <span>
               {EXTERNAL_CATEGORIES[event.category]} ·{" "}
-              {event.scope === "national"
-                ? "National"
-                : event.scope === "psu-wide"
-                  ? "PSU-wide"
-                  : "Local context"}
+              {externalScopeLabel(event.scope)}
             </span>
             <span>
               {event.timeKnown
@@ -202,14 +205,15 @@ export function WeeklyDetails({
             <span>
               {event.analysisReason}{" "}
               {event.analysis === "context-only"
-                ? "Excluded from pressure inputs."
+                ? "Context only; excluded from analytical scheduling density."
                 : "Eligibility follows documented scope/audience; participation is unknown."}
             </span>
             <span>
               {event.geography} · {event.audience}
             </span>
             <span>
-              {event.source.label} · Verification: {event.source.verification}
+              {sourceLabel(event.source)} ·{" "}
+              {verificationLabel(event.source.verification)}
             </span>
             {event.source.url && (
               <a href={event.source.url} target="_blank" rel="noreferrer">

@@ -12,6 +12,7 @@ export type PlanningCalendarOptions = {
   showPsuWide: boolean;
   showCampusLocal: boolean;
   showNational: boolean;
+  showDensity?: boolean;
   onExamSelect: (exam: Exam) => void;
   onProposalSelect: () => void;
 };

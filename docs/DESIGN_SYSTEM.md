@@ -1,4 +1,3 @@
-
 # EUC Events Hub: Design System
 
 **Status:** Draft for review  
@@ -37,23 +36,23 @@ The application's foundational palette will use Penn State's official visual ide
 Reference:
 https://brand.psu.edu/visual-identity-standards/color-and-the-mark
 
-| Color | Hex | Intended usage |
-|---|---|---|
+| Color        | Hex     | Intended usage                                |
+| ------------ | ------- | --------------------------------------------- |
 | Nittany Navy | #001E44 | Primary headings, navigation, strong emphasis |
-| Beaver Blue | #1E407C | Primary buttons, interactive elements |
-| Pugh Blue | #96BEE6 | Subtle accents, selected backgrounds |
-| White | #FFFFFF | Cards, content surfaces, backgrounds |
+| Beaver Blue  | #1E407C | Primary buttons, interactive elements         |
+| Pugh Blue    | #96BEE6 | Subtle accents, selected backgrounds          |
+| White        | #FFFFFF | Cards, content surfaces, backgrounds          |
 
 ### Neutral Interface Colors
 
 The following are proposed application colors, not official Penn State brand colors.
 
-| Token | Hex | Intended usage |
-|---|---|---|
-| Canvas | #F8FAFC | Main application background |
-| Surface | #FFFFFF | Cards and panels |
-| Border | #E2E8F0 | Dividers and borders |
-| Muted text | #475569 | Secondary information |
+| Token          | Hex     | Intended usage                   |
+| -------------- | ------- | -------------------------------- |
+| Canvas         | #F8FAFC | Main application background      |
+| Surface        | #FFFFFF | Cards and panels                 |
+| Border         | #E2E8F0 | Dividers and borders             |
+| Muted text     | #475569 | Secondary information            |
 | Subtle surface | #F1F5F9 | Hover states and grouped content |
 
 These values are starting proposals and may be adjusted after accessibility and visual testing.
@@ -206,12 +205,12 @@ Use a deliberate radius hierarchy.
 
 ### Suggested Radius System
 
-| Component | Suggested radius |
-|---|---|
-| Structural panels | 0–4px |
-| Inputs and controls | 4–6px |
-| Interactive cards | 6–8px |
-| Modals | 8–12px |
+| Component             | Suggested radius      |
+| --------------------- | --------------------- |
+| Structural panels     | 0–4px                 |
+| Inputs and controls   | 4–6px                 |
+| Interactive cards     | 6–8px                 |
+| Modals                | 8–12px                |
 | Filter chips and tags | Pill when appropriate |
 
 These are preliminary values, not strict requirements for every component.
@@ -557,3 +556,35 @@ The EUC Events Hub frontend should:
 - Be maintainable by future student developers.
 
 The ultimate goal is an application whose design makes engineering event discovery and organization scheduling easier, not merely a visually attractive website.
+
+## 17. PR #5 scope, density and independent indicators
+
+The owner-approved master refinement replaces earlier provisional scope colors. Tokens live centrally in `app/globals.css`; classification text remains available alongside color.
+
+| Scope                | Surface token/value                 | Border token/value                 | Foreground token/value                 |
+| -------------------- | ----------------------------------- | ---------------------------------- | -------------------------------------- |
+| PSU-wide             | `scope-psu-surface` #91B8E5         | `scope-psu-border` #3267A3         | `scope-psu-foreground` #102D50         |
+| National             | `scope-national-surface` #EEC078    | `scope-national-border` #A26A21    | `scope-national-foreground` #4D2D0D    |
+| Local                | `scope-local-surface` #94C9AD       | `scope-local-border` #39795C       | `scope-local-foreground` #123E2B       |
+| Ordinary engineering | `scope-engineering-surface` #FFFFFF | `scope-engineering-border` #9AA9BA | `scope-engineering-foreground` #001E44 |
+
+CSS variables have a `--color-` prefix. These fixed card surfaces apply across all five planner layouts and ordinary public event cards. Academic exams keep their separate labeled treatment. Use visible focus outlines and restrained borders; cards remain interactive above every background layer. Local is the visible label; `campus-local` remains an internal identifier. Academic exam cards use **Academic Exam COURSE**. Fictional verification remains `synthetic` internally but is explained as Demo/Example in the UI.
+
+Scheduling density has a separate legend and background palette:
+
+| Factual band                | Token                | Background |
+| --------------------------- | -------------------- | ---------- |
+| 0 known-time commitments    | `density-none`       | #F2F4F7    |
+| 1 simultaneous commitment   | `density-one`        | #C6CCD6    |
+| 2 simultaneous commitments  | `density-two`        | #A79BB8    |
+| 3+ simultaneous commitments | `density-three-plus` | #745F89    |
+
+These bands describe the maximum concurrency within any selected major × academic-year subgroup, never a sum across students or a calibrated pressure level. All-day and uncertain-hour commitments remain separately listed. The overlay starts off, applies behind cards, and never changes their scope colors. Month/2 Weeks have readable date-cell counts; hourly views have background-only noninteractive segments and a textual interval disclosure; List/mobile have factual labels. The deep density background uses white date/label text where required. Scope-card text contrasts are checked in browser tests; this is not a formal accessibility certification.
+
+Scheduling guidance forms a third layer. Avoid scheduling (principally THON) outranks scheduling caution, then factual Review conflicts. Text and icons distinguish these from National amber cards, and they remain visible with the overlay disabled. A compact highest-priority banner leads to optional complete daily reasons and source information. Context-only Local activity is labeled and excluded from analytical density.
+
+Exam Preparation is visually independent: a solid navy lower bound, diagonally striped uncertainty through the upper bound and an unfilled remainder on a 0–10 relative scale. Exact fractional screen-reader labels, equal bounds, zero, unavailable state and forced-color hatching are supported. No midpoint or probability is inferred. Main contributing exams and most-affected equivalent subgroups remain concise; complete distinct subgroup estimates and references are under **Advanced methodology & sources**. The experimental caveat appears once per enabled section, while meaningful uncertainty stays visible.
+
+Other Scheduling Constraints has an explicitly unavailable numerical indicator, factual counts and source-backed cautions. It never uses academic exams. Neither it nor preparation activates an overall score. Further scoring requires owner-approved methodology as documented in [ADR 004](decisions/004-independent-scheduling-indicators.md).
+
+Calendar previous/next controls use square 42px hit areas with centered 20px arrow icons and retained accessible names. Shared-date mobile/tablet grouping, full month names, compact Eastern times and overnight cues remain intact. Use **General Body Meeting (GBM)** and **Social & Recreational** as additional category labels without replacing Student organization. Validate 320, 375, 430, 768, 1024 and 1440px.

@@ -14,15 +14,16 @@ export function externalEligibility(
   const cluster = !!event.targetClusterIds?.some((id) =>
     audience.clusterIds?.includes(id),
   );
+  const selectedLevels = audience.academicLevels ?? ALL_LEVELS;
   const level =
-    !event.targetAcademicLevels?.length ||
-    event.targetAcademicLevels.some((id) =>
-      (audience.academicLevels ?? ALL_LEVELS).includes(id),
-    );
+    selectedLevels.length > 0 &&
+    (!event.targetAcademicLevels?.length ||
+      event.targetAcademicLevels.some((id) => selectedLevels.includes(id)));
   const eligible =
-    event.analysis === "broad-context"
+    level &&
+    (event.analysis === "broad-context"
       ? event.scope === "psu-wide" || event.scope === "national"
-      : event.analysis === "audience-targeted" && (major || cluster) && level;
+      : event.analysis === "audience-targeted" && (major || cluster));
   return {
     eligible,
     reason: event.analysisReason,

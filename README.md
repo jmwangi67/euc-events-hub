@@ -1,6 +1,6 @@
 # EUC Events Hub
 
-A student-led foundation for engineering event discovery and organization planning at Penn State. Milestone 1B adds a public student calendar on the Milestone 1A fixture-backed foundation. All example events, organizations, and exams are fictional, visibly labeled synthetic, and are not official Penn State programming.
+A student-led foundation for engineering event discovery and organization planning at Penn State. Milestone 1B adds a public student calendar on the Milestone 1A fixture-backed foundation. All example events, organizations, and exams are fictional, visibly labeled Example or Demo, and are not official Penn State programming. The current PR also adds the Milestone 1C local organization planner.
 
 ## Local development
 
@@ -36,7 +36,7 @@ Dates, selected view, discovery mode, majors, organizations, categories, and sea
 /?date=2026-10-19&view=dayGridMonth&organizations=example-process&categories=corporate-recruiting
 ```
 
-The calendar opens on the current Eastern date. “View sample dates” navigates to October 19, 2026, where the fixed synthetic fixtures are available. The published unclassified open-studio example is separate from the preserved tentative fixture, which never appears in public results. Native event dialogs support Escape, focus containment, focus restoration, and missing-detail messages. No unavailable location, description, or registration details are invented.
+The calendar opens on the current Eastern date. “View sample dates” navigates to October 19, 2026, where the fixed example fixtures are available. The published unclassified open-studio example is separate from the preserved tentative fixture, which never appears in public results. Native event dialogs support Escape, focus containment, focus restoration, and missing-detail messages. No unavailable location, description, or registration details are invented.
 
 ## Browser verification
 
@@ -104,13 +104,13 @@ getExams({
 });
 ```
 
-Recommended views include college-wide events, explicit target matches, and the union of documented host audiences for inherited events. Explicit audiences take precedence over host classifications. Published unclassified events remain available in All Events. An empty recommended selection includes only college-wide programming. Optional organization and category filters further narrow display queries. No planning analysis exists in this milestone. Event queries accept an optional readonly event-fixture array for isolated tests; production callers use the default fixtures. Tests supply local boundary/status records rather than mutating the shared exports.
+Recommended views include college-wide events, explicit target matches, and the union of documented host audiences for inherited events. Explicit audiences take precedence over host classifications. Published unclassified events remain available in All Events. An empty recommended selection includes only college-wide programming. Optional organization and category filters further narrow display queries. Planner analysis is separate from these public discovery queries. Event queries accept an optional readonly event-fixture array for isolated tests; production callers use the default fixtures. Tests supply local boundary/status records rather than mutating the shared exports.
 
 The calendar label is **All Times Eastern (ET)**. Timed labels use `America/New_York` without repeating zone abbreviations. Same-period ranges share AM/PM (5:00–6:00 PM); different periods retain both (11:30 AM–12:30 PM). Compact overnight cards show Next day (or From prev day on continuation rows); details retain full dates for overnight and multi-day events. Repeated fall-hour ranges include elapsed minutes when wall clocks alone would be ambiguous. All-day labels preserve their dates and exclusive ends. Calendar boundaries continue to use IANA rules rather than fixed offsets; a Sunday-start week is the initial convention.
 
 ## Scope and limitations
 
-This milestone supplies a fixture-backed public student calendar; organization planning is deferred. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, scoring, or priority allocation. Fixture IDs and academic audience mappings are development examples. Final source formats, calendar cancellation behavior, and production ownership remain future decisions. No exam overlays, calendar imports, or officer functionality are included. The shell is not a claim of formal WCAG compliance or university endorsement.
+This application supplies fixture-backed student discovery and a local organization-planner prototype. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, numerical overall scoring, or priority allocation. Fixture IDs, break dates and academic audience mappings are fictional development examples. Final source formats, calendar cancellation behavior, and production ownership remain future decisions. Exam overlays are planner-only; calendar imports and officer accounts remain deferred. The shell is not a claim of formal WCAG compliance or university endorsement.
 
 ### Development dependency review (October 15, 2026)
 
@@ -136,7 +136,7 @@ A synthetic year-end visual-review scenario is available at `/?date=2026-12-31&v
 
 ## Milestone 1C: organization planner prototype
 
-Open `/planner` from the primary navigation. The student calendar remains at `/`. Select a synthetic organization; its documented majors initialize the independent planning audience. Organizations with no default audience require an explicit major selection. Use **Load sample scenario**, then **Analyze proposal**, to compare the sample October 21 workshop against a cross-major published event and an exam whose time is unknown.
+Open `/planner` from the primary navigation. The student calendar remains at `/`. Select an example organization; its documented majors initialize the independent planning audience. Organizations with no default audience require an explicit major selection. Use **Load sample scenario**, then **Analyze proposal**, to compare the sample October 21 workshop against a cross-major published event and an exam whose time is unknown.
 
 The proposal is local React state only: it is not saved, submitted, approved, or published. Reloading or leaving the route clears it. Editing the proposal or audience clears the preceding analysis. Dates and clocks are entered in `America/New_York`; nonexistent spring clocks are rejected, and repeated fall clocks require a first/second occurrence for each ambiguous endpoint. Choose the following end date for overnight proposals. Input resolution uses IANA rules, producing unambiguous UTC instants without fixed Eastern offsets.
 
@@ -158,6 +158,28 @@ Explicitly classified PSU-wide and major national commitments are broad context 
 
 Week/Day lead with **Overall scheduling pressure unavailable — awaiting methodology review**. The overall score remains `null`. An opt-in exposes experimental preparation using the Saturday-anchored candidate `10 × weight × exp(−0.30 × remainingEasternDays^1.35)`, zero from the actual exam start. Daily 10 PM references and exact maximum bounds replace midnight-only estimates. Proposal start and interval maxima include exact left limits and cutoffs. Next-week exams can generate this Saturday's preparation without being counted as exams this week. UI values are rounded relative units, never percentages, enrollment shares or a finalized overall score.
 
-[ADR 003](docs/decisions/003-weekly-planning-intelligence.md) records corrected eligibility, audience cells, parameters, sensitivity, interval mathematics, DST, examples and limitations. [Review reconciliation](docs/reviews/PR5_REVIEW_RECONCILIATION.md) maps every owner-provided Claude finding to its resolution. The [updated Claude handoff](docs/reviews/PR5_CLAUDE_HANDOFF.md) prepares a follow-up independent pass. [Current screenshots](docs/previews/planner/refinements/README.md) cover all views, compact summaries, intermediate desktops and 200%-equivalent reflow.
+[ADR 003](docs/decisions/003-weekly-planning-intelligence.md) records corrected eligibility, audience cells, parameters, sensitivity, interval mathematics, DST, examples and limitations. [Review reconciliation](docs/reviews/PR5_REVIEW_RECONCILIATION.md) maps every owner-provided Claude finding to its resolution. The [updated Claude handoff](docs/reviews/PR5_CLAUDE_HANDOFF.md) prepares a follow-up independent pass. [Earlier refinement screenshots](docs/previews/planner/refinements/README.md) cover all views, compact summaries, intermediate desktops and 200%-equivalent reflow.
 
 **Future enhancement: Smart Scheduling Recommendations** remains documentation only. No date recommendations, numerical overall score, production services, persistence, paid plugins, dependency upgrades or theme toggle are implemented. The CI runner/action changes are limited to the owner's requested compatibility review.
+
+### Master refinement: independent indicators and provisional guidance
+
+**Exam Preparation** uses academic exams only. Its existing mathematics, canonical-source resolution and independent major × academic-year calculations are unchanged. An opt-in displays experimental relative ranges: solid navy to the lower bound, diagonal stripes for uncertainty up to the upper bound, then an unfilled remainder. Equivalent subgroup results are grouped for presentation only; complete cells, mathematical references, source assumptions and optional 10 PM contributions remain under **Advanced methodology & sources**. Stripes are uncertainty, never probability. Meaningful unknown-hour and contradictory-source warnings remain visible.
+
+**Other Scheduling Constraints** accepts only non-exam records. Its numerical score, like the overall scheduling-pressure score, remains `null` and visibly unavailable pending methodology review. It shows audience-relevant commitments, context-only records, exact overlaps and provisional policy cautions with human-readable events, sources and timing. All-day and unknown-hour records are listed separately; no hourly density is invented for them.
+
+**Show scheduling density** is off by default and affects presentation only. Month and 2 Weeks shade date cells; 1 Week and Day shade known-time intervals behind cards; List/mobile provide factual labels. Bands are **0, 1, 2, 3+ maximum simultaneous known-time non-exam commitments within any selected major × academic-year cell**. Independent cells are never pooled. These factual bands are neither attendance estimates nor low/moderate/high pressure thresholds. Explicit cluster/audience targeting and context-only exclusions apply even when ordinary display layers are hidden. Source uncertainty never becomes a fabricated timestamp.
+
+Provisional configurable policies in `lib/domain/non-exam-scheduling.ts` are:
+
+- THON: seven calendar days of lead-up caution, with internal relative importance one-half its maximum policy importance; the full previous day, event days and following day show **Avoid scheduling — THON**, overriding the lead-up caution.
+- Explicitly classified major Local concerts/festivals: two elapsed hours before and after the documented interval. Context-only records remain outside analytical density.
+- Documented academic breaks: two preceding Eastern calendar days warn about possible early departures; fictional sample dates are not an official academic calendar.
+- Relevant career fairs: Eastern midnight until the exact documented finish; no extension afterward.
+- Ordinary engineering/organization events: actual intervals only, with no extra buffers.
+
+Cautions survive a disabled heatmap. Higher-priority guidance is concise by default, with all reasons/sources available. Source lookaround retrieves records whose policy windows can affect the visible/proposal range, including future THON. The policies do not prohibit creating a proposal, assert universal participation, or activate numerical scoring.
+
+Event scope has a separate legend and semantic palette: blue PSU-wide, amber National, green Local, and white/slate ordinary engineering. These card colors stay fixed above density shading. New **General Body Meeting (GBM)** and **Social & Recreational** categories retain all existing categories. Existing event dialogs show only available source-backed audience, eligibility, hosting, location, registration and verification information. **Focus this week in calendar** moves focus to the matching week without switching views.
+
+See [ADR 004](docs/decisions/004-independent-scheduling-indicators.md), [design tokens](docs/DESIGN_SYSTEM.md#17-pr-5-scope-density-and-independent-indicators), and the [master refinement gallery and validation report](docs/previews/planner/master-refinement/README.md). Activating a future numerical non-exam score requires owner approval of calibrated event importance, normalization, handling of audience uncertainty and missing data, and validation against credible evidence. None is approved by this prototype.

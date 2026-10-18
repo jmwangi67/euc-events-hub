@@ -52,14 +52,19 @@ test("academic-level shortcuts and clusters are independent from majors and visi
   await page.getByLabel("Example Career Alliance", { exact: true }).check();
   await summary(page).click();
   await expect(page.getByRole("dialog")).toContainText(
-    "1 explicit cluster matches",
+    "2 explicit cluster matches",
   );
   await expect(
     page
       .getByRole("dialog")
-      .getByText("Synthetic example: Bioprocess industry discussion", {
+      .getByText("Example Event: Bioprocess industry discussion", {
         exact: true,
       }),
+  ).toHaveCount(1);
+  await expect(
+    page
+      .getByRole("dialog")
+      .getByText("Example Event: Design community game night", { exact: true }),
   ).toHaveCount(1);
   await page.keyboard.press("Escape");
   await expect(summary(page)).toBeFocused();
@@ -117,7 +122,7 @@ test("external layers default visible and hiding them leaves analysis and weekly
   page,
 }) => {
   await sample(page);
-  const campus = page.getByLabel("Show campus / local commitments", {
+  const campus = page.getByLabel("Show Local commitments", {
     exact: true,
   });
   const national = page.getByLabel("Show national commitments", {
@@ -136,8 +141,8 @@ test("external layers default visible and hiding them leaves analysis and weekly
     await page.keyboard.press(key);
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText("Synthetic major election scenario");
-    await expect(dialog).toContainText("Synthetic Homecoming weekend");
+    await expect(dialog).toContainText("Example major election scenario");
+    await expect(dialog).toContainText("Example Homecoming weekend");
     await expect(dialog).toContainText("Time unknown");
     await expect(dialog).toContainText(
       "Overall scoring methodology: awaiting review",
@@ -164,7 +169,7 @@ test("external indicator opens its associated week and restores its keyboard foc
     await trigger.focus();
     await page.keyboard.press(key);
     await expect(page.getByRole("dialog")).toContainText(
-      "Synthetic major election scenario",
+      "Example major election scenario",
     );
     await page.keyboard.press("Escape");
     await expect(trigger).toBeFocused();

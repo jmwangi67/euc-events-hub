@@ -6,6 +6,11 @@ import {
 } from "../../lib/domain/planning-audience";
 import { formatEventTime } from "../../lib/time/eastern";
 import { examTimeLabel } from "../calendar/planner-events";
+import {
+  academicExamTitle,
+  sourceLabel,
+  verificationLabel,
+} from "../../lib/domain/source-labels";
 
 type Props = {
   proposal: Proposal | null;
@@ -87,7 +92,7 @@ export function ConflictPanel({
                           event ? onEventSelect(event.id) : onExamSelect(exam!)
                         }
                       >
-                        {event?.title ?? `Academic exam: ${exam!.courseId}`}
+                        {event?.title ?? academicExamTitle(exam!.courseId)}
                       </button>
                     </h3>
                     <p className="constraint-time">
@@ -136,14 +141,16 @@ export function ConflictPanel({
                                       target="_blank"
                                       rel="noreferrer"
                                     >
-                                      {alternative.source.label} (opens a new
-                                      tab)
+                                      {sourceLabel(alternative.source)} (opens a
+                                      new tab)
                                     </a>
                                   ) : (
-                                    alternative.source.label
+                                    sourceLabel(alternative.source)
                                   )}{" "}
                                   · Verification:{" "}
-                                  {alternative.source.verification}
+                                  {verificationLabel(
+                                    alternative.source.verification,
+                                  )}
                                 </p>
                               </li>
                             ),
@@ -188,12 +195,14 @@ export function ConflictPanel({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {conflict.record.source.label} (opens a new tab)
+                          {sourceLabel(conflict.record.source)} (opens a new
+                          tab)
                         </a>
                       ) : (
-                        conflict.record.source.label
+                        sourceLabel(conflict.record.source)
                       )}{" "}
-                      · Verification: {conflict.record.source.verification}
+                      · Verification:{" "}
+                      {verificationLabel(conflict.record.source.verification)}
                     </p>
                   </li>
                 );

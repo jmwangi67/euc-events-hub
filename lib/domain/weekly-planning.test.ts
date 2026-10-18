@@ -176,12 +176,12 @@ describe("weekly factual counts", () => {
       uniqueTotal: 3,
     });
   });
-  it("distinguishes college-wide programming from campus/local and national", () => {
+  it("distinguishes college-wide programming from Local, PSU-wide and National records", () => {
     const result = summarizeWeek(week, audience, context);
-    expect(result.counts.collegeWide).toBe(1);
-    expect(result.counts.psuWide).toBe(2);
-    expect(result.counts.campusLocal).toBe(1);
-    expect(result.counts.national).toBe(1);
+    expect(result.counts.collegeWide).toBe(2);
+    expect(result.counts.psuWide).toBe(3);
+    expect(result.counts.campusLocal).toBe(3);
+    expect(result.counts.national).toBe(2);
     expect(result.counts.uniqueTotal).toBe(
       result.events.length +
         result.exams.length +
@@ -272,7 +272,21 @@ describe("weekly factual counts", () => {
     expect(result.exams.some((e) => e.id === "scenario-upper-process")).toBe(
       true,
     );
-    expect(result.externalEvents.length).toBe(4);
+    // Source queries include policies that can reach this week, while the
+    // weekly factual counts still use the events' actual dates.
+    expect(result.externalEvents.map((event) => event.id)).toEqual([
+      "scenario-homecoming",
+      "scenario-football",
+      "scenario-thon",
+      "scenario-concert",
+      "scenario-local",
+      "scenario-election",
+      "scenario-super-bowl",
+      "scenario-targeted-concert",
+      "scenario-targeted-festival",
+      "scenario-psu-kickoff",
+      "scenario-national-forum",
+    ]);
     const snapshot = structuredClone(result);
     dayPressureBreakdown("2026-10-21", audience, result);
     expect(result).toEqual(snapshot);

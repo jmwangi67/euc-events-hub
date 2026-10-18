@@ -3,9 +3,11 @@
 Status: Revised for owner-provided independent Claude findings on commit `23f81a3`; follow-up independent review and overall scoring approval pending.
 Date: 2026-10-16
 
+Additive update, 2026-10-18: [ADR 004](004-independent-scheduling-indicators.md) governs independent non-exam constraints, explicitly provisional attendance-policy advice, optional factual density, and the revised preparation presentation. All preparation mathematics and uncertainty rules below remain in force. References to deferred recommendations mean automatic candidate-date ranking; the specific THON/music/break/fair policy cautions in ADR 004 are now authorized.
+
 ## Scope and architecture
 
-The owner's PR #5 expansion and final refinement request supersede the original blanket numerical-pressure exclusion for Milestone 1C. Only an isolated experimental **exam-preparation** model is authorized. Overall status remains `awaiting-methodology-review` and its score remains `null`. No attendance predictions, overall thresholds, enrollment shares, recommendations, auth, persistence, live ingestion, deployment or dark mode are authorized.
+The owner's PR #5 expansion and final refinement request supersede the original blanket numerical-pressure exclusion for Milestone 1C. Only an isolated experimental **exam-preparation** model is authorized. Overall status remains `awaiting-methodology-review` and its score remains `null`. No attendance predictions, overall thresholds, enrollment shares, automatic date-ranking recommendations, auth, persistence, live ingestion, deployment or dark mode are authorized.
 
 ADR 001's stack and module boundaries remain unchanged. Calculations live in pure `lib/domain` modules, range-based fixture reads in `lib/data`, Eastern conversion in `lib/time`, and FullCalendar-specific behavior in the single calendar adapter and its focused helper modules. Audience controls, proposal factors, pressure explanations, weekly details and navigation are separate components. The public student calendar retains its four views, URL state, search, published-only queries, existing relevance and details behavior.
 

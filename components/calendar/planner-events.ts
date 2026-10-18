@@ -7,6 +7,11 @@ import {
   formatEventTime,
 } from "../../lib/time/eastern";
 import { listEventTimes } from "./calendar-events";
+import {
+  academicExamTitle,
+  externalScopeLabel,
+  verificationLabel,
+} from "../../lib/domain/source-labels";
 
 export function examTimeLabel(exam: Exam): string {
   return exam.timeKnown
@@ -16,7 +21,7 @@ export function examTimeLabel(exam: Exam): string {
 export function toExamCalendarItem(exam: Exam): EventInput {
   return {
     id: `exam:${exam.id}`,
-    title: `Academic exam: ${exam.courseId}`,
+    title: academicExamTitle(exam.courseId),
     allDay: !exam.timeKnown,
     start: exam.timeKnown ? exam.start : exam.date,
     end: exam.timeKnown ? exam.end : addCalendarDays(exam.date, 1),
@@ -27,7 +32,7 @@ export function toExamCalendarItem(exam: Exam): EventInput {
     extendedProps: {
       kind: "exam",
       exam,
-      category: `Academic exam${!exam.relevantMajorIds.length ? " · Audience unknown · No numerical preparation" : ""} · ${exam.timeKnown ? "Known time" : "Time unknown"} · ${exam.source.verification}`,
+      category: `Academic Exam${!exam.relevantMajorIds.length ? " · Audience unknown · No numerical preparation" : ""} · ${exam.timeKnown ? "Known time" : "Time unknown"} · ${verificationLabel(exam.source.verification)}`,
       timeLabel: examTimeLabel(exam),
       listTimes: exam.timeKnown
         ? listEventTimes({ allDay: false, start: exam.start, end: exam.end })
@@ -68,7 +73,7 @@ export function toExternalCalendarItem(
     extendedProps: {
       kind: "external",
       externalEvent: event,
-      category: `${event.scope === "national" ? "National" : event.scope === "psu-wide" ? "PSU-wide" : "Local context"} · ${event.analysis === "context-only" ? "Context only · " : ""}Synthetic scenario`,
+      category: `${externalScopeLabel(event.scope)} · ${event.analysis === "context-only" ? "Context only · " : ""}${verificationLabel(event.source.verification)}`,
       timeLabel,
       listTimes: event.timeKnown
         ? listEventTimes({ allDay: false, start: event.start, end: event.end })

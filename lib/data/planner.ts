@@ -1,7 +1,7 @@
 import type { Proposal } from "../domain/planning";
 import { addCalendarDays, easternDate } from "../time/eastern";
 import { getEvents, getExams } from "./fixtures";
-import { getExternalEvents } from "./weekly-planning";
+import { getNonExamAnalysisRecords } from "./weekly-planning";
 
 /** Fetch proposal-window identities and all their source alternatives, independent of display. */
 export function getProposalContext(proposal: Proposal) {
@@ -13,7 +13,7 @@ export function getProposalContext(proposal: Proposal) {
     ),
   };
   return {
-    events: getEvents(window),
+    events: getEvents({ ...window, includeIdentityAlternatives: true }),
     exams: getExams({ ...window, includeIdentityAlternatives: true }),
   };
 }
@@ -28,12 +28,11 @@ export function getProposalIntelligenceContext(proposal: Proposal) {
     ),
   };
   return {
-    events: getEvents(window),
+    ...getNonExamAnalysisRecords(window),
     exams: getExams({
       ...window,
       end: addCalendarDays(window.end, 7),
       includeIdentityAlternatives: true,
     }),
-    externalEvents: getExternalEvents(window),
   };
 }

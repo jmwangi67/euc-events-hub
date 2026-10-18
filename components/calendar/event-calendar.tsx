@@ -37,7 +37,13 @@ import { PressurePanel } from "../planner/pressure-panel";
 import { CompactWeeklySummaries } from "../planner/compact-weekly-summaries";
 import { CalendarToolbar } from "./calendar-toolbar";
 import { CalendarItemContent } from "./calendar-item-content";
-import { loadCalendarItems } from "./calendar-source";
+import { loadCalendarItems, loadCalendarScheduling } from "./calendar-source";
+import {
+  CalendarSchedulingGuidance,
+  EventScopeLegend,
+  SchedulingDensityLegend,
+  densityCalendarItems,
+} from "./calendar-density";
 import { useWeekLayout } from "./use-week-layout";
 import type { EventCalendarProps } from "./calendar-types";
 
@@ -81,6 +87,17 @@ export function EventCalendar(props: EventCalendarProps) {
     () => (isPlanning ? getWeeklyPlanningContext(window) : null),
     [window, isPlanning],
   );
+  const scheduling = useMemo(
+    () =>
+      planningAudience
+        ? loadCalendarScheduling(window, planningAudience)
+        : null,
+    [window, planningAudience],
+  );
+  const densityDays = useMemo(
+    () => new Map(scheduling?.days.map((day) => [day.date, day]) ?? []),
+    [scheduling],
+  );
   const weeks = useMemo(
     () =>
       planningAudience && context
@@ -120,7 +137,22 @@ export function EventCalendar(props: EventCalendarProps) {
         const items = loadCalendarItems(range, filters, planning);
         setError(false);
         setCount(items.length);
-        success(items);
+        success(
+          planning?.showDensity && view.startsWith("timeGrid")
+            ? [
+                ...items,
+                ...densityCalendarItems(
+                  loadCalendarScheduling(
+                    {
+                      start: range.startStr.slice(0, 10),
+                      end: range.endStr.slice(0, 10),
+                    },
+                    planning.audience,
+                  ).timeSegments,
+                ),
+              ]
+            : items,
+        );
       } catch (cause) {
         setError(true);
         failure(
@@ -128,7 +160,7 @@ export function EventCalendar(props: EventCalendarProps) {
         );
       }
     },
-    [filters, planning],
+    [filters, planning, view],
   );
   useEffect(() => {
     const api = calendar.current?.getApi();
@@ -183,7 +215,7 @@ export function EventCalendar(props: EventCalendarProps) {
       ?.focus();
   };
   const itemLabel = (event: EventApi) =>
-    `${event.title}. ${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${mobile && event.extendedProps.hosts ? `${event.extendedProps.hosts}. ` : ""}${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Synthetic scenario. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional example. Open event details."}`;
+    `${event.title}. ${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${mobile && event.extendedProps.hosts ? `${event.extendedProps.hosts}. ` : ""}${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
     const next = {
@@ -244,6 +276,21 @@ export function EventCalendar(props: EventCalendarProps) {
           Events could not be loaded. Change the date range to retry.
         </p>
       )}
+      {planning && <EventScopeLegend />}
+      {planning?.showDensity && (
+        <SchedulingDensityLegend
+          segments={
+            view.startsWith("timeGrid") ? scheduling?.timeSegments : undefined
+          }
+        />
+      )}
+      {planning && scheduling && (
+        <CalendarSchedulingGuidance
+          days={scheduling.days}
+          showDensity={!!planning.showDensity}
+          list={view.startsWith("list")}
+        />
+      )}
       {planning && context && view.startsWith("timeGrid") && (
         <PressurePanel
           start={
@@ -266,7 +313,7 @@ export function EventCalendar(props: EventCalendarProps) {
       )}
       <div
         ref={surface}
-        className={`calendar-surface ${monthSummaries ? "planner-month-surface" : ""}`}
+        className={`calendar-surface ${monthSummaries ? "planner-month-surface" : ""} ${planning?.showDensity ? "density-enabled" : ""}`}
       >
         <FullCalendar
           key={view}
@@ -318,17 +365,40 @@ export function EventCalendar(props: EventCalendarProps) {
           eventOrderStrict={mobile && view.startsWith("list")}
           eventInteractive
           navLinks={false}
+          dayCellContent={(info) => {
+            if (!planning?.showDensity || !view.startsWith("dayGrid"))
+              return info.dayNumberText;
+            const date = easternDate(info.date.toISOString());
+            const count = densityDays.get(date)?.maximumConcurrent ?? 0;
+            return (
+              <>
+                {info.dayNumberText}
+                <span
+                  className="density-cell-count"
+                  aria-label={`Peak known-time subgroup density on ${date}: ${count >= 3 ? "3 or more" : count} simultaneous commitments`}
+                >
+                  {count >= 3 ? "3+" : count} timed
+                </span>
+              </>
+            );
+          }}
           dayCellClassNames={(info) => {
-            if (!monthSummaries) return [];
             const date = easternDate(info.date.toISOString());
             const week = weeks.find(
               (week) => week.start <= date && week.end > date,
             );
-            return [
-              week?.counts.uniqueTotal
-                ? "planner-week-populated"
-                : "planner-week-empty",
-            ];
+            const classes = monthSummaries
+              ? [
+                  week?.counts.uniqueTotal
+                    ? "planner-week-populated"
+                    : "planner-week-empty",
+                ]
+              : [];
+            if (planning?.showDensity && view.startsWith("dayGrid"))
+              classes.push(`density-${densityDays.get(date)?.band ?? "none"}`);
+            if (densityDays.get(date)?.primaryCaution)
+              classes.push("has-scheduling-guidance");
+            return classes;
           }}
           dayCellDidMount={(info) => {
             if (!monthSummaries) return;
@@ -376,6 +446,7 @@ export function EventCalendar(props: EventCalendarProps) {
           )}
           eventClick={(info) => {
             info.jsEvent.preventDefault();
+            if (info.event.extendedProps.kind === "density") return;
             selectItem(
               info.event,
               (info.jsEvent.target as HTMLElement).closest<HTMLElement>(
@@ -392,6 +463,11 @@ export function EventCalendar(props: EventCalendarProps) {
             />
           )}
           eventDidMount={(info) => {
+            if (info.event.extendedProps.kind === "density") {
+              info.el.setAttribute("aria-hidden", "true");
+              info.el.removeAttribute("tabindex");
+              return;
+            }
             // List titles use native buttons; retain the table's row semantics.
             if (info.view.type.startsWith("list")) return;
             const trigger = info.el;

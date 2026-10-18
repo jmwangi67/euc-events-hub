@@ -32,6 +32,8 @@ describe("student discovery and shareable state", () => {
     expect(result).toEqual([
       "example-welcome",
       "example-industry",
+      "example-gbm",
+      "example-social",
       "example-design-meeting",
       "example-design-days",
       "example-night-build",
@@ -43,7 +45,7 @@ describe("student discovery and shareable state", () => {
     expect(ids("mode=recommended&majors=bme,che")).toContain(
       "example-process-lab",
     );
-    expect(ids("mode=recommended")).toEqual(["example-welcome"]);
+    expect(ids("mode=recommended")).toEqual(["example-welcome", "example-gbm"]);
   });
   it("keeps majors and host filters independent and combines category filters", () => {
     expect(

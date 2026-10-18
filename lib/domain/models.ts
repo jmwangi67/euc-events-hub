@@ -51,6 +51,8 @@ export const eventCategorySchema = z.enum([
   "networking",
   "career-fair",
   "student-organization",
+  "general-body-meeting",
+  "social-recreational",
   "research",
   "competition",
 ]);
