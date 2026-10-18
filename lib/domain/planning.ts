@@ -41,6 +41,8 @@ export type PlanningConflict = {
     | "exam-date-warning"
     | "exam-audience-warning";
   record: Event | Exam;
+  /** Complete source alternatives for an unresolved canonical identity; never confirmed overlaps. */
+  examAlternatives?: readonly Exam[];
   majorIds: string[];
   reason: string;
 };
@@ -110,43 +112,52 @@ export function analyzeProposal(
     });
   }
   const canonical = examOccurrences(exams);
-  const identityUncertain = new Set(
-    canonical.identityUncertainExams.map((exam) => exam.id),
-  );
-  for (const exam of [
-    ...canonical.exams,
-    ...canonical.identityUncertainExams,
-  ]) {
+  const intersectsAudience = (exam: Exam) => {
     if (
       !examAudienceMatch(exam, {
         ...proposal,
         academicLevels: proposal.academicLevels ?? ALL_LEVELS,
       }).relevant
     )
-      continue;
+      return false;
     const interval = exam.timeKnown
       ? exam
       : {
           start: easternDayStart(exam.date),
           end: easternDayStart(addCalendarDays(exam.date, 1)),
         };
-    if (!intervalsOverlap(proposal, interval)) continue;
+    return intervalsOverlap(proposal, interval);
+  };
+  for (const exam of canonical.exams) {
+    if (!intersectsAudience(exam)) continue;
     conflicts.push({
       id: `exam:${exam.id}`,
-      kind:
-        examAudienceMatch(exam, proposal).audienceUncertain ||
-        identityUncertain.has(exam.id)
-          ? "exam-audience-warning"
-          : exam.timeKnown
-            ? "exam-overlap"
-            : "exam-date-warning",
+      kind: examAudienceMatch(exam, proposal).audienceUncertain
+        ? "exam-audience-warning"
+        : exam.timeKnown
+          ? "exam-overlap"
+          : "exam-date-warning",
       record: exam,
       majorIds: proposal.majorIds.filter((id) =>
         exam.relevantMajorIds.includes(id),
       ),
-      reason: identityUncertain.has(exam.id)
-        ? "Canonical exam records disagree about timing; retained as uncertainty, not a confirmed overlap."
-        : examAudienceMatch(exam, proposal).explanation,
+      reason: examAudienceMatch(exam, proposal).explanation,
+    });
+  }
+  for (const group of canonical.identityConflicts) {
+    // Relevance and overlap must hold for the same source record, not a merged Cartesian audience.
+    const intersecting = group.alternatives.filter(intersectsAudience);
+    if (!intersecting.length) continue;
+    conflicts.push({
+      id: `exam:${group.id}`,
+      kind: "exam-audience-warning",
+      record: intersecting[0],
+      examAlternatives: group.alternatives,
+      majorIds: proposal.majorIds.filter((id) =>
+        intersecting.some((exam) => exam.relevantMajorIds.includes(id)),
+      ),
+      reason:
+        "Canonical exam records disagree about timing; a relevant source alternative may intersect this proposal. Retained as uncertainty, not a confirmed overlap. Numerical preparation is excluded until the records are reconciled.",
     });
   }
   return conflicts;

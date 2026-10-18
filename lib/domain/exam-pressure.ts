@@ -133,6 +133,9 @@ export function combinedExamPreparation(
   side: "at" | "left" = "at",
 ) {
   const canonical = examOccurrences(exams);
+  const identityUncertainIds = new Set(
+    canonical.identityConflicts.map((group) => group.id),
+  );
   const records = canonical.exams;
   const cells = audienceCells(audience).map((cell) => {
     const contributions = records.flatMap((record) => {
@@ -168,7 +171,10 @@ export function combinedExamPreparation(
   return summarizeAudienceCells(cells, [
     ...new Map(
       exams
-        .filter((exam) => !exam.relevantMajorIds.length)
+        .filter(
+          (exam) =>
+            !exam.relevantMajorIds.length && !identityUncertainIds.has(exam.id),
+        )
         .map((exam) => [exam.id, exam]),
     ).values(),
     ...canonical.identityUncertainExams,

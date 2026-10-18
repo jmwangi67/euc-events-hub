@@ -66,21 +66,25 @@ export function summarizeWeek(
   const identityUncertain = new Set(
     canonicalExams.identityUncertainExams.map((exam) => exam.id),
   );
-  const academic = [
-    ...canonicalExams.exams,
-    ...canonicalExams.identityUncertainExams,
-  ].filter(
-    (exam) =>
-      examAudienceMatch(exam, audience).relevant &&
-      intervalsOverlap(
-        window,
-        exam.timeKnown
-          ? exam
-          : {
-              start: easternDayStart(exam.date),
-              end: easternDayStart(addCalendarDays(exam.date, 1)),
-            },
+  const academic = unique(
+    [
+      ...canonicalExams.exams,
+      ...canonicalExams.identityConflicts.flatMap(
+        (group) => group.alternatives,
       ),
+    ].filter(
+      (exam) =>
+        examAudienceMatch(exam, audience).relevant &&
+        intervalsOverlap(
+          window,
+          exam.timeKnown
+            ? exam
+            : {
+                start: easternDayStart(exam.date),
+                end: easternDayStart(addCalendarDays(exam.date, 1)),
+              },
+        ),
+    ),
   );
   const exams = academic.filter(
     (exam) =>

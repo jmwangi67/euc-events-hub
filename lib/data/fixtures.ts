@@ -1,6 +1,6 @@
 import { events, exams, organizations, majors } from "../../data/fixtures";
 import { dateOnlySchema } from "../domain/models";
-import type { Event, EventCategory } from "../domain/models";
+import type { Event, EventCategory, Exam } from "../domain/models";
 import { isEventRelevant } from "../domain/relevance";
 import type { MajorSelection } from "../domain/relevance";
 import { addCalendarDays, easternDayStart } from "../time/eastern";
@@ -89,25 +89,34 @@ export function getMajors() {
 export function getOrganizations() {
   return structuredClone(organizations);
 }
-export function getExams({
-  start,
-  end,
-  termId,
-}: DateWindow & { termId?: string }) {
+/** Analysis can retain full source identities; display queries keep their original range semantics. */
+export function getExams(
+  {
+    start,
+    end,
+    termId,
+    includeIdentityAlternatives = false,
+  }: DateWindow & {
+    termId?: string;
+    includeIdentityAlternatives?: boolean;
+  },
+  examFixtures: readonly Exam[] = exams,
+) {
   const window = parseWindow({ start, end });
+  const matching = examFixtures.filter((exam) => {
+    const interval = exam.timeKnown
+      ? { start: Date.parse(exam.start), end: Date.parse(exam.end) }
+      : {
+          start: Date.parse(easternDayStart(exam.date)),
+          end: Date.parse(easternDayStart(addCalendarDays(exam.date, 1))),
+        };
+    return (!termId || exam.termId === termId) && overlaps(interval, window);
+  });
+  const matchingIds = new Set(matching.map((exam) => exam.id));
   return structuredClone(
-    exams
-      .filter((exam) => {
-        const interval = exam.timeKnown
-          ? { start: Date.parse(exam.start), end: Date.parse(exam.end) }
-          : {
-              start: Date.parse(easternDayStart(exam.date)),
-              end: Date.parse(easternDayStart(addCalendarDays(exam.date, 1))),
-            };
-        return (
-          (!termId || exam.termId === termId) && overlaps(interval, window)
-        );
-      })
-      .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)),
+    (includeIdentityAlternatives
+      ? examFixtures.filter((exam) => matchingIds.has(exam.id))
+      : matching
+    ).sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)),
   );
 }

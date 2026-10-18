@@ -1,6 +1,9 @@
 import type { Major, Event, Exam } from "../../lib/domain/models";
 import type { PlanningConflict, Proposal } from "../../lib/domain/planning";
-import { clusterTargetingLabel } from "../../lib/domain/planning-audience";
+import {
+  ACADEMIC_LEVELS,
+  clusterTargetingLabel,
+} from "../../lib/domain/planning-audience";
 import { formatEventTime } from "../../lib/time/eastern";
 import { examTimeLabel } from "../calendar/planner-events";
 
@@ -68,11 +71,13 @@ export function ConflictPanel({
                         ? event.allDay
                           ? "Recorded all-day interval overlap"
                           : "Known-time event overlap"
-                        : conflict.kind === "exam-audience-warning"
-                          ? "Audience-uncertain academic constraint"
-                          : exam?.timeKnown
-                            ? "Known-time academic exam overlap"
-                            : "Date-level academic warning · Time unknown"}
+                        : conflict.examAlternatives
+                          ? "Timing-uncertain academic constraint"
+                          : conflict.kind === "exam-audience-warning"
+                            ? "Audience-uncertain academic constraint"
+                            : exam?.timeKnown
+                              ? "Known-time academic exam overlap"
+                              : "Date-level academic warning · Time unknown"}
                     </p>
                     <h3>
                       <button
@@ -89,6 +94,63 @@ export function ConflictPanel({
                       {event ? formatEventTime(event) : examTimeLabel(exam!)}
                     </p>
                     <p>{conflict.reason}</p>
+                    {conflict.examAlternatives && (
+                      <details>
+                        <summary>Inspect conflicting exam sources</summary>
+                        <p className="field-help">
+                          The time above is one possible matching record, not a
+                          confirmed exam time. Each source retains its own
+                          timing and audience mapping.
+                        </p>
+                        <ul>
+                          {conflict.examAlternatives.map(
+                            (alternative, index) => (
+                              <li key={index}>
+                                <p>
+                                  <strong>{alternative.courseId}</strong> ·{" "}
+                                  {examTimeLabel(alternative)}
+                                </p>
+                                <p className="field-help">
+                                  Mapped majors:{" "}
+                                  {alternative.relevantMajorIds
+                                    .map(
+                                      (id) =>
+                                        majors.find((major) => major.id === id)
+                                          ?.abbreviation ?? id.toUpperCase(),
+                                    )
+                                    .join(", ") || "Not established"}
+                                  . Typical levels:{" "}
+                                  {alternative.typicalAcademicLevels
+                                    ?.map((level) => ACADEMIC_LEVELS[level])
+                                    .join(", ") || "Unknown"}
+                                  . Sections:{" "}
+                                  {alternative.sectionScope.join(", ") ||
+                                    "Not provided"}
+                                  .
+                                </p>
+                                <p className="constraint-source">
+                                  Source:{" "}
+                                  {alternative.source.url ? (
+                                    <a
+                                      href={alternative.source.url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      {alternative.source.label} (opens a new
+                                      tab)
+                                    </a>
+                                  ) : (
+                                    alternative.source.label
+                                  )}{" "}
+                                  · Verification:{" "}
+                                  {alternative.source.verification}
+                                </p>
+                              </li>
+                            ),
+                          )}
+                        </ul>
+                      </details>
+                    )}
                     {event && (
                       <p className="field-help">
                         {clusterTargetingLabel(event)}

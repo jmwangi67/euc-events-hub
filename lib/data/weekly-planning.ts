@@ -42,6 +42,7 @@ export function getWeeklyPlanningContext(window: DateWindow) {
     exams: getExams({
       ...completeWeeks,
       end: addCalendarDays(completeWeeks.end, 7),
+      includeIdentityAlternatives: true,
     }),
     externalEvents: getExternalEvents(completeWeeks),
     organizations: getOrganizations(),
