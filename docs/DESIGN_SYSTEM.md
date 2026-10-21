@@ -98,18 +98,16 @@ Major colors should remain configurable rather than hardcoded throughout the app
 
 ### Event Category Colors
 
-Events may use category-specific colors, including:
+The public calendar uses exactly six categories:
 
-- Corporate recruiting.
-- Technical workshops.
-- Professional development.
-- Networking.
-- Career fairs.
-- Student organization events.
-- Research events.
+- Career & Networking.
+- Professional Development.
+- Technical Workshops.
+- General Body Meetings.
 - Competitions.
+- Social & Recreational.
 
-Use event category as the primary calendar color treatment when helpful.
+Use the category palette in section 18 for public cards. Career fairs, corporate recruiting and networking remain typed subtypes of Career & Networking. Research and legacy Student organization records need purpose-aware migration; unresolved purposes stay flagged rather than guessed. Planner scope/density colors remain separate.
 
 Do not assign every organization a unique calendar color because this would create excessive visual complexity.
 
@@ -568,7 +566,7 @@ The owner-approved master refinement replaces earlier provisional scope colors. 
 | Local                | `scope-local-surface` #94C9AD       | `scope-local-border` #39795C       | `scope-local-foreground` #123E2B       |
 | Ordinary engineering | `scope-engineering-surface` #FFFFFF | `scope-engineering-border` #9AA9BA | `scope-engineering-foreground` #001E44 |
 
-CSS variables have a `--color-` prefix. These fixed card surfaces apply across all five planner layouts and ordinary public event cards. Academic exams keep their separate labeled treatment. Use visible focus outlines and restrained borders; cards remain interactive above every background layer. Local is the visible label; `campus-local` remains an internal identifier. Academic exam cards use **Academic Exam COURSE**. Fictional verification remains `synthetic` internally but is explained as Demo/Example in the UI.
+CSS variables have a `--color-` prefix. These fixed card surfaces apply across all five planner layouts. Public event colors are superseded by the six-category system below. Academic exams keep their separate labeled treatment. Use visible focus outlines and restrained borders; cards remain interactive above every background layer. Local is the visible label; `campus-local` remains an internal identifier. Academic exam cards use **Academic Exam COURSE**. Fictional verification remains `synthetic` internally but is explained as Demo/Example in the UI.
 
 Scheduling density has a separate legend and background palette:
 
@@ -587,4 +585,23 @@ Exam Preparation is visually independent: a solid navy lower bound, diagonally s
 
 Other Scheduling Constraints has an explicitly unavailable numerical indicator, factual counts and source-backed cautions. It never uses academic exams. Neither it nor preparation activates an overall score. Further scoring requires owner-approved methodology as documented in [ADR 004](decisions/004-independent-scheduling-indicators.md).
 
-Calendar previous/next controls use square 42px hit areas with centered 20px arrow icons and retained accessible names. Shared-date mobile/tablet grouping, full month names, compact Eastern times and overnight cues remain intact. Use **General Body Meeting (GBM)** and **Social & Recreational** as additional category labels without replacing Student organization. Validate 320, 375, 430, 768, 1024 and 1440px.
+Calendar previous/next controls use square 42px hit areas with centered 20px arrow icons and retained accessible names. Shared-date mobile/tablet grouping, full month names, compact Eastern times and overnight cues remain intact. The category taxonomy in this earlier refinement is superseded by section 18’s six public categories and lossless migration rules. Validate 320, 375, 430, 768, 1024 and 1440px.
+
+## 18. Student discovery categories and host badges
+
+The public calendar uses category surfaces independently of planner scope and density. Central `--color-category-*` tokens define:
+
+| Category                 | Surface | Border  |
+| ------------------------ | ------- | ------- |
+| Career & Networking      | #E5AA75 | #A96530 |
+| Professional Development | #A6D3CC | #438B7C |
+| Technical Workshops      | #E3CA78 | #A08530 |
+| General Body Meetings    | #C7A7DF | #8055A5 |
+| Competitions             | #E59AA5 | #AC4E63 |
+| Social & Recreational    | #A9CF8A | #648C3A |
+
+Primary and secondary text use #1C2430 and #34404E. Stable category classes apply to public Month, Week, Day, List and mobile cards. Compact legend/guide labels keep categories distinguishable when hues converge under color-vision deficiencies. Unknown legacy purposes remain flagged with a neutral surface, without adding a seventh category filter. Planner ordinary/external scope styles remain independent.
+
+Hosting uses a separate white badge with #1E407C icon/text and #B8C7DB border. One larger original generic SVG paw means PSU Hosted (university-only); two smaller horizontal paws mean Co-hosted (university plus student organization). Student-only or unresolved hosting gets no institutional badge. There is no white inner-border identity treatment, university-specific card fill, emoji or official logo claim. Full names remain in details/accessible names; compact contexts use registered labels, with CSS container queries selecting full names on spacious List cards. See [ADR 005](decisions/005-student-discovery-and-host-identity.md) for source and branding limitations.
+
+Welcome text remains restrained, with a closed-by-default category/community guide. Shared-date compact grouping, 12px/14px card padding, 4px header/card gap, 8px same-day card gap and 16px between days remain. Planner controls use native disclosure dropdowns above a full-width calendar; the separate proposal disclosure replaces the permanent sidebar without removing functionality.

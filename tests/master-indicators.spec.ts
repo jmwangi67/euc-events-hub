@@ -1,3 +1,4 @@
+import { openPlannerChoices } from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 
 const peakCaveat =
@@ -5,6 +6,7 @@ const peakCaveat =
 
 async function sampleWeek(page: Page) {
   await page.goto("/planner");
+  await openPlannerChoices(page);
   await page
     .getByRole("button", { name: "Load sample scenario", exact: true })
     .click();
@@ -182,6 +184,7 @@ test("proposal ranges retain independent subgroup sources behind an optional met
   page,
 }) => {
   await page.goto("/planner");
+  await openPlannerChoices(page);
   await page
     .getByRole("button", { name: "Load sample scenario", exact: true })
     .click();

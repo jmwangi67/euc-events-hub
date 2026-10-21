@@ -14,6 +14,7 @@ export type DiscoveryState = {
   mode: "all" | "recommended";
   majorIds: string[];
   organizationIds: string[];
+  clusterIds: string[];
   categories: import("./models").EventCategory[];
   search: string;
 };
@@ -24,6 +25,7 @@ export const clearDiscoveryFilters = (
   mode: "all",
   majorIds: [],
   organizationIds: [],
+  clusterIds: [],
   categories: [],
   search: "",
 });
@@ -31,7 +33,11 @@ export const clearDiscoveryFilters = (
 export function parseCalendarState(
   params: URLSearchParams,
   today: string,
-  options: { majorIds: string[]; organizationIds: string[] },
+  options: {
+    majorIds: string[];
+    organizationIds: string[];
+    clusterIds?: string[];
+  },
 ): DiscoveryState {
   const values = (key: string, allowed: readonly string[]) =>
     [...new Set((params.get(key) ?? "").split(","))].filter((value) =>
@@ -45,12 +51,24 @@ export function parseCalendarState(
     view: CALENDAR_VIEWS.includes(view as CalendarView)
       ? (view as CalendarView)
       : undefined,
-    mode: params.get("mode") === "recommended" ? "recommended" : "all",
+    mode: values("majors", options.majorIds).length ? "recommended" : "all",
     majorIds: values("majors", options.majorIds),
     organizationIds: values("organizations", options.organizationIds),
-    categories: values(
-      "categories",
-      eventCategorySchema.options,
+    clusterIds: values("clusters", options.clusterIds ?? []),
+    categories: [
+      ...new Set(
+        (params.get("categories") ?? "")
+          .split(",")
+          .map((value) =>
+            ["corporate-recruiting", "career-fair", "networking"].includes(
+              value,
+            )
+              ? "career-networking"
+              : value,
+          ),
+      ),
+    ].filter(
+      (value) => eventCategorySchema.safeParse(value).success,
     ) as DiscoveryState["categories"],
     search: (params.get("q") ?? "").slice(0, 200),
   };
@@ -62,6 +80,8 @@ export function serializeCalendarState(state: DiscoveryState): string {
   if (state.majorIds.length) params.set("majors", state.majorIds.join(","));
   if (state.organizationIds.length)
     params.set("organizations", state.organizationIds.join(","));
+  if (state.clusterIds.length)
+    params.set("clusters", state.clusterIds.join(","));
   if (state.categories.length)
     params.set("categories", state.categories.join(","));
   if (state.search) params.set("q", state.search);
@@ -69,11 +89,11 @@ export function serializeCalendarState(state: DiscoveryState): string {
 }
 export function discoveryFilters(state: DiscoveryState): EventFilters {
   return {
-    audience:
-      state.mode === "all"
-        ? { mode: "all" }
-        : { mode: "recommended", majorIds: state.majorIds },
+    audience: !state.majorIds.length
+      ? { mode: "all" }
+      : { mode: "recommended", majorIds: state.majorIds },
     organizationIds: state.organizationIds,
+    clusterIds: state.clusterIds,
     categories: state.categories,
     search: state.search,
   };

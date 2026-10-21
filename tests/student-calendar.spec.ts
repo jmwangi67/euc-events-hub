@@ -28,7 +28,7 @@ test("discovers published events, combines filters, searches, resets, and restor
       exact: true,
     })
     .check();
-  await page.getByLabel("Corporate recruiting", { exact: true }).check();
+  await page.getByLabel("Career & Networking", { exact: true }).check();
   await expect(page.locator(".fc-event")).toHaveCount(1);
   await expect(event(page, "Bioprocess industry discussion")).toBeVisible();
   const filteredUrl = page.url();
@@ -291,7 +291,7 @@ for (const width of [1024, 1440]) {
         exact: true,
       })
       .check();
-    await page.getByLabel("Corporate recruiting", { exact: true }).check();
+    await page.getByLabel("Career & Networking", { exact: true }).check();
     for (const group of [majors, organizations, categories]) {
       await group.locator("summary").focus();
       await page.keyboard.press("Enter");
@@ -315,7 +315,7 @@ for (const width of [1024, 1440]) {
       }),
     ).toBeChecked();
     await expect(
-      page.getByLabel("Corporate recruiting", { exact: true }),
+      page.getByLabel("Career & Networking", { exact: true }),
     ).toBeChecked();
   });
 }
@@ -335,10 +335,10 @@ for (const width of [320, 375, 430, 768, 1023]) {
     await page
       .getByLabel("Biomedical Engineering (BME)", { exact: true })
       .check();
-    await expect(page.locator(".filter-count")).toHaveText("0 active filters");
+    await expect(page.locator(".filter-count")).toHaveText("1 active filter");
     await page.locator("summary").filter({ hasText: "Majors" }).click();
     await page.getByLabel("Recommended Events", { exact: true }).check();
-    await page.getByLabel("Corporate recruiting", { exact: true }).check();
+    await page.getByLabel("Career & Networking", { exact: true }).check();
     await expect(
       page.getByLabel("Biomedical Engineering (BME)", { exact: true }),
     ).toBeHidden();
@@ -349,7 +349,7 @@ for (const width of [320, 375, 430, 768, 1023]) {
       });
     await page.getByRole("button", { name: /Hide filters/ }).click();
     await expect(panel).toBeHidden();
-    await expect(page.locator(".filter-count")).toHaveText("3 active filters");
+    await expect(page.locator(".filter-count")).toHaveText("2 active filters");
     await page.getByRole("button", { name: /Show filters/ }).click();
     await page.locator("summary").filter({ hasText: "Majors" }).click();
     await expect(
@@ -443,19 +443,19 @@ for (const width of [320, 375, 430, 768]) {
       [
         "Engineering welcome",
         "5:00–6:00 PM",
-        "Student organization",
+        "Social & Recreational",
         "Example Engineering Council",
       ],
       [
         "Process lab workshop",
         "6:00–7:30 PM",
-        "Technical workshop",
+        "Technical Workshops",
         "Example Process Engineering Society",
       ],
       [
         "Bioprocess industry discussion",
         "4:00–5:00 PM",
-        "Corporate recruiting",
+        "Career & Networking",
         "Example Process Engineering Society",
       ],
     ];
@@ -464,7 +464,7 @@ for (const width of [320, 375, 430, 768]) {
       await expect(row.locator(".event-title")).toHaveText(title);
       await expect(row.locator(".list-event-times")).toHaveText(time);
       await expect(row.locator(".event-category")).toContainText(category);
-      await expect(row.locator(".event-category")).toContainText(host);
+      await expect(row.locator(".event-hosts")).toContainText(host);
       await expect(row).not.toContainText(/2026|Oct|Monday|Tuesday|Wednesday/);
       const titleBox = await row.locator(".event-title").boundingBox();
       const timeBox = await row.locator(".list-event-times").boundingBox();
@@ -528,13 +528,13 @@ for (const width of [320, 375, 430, 768]) {
       "Next day",
     );
     await expect(rows.nth(1).locator(".event-category")).toContainText(
-      "Professional development · Engineering · Example Event · Example Engineering Council",
+      "Professional Development · Example Event",
     );
     await expect(rows.nth(2).locator(".event-category")).toContainText(
-      "Technical workshop · Engineering · Example Event · Example Process Engineering Society",
+      "Technical Workshops · Example Event",
     );
     await expect(rows.nth(3).locator(".event-category")).toContainText(
-      "Student organization · Engineering · Example Event · Example Design Collective",
+      "Technical Workshops · Example Event",
     );
     // Three sibling rows belong to the same single FullCalendar day header.
     await expect(group.locator("xpath=following-sibling::tr")).toHaveCount(3);
@@ -590,12 +590,12 @@ for (const width of [320, 375, 430, 768]) {
       cardPadding: "12px 14px",
       itemGap: "8px",
       headerGap: "4px",
-      cardSurface: "rgb(255, 255, 255)",
+      cardSurface: "rgb(229, 154, 165)",
       pageSurface: "rgb(248, 250, 252)",
       shadow: "none",
       groupSurface: "rgb(232, 239, 247)",
       headerSurface: "rgb(232, 239, 247)",
-      cardBorderColor: "rgb(154, 169, 186)",
+      cardBorderColor: "rgb(172, 78, 99)",
       groupInset: "8px",
       groupBottom: "8px",
       headerPadding: "8px",

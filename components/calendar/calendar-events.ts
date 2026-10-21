@@ -1,6 +1,6 @@
 import type { EventInput } from "@fullcalendar/core";
 import type { Event } from "../../lib/domain/models";
-import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
+import { categoryLabel } from "../../lib/domain/event-categories";
 import {
   formatEventClockRange,
   addCalendarDays,
@@ -18,7 +18,10 @@ export function toCalendarEvent(event: Event): EventInput {
     allDay: event.allDay,
     classNames: [`category-${event.category}`],
     extendedProps: {
-      category: EVENT_CATEGORIES[event.category],
+      category: categoryLabel(event.category),
+      subtype: event.subtype,
+      categoryMappingNote: event.categoryMappingNote,
+      location: event.location,
       timeLabel: formatEventTime(event),
       listTimes: listEventTimes(event),
     },

@@ -1,7 +1,9 @@
+import { openPlannerChoices } from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 
 async function sample(page: Page) {
   await page.goto("/planner");
+  await openPlannerChoices(page);
   await page
     .getByRole("button", { name: "Load sample scenario", exact: true })
     .click();
@@ -308,7 +310,7 @@ for (const width of [320, 375, 430, 768, 1024, 1440]) {
         ),
       ).toContainText("6:00–7:00 PM");
       const button = page.locator(
-        ".fc-list-event.category-social-recreational .mobile-list-event",
+        '.fc-list-event.category-social-recreational .mobile-list-event[data-calendar-event-id="example-social"]',
       );
       await expect(button).toContainText("6:30–8:00 PM");
       await expect(button).toContainText("Social & Recreational");

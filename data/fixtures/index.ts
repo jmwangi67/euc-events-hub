@@ -1,4 +1,4 @@
-/** Entire dataset is fictional; none of these records are official Penn State programming. */
+/** Events/exams are fictional. Sourced institutional host identities never verify these events. */
 import {
   eventSchema,
   examSchema,
@@ -6,6 +6,8 @@ import {
   organizationSchema,
 } from "../../lib/domain/models";
 
+import { discoveryExamples } from "./discovery";
+import { registeredHosts } from "./hosts";
 export const majors = majorSchema.array().parse([
   { id: "bme", name: "Biomedical Engineering", abbreviation: "BME" },
   { id: "che", name: "Chemical Engineering", abbreviation: "CHE" },
@@ -16,6 +18,7 @@ export const organizations = organizationSchema.array().parse([
     id: "example-council",
     name: "Example Engineering Council",
     defaultMajorIds: [],
+    hostType: "student-organization",
     classification: "college-wide",
     clusterIds: ["example-careers"],
   },
@@ -23,6 +26,7 @@ export const organizations = organizationSchema.array().parse([
     id: "example-process",
     name: "Example Process Engineering Society",
     defaultMajorIds: ["che"],
+    hostType: "student-organization",
     classification: "academic",
     clusterIds: ["example-makers", "example-careers"],
   },
@@ -30,9 +34,17 @@ export const organizations = organizationSchema.array().parse([
     id: "example-design",
     name: "Example Design Collective",
     defaultMajorIds: ["me", "bme"],
+    hostType: "student-organization",
     classification: "project",
     clusterIds: ["example-makers"],
   },
+  {
+    id: "example-host-unclassified",
+    name: "Example community host — classification unavailable",
+    hostType: "unknown",
+    defaultMajorIds: [],
+  },
+  ...registeredHosts,
 ]);
 const source = {
   label: "Example development fixture — not a real or verified event",
@@ -44,13 +56,14 @@ const base = {
   status: "published",
   targetMajorIds: [],
   targeting: "unclassified",
-  category: "student-organization",
+  category: "social-recreational",
   source,
 };
 export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-welcome",
+    category: "social-recreational",
     title: "Example Event: Engineering welcome",
     hostOrganizationIds: ["example-council"],
     collegeWide: true,
@@ -87,6 +100,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-design-meeting",
+    category: "general-body-meeting",
     title: "Example Event: Design collective meeting",
     hostOrganizationIds: ["example-design"],
     targeting: "inherited",
@@ -97,6 +111,8 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-open-topic",
+    category: null,
+    categoryMappingNote: "Event purpose has not yet been classified.",
     title: "Example Event: Topic to be announced",
     hostOrganizationIds: ["example-process"],
     status: "tentative",
@@ -117,6 +133,7 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-night-build",
+    category: "technical-workshop",
     title: "Example Event: Late design session",
     hostOrganizationIds: ["example-design"],
     targeting: "inherited",
@@ -207,11 +224,13 @@ export const events = eventSchema.array().parse([
   {
     ...base,
     id: "example-visual-night",
+    category: "technical-workshop",
     title: "Example Event: Late-night build session",
     hostOrganizationIds: ["example-design"],
     start: "2026-12-31T23:30:00-05:00",
     end: "2027-01-01T00:30:00-05:00",
   },
+  ...discoveryExamples,
 ]);
 export const exams = examSchema.array().parse([
   {

@@ -23,6 +23,8 @@ import { getEventById } from "../../lib/data/fixtures";
 import { getProposalIntelligenceContext } from "../../lib/data/planner";
 import { analyzePlanningProposal } from "../../lib/domain/proposal-analysis";
 import { ProposalFactors } from "./proposal-factors";
+import { SelectionDropdown } from "../filters/selection-dropdown";
+import { plannerControlCount } from "../../lib/domain/planner-control-summary";
 import { AudienceControls } from "./audience-controls";
 import { easternDate } from "../../lib/time/eastern";
 import {
@@ -35,7 +37,10 @@ import { EventCalendar } from "../calendar/event-calendar";
 import { EventDetails } from "../calendar/event-details";
 import { useCompactCalendar } from "../calendar/use-compact-calendar";
 import { ConflictPanel } from "./conflict-panel";
-import { ALL_LEVELS } from "../../lib/domain/planning-audience";
+import {
+  ALL_LEVELS,
+  ACADEMIC_LEVELS,
+} from "../../lib/domain/planning-audience";
 import { getOrganizationClusters } from "../../lib/data/weekly-planning";
 import { ExamDetails } from "./exam-details";
 
@@ -247,6 +252,11 @@ export function OrganizationPlanner({
     setErrors({});
     setDate("2026-10-21");
   }
+  const activeFilterCount = plannerControlCount(
+    audience,
+    [showEvents, showExams, showPsuWide, showCampusLocal, showNational],
+    showDensity,
+  );
   return (
     <>
       <div className="development-notice">
@@ -265,33 +275,72 @@ export function OrganizationPlanner({
           Compare a local proposal with recorded event and academic constraints.
         </p>
       </div>
-      <div className="planner-layout">
-        <form
-          className="proposal-form"
-          onSubmit={analyze}
-          noValidate
-          aria-labelledby="proposal-title"
-        >
-          <h2 id="proposal-title">Your local scenario</h2>
-          <p className="field-help">
-            All input times are Eastern. Selecting an organization does not
-            verify representation.
-          </p>
-          {Object.keys(errors).length > 0 && (
-            <div
-              className="planner-errors"
-              role="alert"
-              tabIndex={-1}
-              ref={errorSummary}
-            >
-              <h3>Check the proposal</h3>
-              <ul>
-                {Object.entries(errors).map(([field, message]) => (
-                  <li key={field}>{message}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+      <details className="planner-controls" open>
+        <summary>
+          <strong>Filters &amp; Audience</strong>
+          <span className="planner-filter-count">
+            {activeFilterCount} active{" "}
+            {activeFilterCount === 1 ? "filter" : "filters"}
+          </span>
+          <span className="planner-collapsed-summary">
+            {majorIds
+              .map(
+                (id) =>
+                  majors.find((major) => major.id === id)?.abbreviation ?? id,
+              )
+              .join(", ") || "No majors"}{" "}
+            ·{" "}
+            {academicLevels.length === ALL_LEVELS.length
+              ? "All years"
+              : academicLevels
+                  .map((level) => ACADEMIC_LEVELS[level])
+                  .join(", ") || "No academic years"}{" "}
+            · {clusterIds.length} analytical clusters
+            {clusterIds.length > 0
+              ? ` (${clusters
+                  .filter((cluster) => clusterIds.includes(cluster.id))
+                  .map((cluster) => cluster.name)
+                  .join(", ")})`
+              : ""}{" "}
+            ·{" "}
+            {
+              [
+                showEvents,
+                showExams,
+                showPsuWide,
+                showCampusLocal,
+                showNational,
+              ].filter((value) => !value).length
+            }{" "}
+            hidden calendar layers
+            {[
+              showEvents,
+              showExams,
+              showPsuWide,
+              showCampusLocal,
+              showNational,
+            ].some((value) => !value)
+              ? ` (${[
+                  ["Published events", showEvents],
+                  ["Academic exams", showExams],
+                  ["PSU-wide", showPsuWide],
+                  ["Local", showCampusLocal],
+                  ["National", showNational],
+                ]
+                  .filter(([, visible]) => !visible)
+                  .map(([label]) => label)
+                  .join(", ")})`
+              : ""}
+            {showDensity ? " · Density on" : ""}. Proposal host:{" "}
+            {organization.name}.
+          </span>
+        </summary>
+        <p className="field-help">
+          Audience selections affect analysis. Calendar display controls affect
+          visibility only. Proposal host identifies who is planning; it does not
+          filter calendar hosts.
+        </p>
+        <div className="planner-controls-grid">
           <label className="planner-field">
             Example organization
             <select
@@ -328,141 +377,10 @@ export function OrganizationPlanner({
               setErrors({});
             }}
           />
-          <label className="planner-field">
-            Proposed event title
-            <input
-              ref={titleInput}
-              className="control"
-              value={draft.title}
-              maxLength={160}
-              required
-              aria-invalid={!!errors.title}
-              onChange={(e) => updateDraft({ title: e.target.value })}
-            />
-          </label>
-          {(["start", "end"] as const).map((endpoint) => (
-            <fieldset
-              className="proposal-endpoint"
-              key={endpoint}
-              aria-describedby={
-                errors[endpoint] ? `${endpoint}-error` : undefined
-              }
-            >
-              <legend>{endpoint === "start" ? "Starts" : "Ends"}</legend>
-              <div className="proposal-date-time">
-                <label className="planner-field">
-                  {endpoint === "start" ? "Start" : "End"} date
-                  <input
-                    className="control"
-                    type="date"
-                    required
-                    value={draft[`${endpoint}Date`]}
-                    aria-invalid={!!errors[endpoint]}
-                    aria-describedby={
-                      errors[endpoint] ? `${endpoint}-error` : undefined
-                    }
-                    onChange={(e) =>
-                      updateDraft({ [`${endpoint}Date`]: e.target.value })
-                    }
-                  />
-                </label>
-                <label className="planner-field">
-                  {endpoint === "start" ? "Start" : "End"} time
-                  <input
-                    className="control"
-                    type="time"
-                    required
-                    value={draft[`${endpoint}Time`]}
-                    aria-invalid={!!errors[endpoint]}
-                    aria-describedby={
-                      errors[endpoint] ? `${endpoint}-error` : undefined
-                    }
-                    onChange={(e) =>
-                      updateDraft({ [`${endpoint}Time`]: e.target.value })
-                    }
-                  />
-                </label>
-              </div>
-              {ambiguous(endpoint) && (
-                <label className="planner-field">
-                  {endpoint === "start" ? "Start" : "End"} repeated-time
-                  occurrence
-                  <select
-                    aria-label={`${endpoint === "start" ? "Start" : "End"} repeated-time occurrence`}
-                    aria-describedby={`${endpoint}-fold-help`}
-                    className="control"
-                    value={draft[`${endpoint}Occurrence`]}
-                    onChange={(e) =>
-                      updateDraft({
-                        [`${endpoint}Occurrence`]: e.target.value as
-                          LocalOccurrence | "",
-                      })
-                    }
-                  >
-                    <option value="">Choose an occurrence</option>
-                    <option value="first">First occurrence</option>
-                    <option value="second">
-                      Second occurrence (one hour later)
-                    </option>
-                  </select>
-                  <span className="field-help" id={`${endpoint}-fold-help`}>
-                    The Eastern clock repeats this time during the fall
-                    transition.
-                  </span>
-                </label>
-              )}
-              {errors[endpoint] && (
-                <p className="field-error" id={`${endpoint}-error`}>
-                  {errors[endpoint]}
-                </p>
-              )}
-            </fieldset>
-          ))}
-          <label className="planner-field">
-            Category (optional)
-            <select
-              className="control"
-              aria-label="Category (optional)"
-              value={draft.category}
-              onChange={(e) => updateDraft({ category: e.target.value })}
-            >
-              <option value="">Not specified</option>
-              {Object.entries(EVENT_CATEGORIES).map(([id, label]) => (
-                <option key={id} value={id}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button className="control planner-analyze" type="submit">
-            Analyze proposal
-          </button>
-          <p className="field-help">
-            Editing the proposal or its audience clears the previous analysis.
-            For overnight events, set the following end date.
-          </p>
-        </form>
-        <div className="planner-workspace">
-          <ConflictPanel
-            proposal={proposal}
-            conflicts={proposalAnalysis?.conflicts ?? []}
-            majors={majors}
-            onEventSelect={setSelectedId}
-            onExamSelect={setSelectedExam}
-          />
-          {proposalAnalysis && proposalContext && (
-            <ProposalFactors
-              analysis={proposalAnalysis}
-              context={proposalContext}
-            />
-          )}
-          <section className="planner-context" aria-labelledby="context-title">
-            <div className="planner-section-heading">
-              <div>
-                <p className="eyebrow">Planning context</p>
-                <h2 id="context-title">Events and academic exams</h2>
-              </div>
-            </div>
+          <SelectionDropdown
+            title="Calendar layers"
+            summary={`${[showEvents, showExams, showPsuWide, showCampusLocal, showNational].filter(Boolean).length} visible${showDensity ? " · density on" : ""}`}
+          >
             <fieldset className="planner-display">
               <legend>Calendar display only</legend>
               <label className="choice">
@@ -524,6 +442,174 @@ export function OrganizationPlanner({
               analysis. Academic exams use a distinct border and explicit
               labels; unknown times remain date-level entries.
             </p>
+          </SelectionDropdown>
+        </div>
+      </details>
+      <div className="planner-layout">
+        <details className="proposal-disclosure" open>
+          <summary>Local proposal · Unsaved scenario</summary>
+          <form
+            className="proposal-form"
+            onSubmit={analyze}
+            noValidate
+            aria-labelledby="proposal-title"
+          >
+            <h2 id="proposal-title">Your local scenario</h2>
+            <p className="field-help">
+              All input times are Eastern. Selecting an organization does not
+              verify representation.
+            </p>
+            {Object.keys(errors).length > 0 && (
+              <div
+                className="planner-errors"
+                role="alert"
+                tabIndex={-1}
+                ref={errorSummary}
+              >
+                <h3>Check the proposal</h3>
+                <ul>
+                  {Object.entries(errors).map(([field, message]) => (
+                    <li key={field}>{message}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <label className="planner-field">
+              Proposed event title
+              <input
+                ref={titleInput}
+                className="control"
+                value={draft.title}
+                maxLength={160}
+                required
+                aria-invalid={!!errors.title}
+                onChange={(e) => updateDraft({ title: e.target.value })}
+              />
+            </label>
+            {(["start", "end"] as const).map((endpoint) => (
+              <fieldset
+                className="proposal-endpoint"
+                key={endpoint}
+                aria-describedby={
+                  errors[endpoint] ? `${endpoint}-error` : undefined
+                }
+              >
+                <legend>{endpoint === "start" ? "Starts" : "Ends"}</legend>
+                <div className="proposal-date-time">
+                  <label className="planner-field">
+                    {endpoint === "start" ? "Start" : "End"} date
+                    <input
+                      className="control"
+                      type="date"
+                      required
+                      value={draft[`${endpoint}Date`]}
+                      aria-invalid={!!errors[endpoint]}
+                      aria-describedby={
+                        errors[endpoint] ? `${endpoint}-error` : undefined
+                      }
+                      onChange={(e) =>
+                        updateDraft({ [`${endpoint}Date`]: e.target.value })
+                      }
+                    />
+                  </label>
+                  <label className="planner-field">
+                    {endpoint === "start" ? "Start" : "End"} time
+                    <input
+                      className="control"
+                      type="time"
+                      required
+                      value={draft[`${endpoint}Time`]}
+                      aria-invalid={!!errors[endpoint]}
+                      aria-describedby={
+                        errors[endpoint] ? `${endpoint}-error` : undefined
+                      }
+                      onChange={(e) =>
+                        updateDraft({ [`${endpoint}Time`]: e.target.value })
+                      }
+                    />
+                  </label>
+                </div>
+                {ambiguous(endpoint) && (
+                  <label className="planner-field">
+                    {endpoint === "start" ? "Start" : "End"} repeated-time
+                    occurrence
+                    <select
+                      aria-label={`${endpoint === "start" ? "Start" : "End"} repeated-time occurrence`}
+                      aria-describedby={`${endpoint}-fold-help`}
+                      className="control"
+                      value={draft[`${endpoint}Occurrence`]}
+                      onChange={(e) =>
+                        updateDraft({
+                          [`${endpoint}Occurrence`]: e.target.value as
+                            LocalOccurrence | "",
+                        })
+                      }
+                    >
+                      <option value="">Choose an occurrence</option>
+                      <option value="first">First occurrence</option>
+                      <option value="second">
+                        Second occurrence (one hour later)
+                      </option>
+                    </select>
+                    <span className="field-help" id={`${endpoint}-fold-help`}>
+                      The Eastern clock repeats this time during the fall
+                      transition.
+                    </span>
+                  </label>
+                )}
+                {errors[endpoint] && (
+                  <p className="field-error" id={`${endpoint}-error`}>
+                    {errors[endpoint]}
+                  </p>
+                )}
+              </fieldset>
+            ))}
+            <label className="planner-field">
+              Category (optional)
+              <select
+                className="control"
+                aria-label="Category (optional)"
+                value={draft.category}
+                onChange={(e) => updateDraft({ category: e.target.value })}
+              >
+                <option value="">Not specified</option>
+                {Object.entries(EVENT_CATEGORIES).map(([id, label]) => (
+                  <option key={id} value={id}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button className="control planner-analyze" type="submit">
+              Analyze proposal
+            </button>
+            <p className="field-help">
+              Editing the proposal or its audience clears the previous analysis.
+              For overnight events, set the following end date.
+            </p>
+          </form>
+        </details>
+        <div className="planner-workspace">
+          <ConflictPanel
+            proposal={proposal}
+            conflicts={proposalAnalysis?.conflicts ?? []}
+            majors={majors}
+            onEventSelect={setSelectedId}
+            onExamSelect={setSelectedExam}
+          />
+          {proposalAnalysis && proposalContext && (
+            <ProposalFactors
+              analysis={proposalAnalysis}
+              context={proposalContext}
+            />
+          )}
+          <section className="planner-context" aria-labelledby="context-title">
+            <div className="planner-section-heading">
+              <div>
+                <p className="eyebrow">Planning context</p>
+                <h2 id="context-title">Events and academic exams</h2>
+              </div>
+            </div>
             <EventCalendar
               date={date}
               view={activeView}

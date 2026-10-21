@@ -26,7 +26,7 @@ describe("strict exam/non-exam indicator independence", () => {
     expect(withoutExams.preparation.range).toEqual([0, 0]);
     expect(
       withExams.nonExam.constraints.every(
-        (item) => !item.category.includes("exam"),
+        (item) => !item.category?.includes("exam"),
       ),
     ).toBe(true);
     expect(withExams.nonExam.overall).toEqual({

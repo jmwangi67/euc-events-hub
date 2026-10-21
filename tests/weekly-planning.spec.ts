@@ -1,6 +1,8 @@
+import { openPlannerChoices } from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 async function sample(page: Page) {
   await page.goto("/planner");
+  await openPlannerChoices(page);
   await page.getByRole("button", { name: "Load sample scenario" }).click();
 }
 const summary = (page: Page) =>

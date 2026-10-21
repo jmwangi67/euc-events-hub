@@ -91,7 +91,7 @@ describe("fixture-backed queries", () => {
         filters: {
           audience: { mode: "recommended", majorIds: ["bme"] },
           organizationIds: ["example-process"],
-          categories: ["corporate-recruiting"],
+          categories: ["career-networking"],
         },
       }).map((e) => e.id),
     ).toEqual(["example-industry"]));

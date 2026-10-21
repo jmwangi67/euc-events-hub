@@ -16,7 +16,7 @@ describe("FullCalendar data mapping", () => {
       start: "2026-10-21T16:00:00-04:00",
       end: "2026-10-21T17:00:00-04:00",
       allDay: false,
-      extendedProps: { category: "Corporate recruiting" },
+      extendedProps: { category: "Career & Networking" },
     });
   });
   it("preserves exclusive all-day ends without converting to instants", () => {

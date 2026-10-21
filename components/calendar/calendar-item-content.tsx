@@ -1,3 +1,4 @@
+import { HostingBadge } from "./hosting-badge";
 import type { EventApi, EventContentArg } from "@fullcalendar/core";
 import {
   externalScopeLabel,
@@ -10,11 +11,13 @@ export function CalendarItemContent({
   mobile,
   itemLabel,
   selectItem,
+  planner,
 }: {
   info: EventContentArg;
   mobile: boolean;
   itemLabel: (event: EventApi) => string;
   selectItem: (event: EventApi) => void;
+  planner: boolean;
 }) {
   if (info.event.extendedProps.kind === "density") return null;
   if (
@@ -44,6 +47,19 @@ export function CalendarItemContent({
     info.view.type.startsWith("dayGrid")
       ? `Academic Exam${!info.event.extendedProps.exam.relevantMajorIds.length ? " · Audience unknown" : ""} · ${verificationLabel(info.event.extendedProps.exam.source.verification)}`
       : info.event.extendedProps.category;
+  const hostContent = !info.event.extendedProps.kind && (
+    <>
+      <HostingBadge identity={info.event.extendedProps.hostingIdentity} />
+      {info.event.extendedProps.hosts && (
+        <span className="event-hosts">
+          <span className="hosts-full">{info.event.extendedProps.hosts}</span>
+          <span className="hosts-compact" aria-hidden="true">
+            {info.event.extendedProps.compactHosts}
+          </span>
+        </span>
+      )}
+    </>
+  );
   const content = (
     <span className="calendar-event-content">
       <span className="event-time">
@@ -56,8 +72,15 @@ export function CalendarItemContent({
       <span className="event-title">{compactTitle(info.event.title)}</span>
       <span className="event-category">
         {categoryLabel}
-        {!info.event.extendedProps.kind && " · Engineering · Example Event"}
+        {!info.event.extendedProps.kind &&
+          (planner ? " · Engineering · Example Event" : " · Example Event")}
       </span>
+      {hostContent}
+      {info.event.extendedProps.location && (
+        <span className="event-location">
+          {info.event.extendedProps.location}
+        </span>
+      )}
     </span>
   );
   return info.view.type.startsWith("list") ? (
@@ -89,10 +112,15 @@ export function CalendarItemContent({
           </span>
           <span className="event-category">
             {info.event.extendedProps.category}
-            {!info.event.extendedProps.kind && " · Engineering · Example Event"}
-            {info.event.extendedProps.hosts &&
-              ` · ${info.event.extendedProps.hosts}`}
+            {!info.event.extendedProps.kind &&
+              (planner ? " · Engineering · Example Event" : " · Example Event")}
           </span>
+          {hostContent}
+          {info.event.extendedProps.location && (
+            <span className="event-location">
+              {info.event.extendedProps.location}
+            </span>
+          )}
         </span>
       ) : (
         <>

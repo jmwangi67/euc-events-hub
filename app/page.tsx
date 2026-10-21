@@ -1,4 +1,5 @@
 import { StudentCalendar } from "../components/calendar/student-calendar";
+import { getOrganizationClusters } from "../lib/data/weekly-planning";
 import { getMajors, getOrganizations } from "../lib/data/fixtures";
 import { parseCalendarState } from "../lib/domain/calendar-state";
 import { easternDate } from "../lib/time/eastern";
@@ -21,6 +22,7 @@ export default async function Home({
     {
       majorIds: majors.map((major) => major.id),
       organizationIds: organizations.map((org) => org.id),
+      clusterIds: getOrganizationClusters().map((cluster) => cluster.id),
     },
   );
   return (

@@ -1,4 +1,6 @@
 "use client";
+import { HostingBadge } from "./hosting-badge";
+import { departmentHosted, hostingIdentity } from "../../lib/domain/hosting";
 import { DetailsDialog } from "./details-dialog";
 import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
 import type {
@@ -7,7 +9,7 @@ import type {
   Organization,
   OrganizationCluster,
 } from "../../lib/domain/models";
-import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
+import { categoryLabel } from "../../lib/domain/event-categories";
 import { sourceLabel, verificationLabel } from "../../lib/domain/source-labels";
 import { formatEventTime } from "../../lib/time/eastern";
 
@@ -61,8 +63,15 @@ export function EventDetails({
           official Penn State schedule.
         </p>
       )}
+      <HostingBadge identity={hostingIdentity(event, organizations)} />
       <p className="detail-time">{formatEventTime(event)}</p>
       <dl className="event-facts">
+        {departmentHosted(event, organizations) && (
+          <div>
+            <dt>Host type</dt>
+            <dd>Department-hosted</dd>
+          </div>
+        )}
         <div>
           <dt>
             {hosts.length > 1 ? "Host organizations" : "Host organization"}
@@ -70,11 +79,58 @@ export function EventDetails({
           <dd>
             {hosts.map((host) => host.name).join(", ") ||
               "Host details not provided"}
+            {hosts
+              .filter((host) => host.parentUnitIds?.length)
+              .map((host) => (
+                <span className="field-help" key={`parent-${host.id}`}>
+                  {host.name} · Parent units:{" "}
+                  {host
+                    .parentUnitIds!.map(
+                      (id) =>
+                        organizations.find((unit) => unit.id === id)?.name ??
+                        "Parent unit not documented",
+                    )
+                    .join(" + ")}
+                  .
+                </span>
+              ))}
+            {hosts
+              .filter((host) => host.source)
+              .map((host) => (
+                <span key={host.id} className="field-help">
+                  Host identity only:{" "}
+                  {host.source!.url ? (
+                    <a href={host.source!.url} target="_blank" rel="noreferrer">
+                      {host.name} source (opens a new tab)
+                    </a>
+                  ) : (
+                    sourceLabel(host.source!)
+                  )}
+                  . This does not verify the event.
+                </span>
+              ))}
           </dd>
         </div>
         <div>
           <dt>Category</dt>
-          <dd>{EVENT_CATEGORIES[event.category]}</dd>
+          <dd>
+            {categoryLabel(event.category)}
+            {event.categoryMappingNote && event.category === null && (
+              <span className="field-help">{event.categoryMappingNote}</span>
+            )}
+            {event.subtype && (
+              <span className="field-help">
+                Subtype:{" "}
+                {event.subtype === "career-fair"
+                  ? "Career fair"
+                  : event.subtype === "corporate-recruiting"
+                    ? "Corporate recruiting session"
+                    : event.subtype === "networking"
+                      ? "Networking event"
+                      : "Educational research seminar"}
+              </span>
+            )}
+          </dd>
         </div>
         <div>
           <dt>Location</dt>
@@ -161,6 +217,12 @@ export function EventDetails({
         </div>
       </dl>
       <h3>About this event</h3>
+      {departmentHosted(event, organizations) && (
+        <p className="department-host-note">
+          Department-hosted · Hosted by:{" "}
+          {hosts.map((host) => host.name).join(" + ")}
+        </p>
+      )}
       <p className="detail-description">
         {event.description || "No description has been provided."}
       </p>

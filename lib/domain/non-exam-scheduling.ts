@@ -310,7 +310,7 @@ function externalWindows(
   ];
 }
 function engineeringWindows(event: Event): NonExamWindow[] {
-  const fair = event.category === "career-fair";
+  const fair = event.subtype === "career-fair";
   const description = {
     kind: fair ? ("policy" as const) : ("actual" as const),
     guidance: fair

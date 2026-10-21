@@ -644,7 +644,7 @@ Week/Day lead with overall scoring unavailable pending methodology review (`scor
 
 ## PR #5 master refinement: discovery and independent scheduling guidance
 
-The owner's master PR #5 request authorizes the focused refinements in [ADR 004](decisions/004-independent-scheduling-indicators.md). Student event discovery retains published-only visibility, existing major/organization/category filtering, search, keyboard activation, and source-backed details. **GBM** and **Social & Recreational** are explicit discoverable categories. Fictional records remain labeled as examples/demo data, including records that resemble PSU-wide or national commitments. The calendar-level time label remains **All Times Eastern (ET)**.
+The owner's master PR #5 request authorizes the focused refinements in [ADR 004](decisions/004-independent-scheduling-indicators.md). Student event discovery retains published-only visibility, existing major/organization/category filtering, search, keyboard activation, and source-backed details. The category additions in that earlier refinement are superseded by the six-category taxonomy below. Fictional records remain labeled as examples/demo data, including records that resemble PSU-wide or national commitments. The calendar-level time label remains **All Times Eastern (ET)**.
 
 Planner scheduling information has two independent sections:
 
@@ -660,3 +660,11 @@ Specific policy guidance is authorized as a local prototype: THON avoidance cove
 Eligible **Avoid scheduling** guidance takes priority over ordinary **Scheduling caution** and **Review conflicts** reasons, with additional sources and uncertainty available accessibly. Cautions remain visible when density is off. Local context stays analytically excluded without explicit selected-audience applicability. Host cluster membership alone does not establish event targeting. Calendar show/hide controls do not narrow analysis or change either indicator's results.
 
 The application remains a synthetic-data prototype without authentication, live ingestion, database persistence, publication, or new paid infrastructure. Final owner visual acceptance remains required before any merge. Later numerical scoring needs an approved relevance/weighting and normalization model, source-coverage review, calibration data, uncertainty treatment, and representative validation; factual counts and policy priorities do not substitute for those decisions.
+
+## PR #5 student discovery and host identity refinement
+
+[ADR 005](decisions/005-student-discovery-and-host-identity.md) authorizes six public categories with lossless legacy migration and explicit event subtypes, including preserved career-fair policy behavior. Unresolved legacy purposes remain published records with an explanatory review flag. The existing Organization model is extended with structured hosting identity, parent units, full/compact names and separate identity sources; no duplicate host model is introduced.
+
+Public discovery uses selected major relevance AND active host organization/host-membership cluster/category restrictions, with OR within each dimension. Empty filters impose no restriction. Host membership discovery never changes the planner's explicit cluster-targeting semantics. Source-backed institutional badges are presentation only, using an original generic SVG rather than an official trademark. Student category colors remain separate from planner scope/density palettes.
+
+The planner's permanent sidebar is removed in favor of collapsible dropdown controls and an independent local-proposal disclosure above the full-width calendar. All existing proposal validation, audience selection, display visibility, density, source uncertainty, independent indicators, five views and inline weekly summaries remain. Exam mathematics and numerical overall/non-exam score gates are unchanged. No new dependency, service, persistence, authentication or live data is introduced. Owner visual acceptance remains pending.

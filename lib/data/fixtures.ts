@@ -10,6 +10,7 @@ export type EventFilters = {
   audience?: MajorSelection;
   organizationIds?: readonly string[];
   categories?: readonly EventCategory[];
+  clusterIds?: readonly string[];
   search?: string;
 };
 
@@ -66,8 +67,15 @@ export function getEvents(
         filters.organizationIds.some((id) =>
           event.hostOrganizationIds.includes(id),
         )) &&
+      (!filters.clusterIds?.length ||
+        organizations.some(
+          (org) =>
+            event.hostOrganizationIds.includes(org.id) &&
+            org.clusterIds?.some((id) => filters.clusterIds!.includes(id)),
+        )) &&
       (!filters.categories?.length ||
-        filters.categories.includes(event.category)) &&
+        (event.category !== null &&
+          filters.categories.includes(event.category))) &&
       (!search ||
         `${event.title} ${event.description ?? ""}`
           .toLowerCase()

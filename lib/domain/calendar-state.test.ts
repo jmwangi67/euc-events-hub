@@ -45,7 +45,7 @@ describe("student discovery and shareable state", () => {
     expect(ids("mode=recommended&majors=bme,che")).toContain(
       "example-process-lab",
     );
-    expect(ids("mode=recommended")).toEqual(["example-welcome", "example-gbm"]);
+    expect(ids("mode=recommended")).toEqual(ids());
   });
   it("keeps majors and host filters independent and combines category filters", () => {
     expect(
@@ -59,6 +59,8 @@ describe("student discovery and shareable state", () => {
     expect(ids("categories=corporate-recruiting,technical-workshop")).toEqual([
       "example-process-lab",
       "example-industry",
+      "example-open-studio",
+      "example-night-build",
     ]);
   });
   it("searches titles and descriptions without case or surrounding whitespace sensitivity", () => {
@@ -90,6 +92,7 @@ describe("student discovery and shareable state", () => {
       mode: "all",
       majorIds: [],
       organizationIds: [],
+      clusterIds: [],
       categories: [],
       search: "",
     });
@@ -106,7 +109,7 @@ describe("student discovery and shareable state", () => {
     );
     expect(state.date).toBe("2026-10-19");
     expect(state.view).toBeUndefined();
-    expect(state.mode).toBe("all");
+    expect(state.mode).toBe("recommended");
     expect(state.majorIds).toEqual(["bme"]);
     expect(state.organizationIds).toEqual([]);
     expect(state.categories).toEqual([]);

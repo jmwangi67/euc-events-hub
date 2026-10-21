@@ -1,3 +1,4 @@
+import { SelectionDropdown } from "../filters/selection-dropdown";
 import type {
   AcademicLevel,
   Major,
@@ -40,101 +41,123 @@ export function AudienceControls({
     .join(", ");
   return (
     <>
-      <fieldset
-        className="planning-audience"
-        aria-describedby="audience-help audience-summary"
+      <SelectionDropdown
+        title="Planning majors"
+        summary={`${majorIds.length} selected`}
       >
-        <legend>Planning audience</legend>
-        <p className="field-help" id="audience-help">
-          {organization.defaultMajorIds.length
-            ? "Starts with the organization’s documented majors. Adjust for this proposal."
-            : "No default audience is documented. Select the majors you intend to reach before analysis."}
-        </p>
-        {majors.map((major) => (
-          <label className="choice" key={major.id}>
-            <input
-              type="checkbox"
-              checked={majorIds.includes(major.id)}
-              onChange={() =>
-                onChange({ majorIds: toggle(majorIds, major.id) })
-              }
-            />
-            {major.name} ({major.abbreviation})
-          </label>
-        ))}
-        <p
-          id="audience-summary"
-          className="audience-summary"
-          aria-live="polite"
+        <fieldset
+          className="planning-audience"
+          aria-describedby="audience-help audience-summary"
         >
-          Analyzing for:{" "}
-          <strong>{audienceLabel || "Select a planning audience"}</strong>
-        </p>
-      </fieldset>
-      <fieldset className="planning-audience academic-levels">
-        <legend>Academic levels</legend>
-        <div
-          className="audience-shortcuts"
-          role="group"
-          aria-label="Academic level shortcuts"
-        >
-          {shortcuts.map(([label, levels]) => (
-            <button
-              key={label}
-              type="button"
-              className="control"
-              aria-pressed={
-                academicLevels.length === levels.length &&
-                levels.every((level) => academicLevels.includes(level))
-              }
-              onClick={() => onChange({ academicLevels: [...levels] })}
-            >
-              {label}
-            </button>
+          <legend>Planning audience</legend>
+          <p className="field-help" id="audience-help">
+            {organization.defaultMajorIds.length
+              ? "Starts with the organization’s documented majors. Adjust for this proposal."
+              : "No default audience is documented. Select the majors you intend to reach before analysis."}
+          </p>
+          {majors.map((major) => (
+            <label className="choice" key={major.id}>
+              <input
+                type="checkbox"
+                checked={majorIds.includes(major.id)}
+                onChange={() =>
+                  onChange({ majorIds: toggle(majorIds, major.id) })
+                }
+              />
+              {major.name} ({major.abbreviation})
+            </label>
           ))}
-        </div>
-        {ALL_LEVELS.map((level) => (
-          <label className="choice" key={level}>
-            <input
-              type="checkbox"
-              checked={academicLevels.includes(level)}
-              onChange={() =>
-                onChange({ academicLevels: toggle(academicLevels, level) })
-              }
-            />
-            {ACADEMIC_LEVELS[level]}
-          </label>
-        ))}
-        <p className="field-help">
-          Majors and levels are independent. Each major × level subgroup is
-          analyzed separately; typical sequencing does not exclude
-          out-of-sequence students.
-        </p>
-      </fieldset>
-      <fieldset className="planning-audience">
-        <legend>Organization clusters</legend>
-        {clusters.map((cluster) => (
-          <label key={cluster.id} className="choice">
-            <input
-              type="checkbox"
-              checked={clusterIds.includes(cluster.id)}
-              onChange={() =>
-                onChange({ clusterIds: toggle(clusterIds, cluster.id) })
-              }
-            />
-            {cluster.name}
-          </label>
-        ))}
-        <p className="field-help">
-          Example organization memberships. {organization.name} belongs to:{" "}
-          {clusters
-            .filter((cluster) => organization.clusterIds?.includes(cluster.id))
-            .map((cluster) => cluster.name)
-            .join(", ") || "none documented"}
-          . Only explicit event cluster targeting adds relevance; host
-          membership never does. Unspecified cluster targeting remains unknown.
-        </p>
-      </fieldset>
+          <p
+            id="audience-summary"
+            className="audience-summary"
+            aria-live="polite"
+          >
+            Analyzing for:{" "}
+            <strong>{audienceLabel || "Select a planning audience"}</strong>
+          </p>
+        </fieldset>
+      </SelectionDropdown>
+      <SelectionDropdown
+        title="Academic years"
+        summary={
+          academicLevels.length === ALL_LEVELS.length
+            ? "All years"
+            : `${academicLevels.length} selected`
+        }
+      >
+        <fieldset className="planning-audience academic-levels">
+          <legend>Academic levels</legend>
+          <div
+            className="audience-shortcuts"
+            role="group"
+            aria-label="Academic level shortcuts"
+          >
+            {shortcuts.map(([label, levels]) => (
+              <button
+                key={label}
+                type="button"
+                className="control"
+                aria-pressed={
+                  academicLevels.length === levels.length &&
+                  levels.every((level) => academicLevels.includes(level))
+                }
+                onClick={() => onChange({ academicLevels: [...levels] })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {ALL_LEVELS.map((level) => (
+            <label className="choice" key={level}>
+              <input
+                type="checkbox"
+                checked={academicLevels.includes(level)}
+                onChange={() =>
+                  onChange({ academicLevels: toggle(academicLevels, level) })
+                }
+              />
+              {ACADEMIC_LEVELS[level]}
+            </label>
+          ))}
+          <p className="field-help">
+            Majors and levels are independent. Each major × level subgroup is
+            analyzed separately; typical sequencing does not exclude
+            out-of-sequence students.
+          </p>
+        </fieldset>
+      </SelectionDropdown>
+      <SelectionDropdown
+        title="Analytical clusters"
+        summary={`${clusterIds.length} selected`}
+      >
+        <fieldset className="planning-audience">
+          <legend>Organization clusters</legend>
+          {clusters.map((cluster) => (
+            <label key={cluster.id} className="choice">
+              <input
+                type="checkbox"
+                checked={clusterIds.includes(cluster.id)}
+                onChange={() =>
+                  onChange({ clusterIds: toggle(clusterIds, cluster.id) })
+                }
+              />
+              {cluster.name}
+            </label>
+          ))}
+          <p className="field-help">
+            Example organization memberships. {organization.name} belongs to:{" "}
+            {clusters
+              .filter((cluster) =>
+                organization.clusterIds?.includes(cluster.id),
+              )
+              .map((cluster) => cluster.name)
+              .join(", ") || "none documented"}
+            . Only explicit event cluster targeting adds relevance; host
+            membership never does. Unspecified cluster targeting remains
+            unknown.
+          </p>
+        </fieldset>
+      </SelectionDropdown>
       <p className="field-help planning-scope" aria-live="polite">
         Current analysis: {audienceLabel || "No majors"} ·{" "}
         {academicLevels.length === ALL_LEVELS.length

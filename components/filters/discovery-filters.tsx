@@ -5,6 +5,7 @@ import type {
   Major,
   Organization,
   EventCategory,
+  OrganizationCluster,
 } from "../../lib/domain/models";
 import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
 
@@ -12,6 +13,7 @@ type Props = {
   state: DiscoveryState;
   majors: Major[];
   organizations: Organization[];
+  clusters: OrganizationCluster[];
   onChange: (state: DiscoveryState) => void;
   onReset: () => void;
 };
@@ -39,34 +41,36 @@ export function DiscoveryFilters({
   state,
   majors,
   organizations,
+  clusters,
   onChange,
   onReset,
 }: Props) {
   const [open, setOpen] = useState(false);
   const activeCount =
     state.organizationIds.length +
+    state.clusterIds.length +
     state.categories.length +
-    (state.mode === "recommended" ? 1 + state.majorIds.length : 0) +
+    state.majorIds.length +
     (state.search.trim() ? 1 : 0);
   return (
     <aside className="filters-panel" aria-labelledby="filters-title">
       <div className="filter-heading">
         <h2 id="filters-title">Refine events</h2>
+        <button
+          className="filter-toggle control"
+          aria-expanded={open}
+          aria-controls="filter-controls"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? "Hide filters" : "Show filters"}
+          <span className="filter-count">
+            {activeCount} active {activeCount === 1 ? "filter" : "filters"}
+          </span>
+        </button>
         <button className="text-button" onClick={onReset}>
           Clear filters
         </button>
       </div>
-      <button
-        className="filter-toggle control"
-        aria-expanded={open}
-        aria-controls="filter-controls"
-        onClick={() => setOpen(!open)}
-      >
-        {open ? "Hide filters" : "Show filters"}
-        <span className="filter-count">
-          {activeCount} active {activeCount === 1 ? "filter" : "filters"}
-        </span>
-      </button>
       <div
         id="filter-controls"
         className={`filter-body ${open ? "is-open" : ""}`}
@@ -78,7 +82,7 @@ export function DiscoveryFilters({
               type="radio"
               name="mode"
               checked={state.mode === "all"}
-              onChange={() => onChange({ ...state, mode: "all" })}
+              onChange={() => onChange({ ...state, mode: "all", majorIds: [] })}
             />
             All Events
           </label>
@@ -97,8 +101,8 @@ export function DiscoveryFilters({
             <legend className="sr-only">Your engineering majors</legend>
             <p id="major-help" className="field-help">
               {state.mode === "all"
-                ? "Used in Recommended Events. Select one or more."
-                : "College-wide events are always included."}
+                ? "Select majors to discover relevant events from any host."
+                : "Major relevance includes college-wide events; other active filters still apply."}
             </p>
             {majors.map((major) => (
               <label className="choice" key={major.id}>
@@ -109,6 +113,9 @@ export function DiscoveryFilters({
                     onChange({
                       ...state,
                       majorIds: toggle(state.majorIds, major.id),
+                      mode: toggle(state.majorIds, major.id).length
+                        ? "recommended"
+                        : "all",
                     })
                   }
                 />
@@ -121,7 +128,7 @@ export function DiscoveryFilters({
           </fieldset>
         </FilterGroup>
         <FilterGroup title="Organizations">
-          <fieldset>
+          <fieldset className="filter-options-scroll">
             <legend className="sr-only">Organizations</legend>
             <p className="field-help">Any host unless selected.</p>
             {organizations.map((org) => (
@@ -137,6 +144,29 @@ export function DiscoveryFilters({
                   }
                 />
                 {org.name}
+              </label>
+            ))}
+          </fieldset>
+        </FilterGroup>
+        <FilterGroup title="Student organization clusters">
+          <fieldset>
+            <legend className="sr-only">Student organization clusters</legend>
+            <p className="field-help">
+              Matches documented host membership; combines with other filters.
+            </p>
+            {clusters.map((cluster) => (
+              <label key={cluster.id} className="choice">
+                <input
+                  type="checkbox"
+                  checked={state.clusterIds.includes(cluster.id)}
+                  onChange={() =>
+                    onChange({
+                      ...state,
+                      clusterIds: toggle(state.clusterIds, cluster.id),
+                    })
+                  }
+                />
+                {cluster.name}
               </label>
             ))}
           </fieldset>

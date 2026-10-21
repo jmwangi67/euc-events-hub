@@ -13,7 +13,7 @@ it("keeps planning context independent of hidden display categories", () => {
     getEvents({
       start: "2026-10-21",
       end: "2026-10-22",
-      filters: { categories: ["research"] },
+      filters: { categories: ["competition"] },
     }),
   ).toEqual([]);
   const context = getProposalContext(proposal);

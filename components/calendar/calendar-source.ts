@@ -1,3 +1,8 @@
+import {
+  eventHosts,
+  hostNames,
+  hostingIdentity,
+} from "../../lib/domain/hosting";
 import type { EventInput } from "@fullcalendar/core";
 import {
   getEvents,
@@ -59,10 +64,9 @@ export function loadCalendarItems(
         ...mapped,
         extendedProps: {
           ...mapped.extendedProps,
-          hosts: organizations
-            .filter((org) => event.hostOrganizationIds.includes(org.id))
-            .map((org) => org.name)
-            .join(", "),
+          hosts: hostNames(eventHosts(event, organizations)),
+          compactHosts: hostNames(eventHosts(event, organizations), true),
+          hostingIdentity: hostingIdentity(event, organizations),
         },
       };
     });

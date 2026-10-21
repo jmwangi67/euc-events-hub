@@ -332,7 +332,8 @@ describe("provisional THON policy and precedence", () => {
         at("2026-10-29", "10:00"),
         at("2026-10-29", "17:00"),
       ),
-      category: "career-fair" as const,
+      category: "career-networking" as const,
+      subtype: "career-fair" as const,
     };
     const result = analyze(
       context([fair], [thon(), thon()]),
@@ -547,7 +548,8 @@ describe("break, fair and ordinary interval policies", () => {
         at("2026-10-24", "10:00"),
         at("2026-10-24", "15:00"),
       ),
-      category: "career-fair" as const,
+      category: "career-networking" as const,
+      subtype: "career-fair" as const,
       targetAcademicLevels: ["third"] as Event["targetAcademicLevels"],
     };
     const result = analyze(context([fair]));

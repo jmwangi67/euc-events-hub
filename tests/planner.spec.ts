@@ -1,7 +1,9 @@
+import { openPlannerChoices } from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 const panel = (page: Page) => page.locator(".conflict-panel");
 async function sample(page: Page) {
   await page.goto("/planner");
+  await openPlannerChoices(page);
   await page.getByRole("button", { name: "Load sample scenario" }).click();
 }
 async function interval(
@@ -30,6 +32,7 @@ test("planner navigation, independent display and explanatory synthetic conflict
     .getByRole("link", { name: "Organization planner", exact: true })
     .click();
   await expect(page).toHaveURL(/\/planner$/);
+  await openPlannerChoices(page);
   await expect(
     page.getByRole("link", { name: "Organization planner", exact: true }),
   ).toHaveAttribute("aria-current", "page");
@@ -67,7 +70,10 @@ test("planner navigation, independent display and explanatory synthetic conflict
     .getByRole("link", { name: "Student calendar", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Engineering events", exact: true }),
+    page.getByRole("heading", {
+      name: "Hey, find your next event here!",
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(page.getByLabel("Search events", { exact: true })).toBeVisible();
 });

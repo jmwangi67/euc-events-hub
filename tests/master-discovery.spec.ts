@@ -21,16 +21,16 @@ for (const width of [375, 1440]) {
     await page.goto("/?date=2026-10-21&view=listMonth");
     if (width < 1024)
       await page.getByRole("button", { name: /Show filters/ }).click();
-    const gbm = page.getByLabel("General Body Meeting (GBM)", {
+    const gbm = page.getByLabel("General Body Meetings", {
       exact: true,
     });
     const social = page.getByLabel("Social & Recreational", { exact: true });
     await gbm.check();
-    await expect(page.locator(".fc-event")).toHaveCount(1);
+    await expect(page.locator(".fc-event")).toHaveCount(2);
     await expect(event(page, gbmTitle)).toBeVisible();
     await expect(event(page, socialTitle)).toHaveCount(0);
     await social.check();
-    await expect(page.locator(".fc-event")).toHaveCount(2);
+    await expect(page.locator(".fc-event")).toHaveCount(4);
     await expect(event(page, gbmTitle)).toBeVisible();
     await expect(event(page, socialTitle)).toBeVisible();
     await page.reload();
@@ -39,12 +39,12 @@ for (const width of [375, 1440]) {
     await expect(gbm).toBeChecked();
     await expect(social).toBeChecked();
     await gbm.uncheck();
-    await expect(page.locator(".fc-event")).toHaveCount(1);
+    await expect(page.locator(".fc-event")).toHaveCount(2);
     await expect(event(page, socialTitle)).toBeVisible();
     await expect(event(page, gbmTitle)).toHaveCount(0);
     await social.uncheck();
-    await page.getByLabel("Student organization", { exact: true }).check();
-    await expect(event(page, "Engineering welcome")).toBeVisible();
+    await page.getByLabel("Technical Workshops", { exact: true }).check();
+    await expect(event(page, "Process lab workshop")).toBeVisible();
     await expect(event(page, socialTitle)).toHaveCount(0);
     await expect(event(page, gbmTitle)).toHaveCount(0);
     await noOverflow(page);
@@ -171,7 +171,7 @@ test("mobile discovery details expose source and registration without inventing 
   await trigger.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText("General Body Meeting (GBM)");
+  await expect(dialog).toContainText("General Body Meetings");
   await expect(dialog).toContainText("All engineering majors");
   await expect(dialog).toContainText("Example engineering meeting room");
   const source = dialog.getByRole("link", {

@@ -7,32 +7,43 @@ import { eventCategorySchema, eventSchema } from "./models";
 
 describe("event-discovery categories and demo records", () => {
   it.each([
-    ["general-body-meeting", "General Body Meeting (GBM)", "example-gbm"],
-    ["social-recreational", "Social & Recreational", "example-social"],
-  ] as const)("supports and filters the %s category", (category, label, id) => {
-    expect(eventCategorySchema.parse(category)).toBe(category);
-    expect(EVENT_CATEGORIES[category]).toBe(label);
-    const record = events.find((event) => event.id === id)!;
-    expect(eventSchema.parse(record)).toEqual(record);
-    expect(
-      getEvents({
-        start: "2026-10-19",
-        end: "2026-10-26",
-        filters: { categories: [category] },
-      }).map((event) => event.id),
-    ).toEqual([id]);
-  });
+    [
+      "general-body-meeting",
+      "General Body Meetings",
+      "example-gbm",
+      ["example-gbm", "example-design-meeting"],
+    ],
+    [
+      "social-recreational",
+      "Social & Recreational",
+      "example-social",
+      ["example-welcome", "example-social"],
+    ],
+  ] as const)(
+    "supports and filters the %s category",
+    (category, label, id, expectedIds) => {
+      expect(eventCategorySchema.parse(category)).toBe(category);
+      expect(EVENT_CATEGORIES[category]).toBe(label);
+      const record = events.find((event) => event.id === id)!;
+      expect(eventSchema.parse(record)).toEqual(record);
+      expect(
+        getEvents({
+          start: "2026-10-19",
+          end: "2026-10-26",
+          filters: { categories: [category] },
+        }).map((event) => event.id),
+      ).toEqual(expectedIds);
+    },
+  );
 
-  it("retains the general Student organization category", () => {
-    expect(eventCategorySchema.parse("student-organization")).toBe(
-      "student-organization",
-    );
-    expect(EVENT_CATEGORIES["student-organization"]).toBe(
-      "Student organization",
-    );
-    expect(
-      events.some((event) => event.category === "student-organization"),
-    ).toBe(true);
+  it("preserves ambiguous legacy organization events with an explicit review flag", () => {
+    const raw = { ...events[0], category: "student-organization" };
+    const migrated = eventSchema.parse(raw);
+    expect(migrated.id).toBe(raw.id);
+    expect(migrated.category).toBeNull();
+    expect(migrated.legacyCategory).toBe("student-organization");
+    expect(migrated.categoryMappingNote).toMatch(/requires review/);
+    expect(Object.keys(EVENT_CATEGORIES)).toHaveLength(6);
   });
 
   it("clearly identifies fictional public records and safe example links", () => {

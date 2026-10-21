@@ -1,4 +1,5 @@
 "use client";
+import { CategoryLegend } from "./category-legend";
 import { useCallback, useRef, useState, useMemo, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -215,7 +216,7 @@ export function EventCalendar(props: EventCalendarProps) {
       ?.focus();
   };
   const itemLabel = (event: EventApi) =>
-    `${event.title}. ${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${mobile && event.extendedProps.hosts ? `${event.extendedProps.hosts}. ` : ""}${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
+    `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
     const next = {
@@ -234,7 +235,7 @@ export function EventCalendar(props: EventCalendarProps) {
   };
   return (
     <section
-      className={`calendar-region ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
+      className={`calendar-region ${planning ? "planner-calendar" : "student-category-calendar"} ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
       aria-label={
         planning
           ? "Planning calendar with academic exams"
@@ -311,6 +312,7 @@ export function EventCalendar(props: EventCalendarProps) {
           onOpen={openWeek}
         />
       )}
+      {!planning && <CategoryLegend />}
       <div
         ref={surface}
         className={`calendar-surface ${monthSummaries ? "planner-month-surface" : ""} ${planning?.showDensity ? "density-enabled" : ""}`}
@@ -350,17 +352,13 @@ export function EventCalendar(props: EventCalendarProps) {
             hour: "numeric",
             minute: "2-digit",
           }}
-          listDayFormat={
-            mobile || planning
-              ? {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  year: showGroupYear ? "numeric" : undefined,
-                }
-              : undefined
-          }
-          listDaySideFormat={mobile || planning ? false : undefined}
+          listDayFormat={{
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            year: showGroupYear ? "numeric" : undefined,
+          }}
+          listDaySideFormat={false}
           eventOrder="start,title"
           eventOrderStrict={mobile && view.startsWith("list")}
           eventInteractive
@@ -460,6 +458,7 @@ export function EventCalendar(props: EventCalendarProps) {
               mobile={mobile}
               itemLabel={itemLabel}
               selectItem={selectItem}
+              planner={!!planning}
             />
           )}
           eventDidMount={(info) => {
