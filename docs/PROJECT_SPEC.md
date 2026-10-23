@@ -538,6 +538,16 @@ The product will be developed incrementally.
 
 ## 14. Future Development Milestones
 
+### Milestone 2A: Academic Exam Data Administration
+
+**Objective:** Replace future developer-edited exam schedules with semester-based, EUC-administered datasets. See the [Milestone 2A implementation plan](milestones/2A-ACADEMIC-EXAM-ADMINISTRATION.md) for the approved direction, data contract, security prerequisites, staging workflow and acceptance criteria.
+
+- **Now, while PR #5 remains prototype-only:** Design and validate a source-aware exam import format using private local test datasets. Preserve exact or unknown times, source confirmation, requested/unapproved dates, alternative eTesting dates, and canonical occurrence identities. Do not commit actual exam data to the public fixture directory or silently display it to students.
+- **After Milestone 3's database/auth foundations:** Add authenticated EUC administration, manual exam editing, CSV/XLSX import with human review, source-version reconciliation, audit history, semester archives, and controlled planner/public publication.
+- **Integration:** Approved planner records feed existing exam overlays and independent experimental exam preparation without altering the non-exam model or authorizing a numerical overall score. A public student exam overlay requires separate publication permission and product approval.
+
+**Dependency note:** The numbering identifies a product workstream, not permission to deploy a privileged admin portal before backend authorization, row-level security, source rights and audit logging exist.
+
 ### Milestone 2: Calendar Integration
 
 Implement authorized source imports, recurring-event handling, provenance, deduplication, and reviewed synchronization.
