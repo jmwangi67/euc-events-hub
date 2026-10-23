@@ -29,11 +29,16 @@ export type EventCalendarProps = BaseProps &
   (
     | {
         planning?: undefined;
+        examReview?: {
+          dataset: import("../../lib/exams/staging").StagedExamDataset;
+          onSelect: (id: string, triggerId: string) => void;
+        };
         view: CalendarView;
         onViewChange: (view: CalendarView) => void;
       }
     | {
         planning: PlanningCalendarOptions;
+        examReview?: never;
         view: PlannerCalendarView;
         onViewChange: (view: PlannerCalendarView) => void;
       }

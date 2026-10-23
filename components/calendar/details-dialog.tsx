@@ -76,7 +76,11 @@ export function DetailsDialog({
         cancel.preventDefault();
         onClose();
       }}
-      onClose={onClose}
+      onClose={(event) => {
+        // Strict Mode can close/reopen during effect replay before the queued
+        // close event arrives. That old notification must not dismiss the new dialog.
+        if (!event.currentTarget.open) onClose();
+      }}
       onClick={(e) => {
         if (e.target !== e.currentTarget) return;
         const box = e.currentTarget.getBoundingClientRect();

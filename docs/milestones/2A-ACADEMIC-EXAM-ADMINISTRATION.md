@@ -1,10 +1,11 @@
 # Milestone 2A — EUC-administered academic exam datasets
 
-**Status:** Planned; source-data normalization/testing preparation may occur now. Full production functionality is **not** part of PR #5.  
+**Status:** Milestone 2A.0 implemented in PR #5; owner local testing/review pending. Milestones 2A.1–2A.2 remain planned. Full production administration is **not** part of PR #5.
+
 **Owner:** EUC administration (future platform role).  
 **Scope:** Semester-based, administrator-managed academic exam records for EUC Events Hub.  
 **Dependencies:** Persistent database, individual administrator authentication, authorization/RLS, server-side validation, source-permission review, and audit logging (the existing Milestone 3 foundation).  
-**Boundary:** No public import, database, login, administrator dashboard, live schedule, or source publication is authorized by this roadmap change.
+**Boundary:** Offline import and an explicitly enabled loopback-only development review are authorized. No public import, database, login, administrator dashboard, live schedule, or source publication is authorized.
 
 ## Outcome
 
@@ -12,13 +13,28 @@ After Milestone 2A is implemented, authorized EUC administrators can create a se
 
 ## Existing prototype integration
 
-The Milestone 1C planner already has synthetic exams, weekly academic summaries, independent experimental exam preparation, Eastern Time handling, source alternatives, and a separate non-exam scheduling model. Preserve all of these. The existing `Exam` schema models one date with known or unknown hours. A future version must represent **one canonical exam occurrence with multiple possible eTesting dates**, rather than fabricating multiple exams or assigning an exact time without evidence.
+The Milestone 1C planner retains synthetic exams, weekly academic summaries, independent experimental exam preparation, Eastern Time handling, source alternatives, and a separate non-exam scheduling model. Its published `Exam` schema still models one date with known or unknown hours. Milestone 2A.0 adds a separate versioned staging model representing **one canonical exam occurrence with multiple possible testing dates**, without fabricating multiple exams or assigning an exact time without evidence.
 
 Do not fold exam data into the six student event categories, count it in non-exam density, alter the uncalibrated exam-preparation equation, or replace `{status: "awaiting-methodology-review", score: null}`.
 
 ## Incremental delivery
 
 ### 2A.0 — Data contract and offline validation (can begin before backend)
+
+Completed preparation checklist:
+
+- [x] Typed Zod version 1 contract with separate certainty, workflow, source rights and audience review.
+- [x] Offline JSON/CSV validation/import, atomic private output, deterministic duplicate reconciliation and idempotent re-import.
+- [x] Timed, date-only, date-option, possible-only and date-window representation with one canonical identity.
+- [x] Explicit eligibility adapter to the unchanged preparation model; unknown mappings, default hours and multi-date windows remain review-only.
+- [x] Separate `/planner/exam-preview` using the existing calendar, enabled only in development with an explicit flag and loopback request.
+- [x] Server-only private reads, ignored private files/cache, production tracing exclusions and aggregate artifact audit.
+- [x] Private archive validated locally: 84 occurrences, 32 courses, 98 reported date options, one additional possible date; zero invalid/conflicting records and zero preparation-eligible occurrences. These counts are not source verification or publication approval.
+- [x] Invented regression cases for uncertainty, DST, duplicates, source conflicts, audience independence and browser accessibility. Public previews contain invented records only.
+- [x] [Windows PowerShell setup and contract guide](../LOCAL_EXAM_IMPORT.md), [ADR 006](../decisions/006-local-exam-import-and-review.md), and [synthetic preview/validation report](../previews/planner/exam-import/README.md).
+- [ ] Project owner completes local testing and reviews the implementation before further development or merge.
+
+Implemented scope:
 
 - Define a versioned, semester-scoped staging format for individual timed exams, unknown-hour single-day exams, multiple alternative testing dates, optional possible dates, source conflicts, and date-wide exam windows.
 - Separate canonical exam occurrence identity from source records, sections, student choice of eTesting date, and imported file identity.

@@ -47,6 +47,8 @@ import {
 } from "./calendar-density";
 import { useWeekLayout } from "./use-week-layout";
 import type { EventCalendarProps } from "./calendar-types";
+import { queryStagedExams } from "../../lib/exams/staging";
+import { stagedExamCalendarItems } from "./staged-exam-events";
 
 const studentViews: [PlannerCalendarView, string][] = [
   ["dayGridMonth", "Month"],
@@ -66,6 +68,7 @@ export function EventCalendar(props: EventCalendarProps) {
     onReset,
     mobile,
     planning,
+    examReview,
   } = props;
   const changeView = (id: PlannerCalendarView) => {
     if (props.planning) props.onViewChange(id);
@@ -135,9 +138,19 @@ export function EventCalendar(props: EventCalendarProps) {
   const source: EventSourceFunc = useCallback(
     (range, success, failure) => {
       try {
-        const items = loadCalendarItems(range, filters, planning);
+        const reviewExams = examReview
+          ? queryStagedExams(
+              examReview.dataset,
+              range.startStr.slice(0, 10),
+              range.endStr.slice(0, 10),
+            )
+          : null;
+        const items =
+          reviewExams && examReview
+            ? stagedExamCalendarItems(reviewExams, examReview.dataset)
+            : loadCalendarItems(range, filters, planning);
         setError(false);
-        setCount(items.length);
+        setCount(reviewExams ? reviewExams.length : items.length);
         success(
           planning?.showDensity && view.startsWith("timeGrid")
             ? [
@@ -161,7 +174,7 @@ export function EventCalendar(props: EventCalendarProps) {
         );
       }
     },
-    [filters, planning, view],
+    [filters, planning, view, examReview],
   );
   useEffect(() => {
     const api = calendar.current?.getApi();
@@ -176,7 +189,9 @@ export function EventCalendar(props: EventCalendarProps) {
   };
   const selectItem = (event: EventApi, segmentDate?: string) => {
     setWeekTriggerId(event.id);
-    if (event.extendedProps.kind === "external" && planning && context) {
+    if (event.extendedProps.kind === "exam-review" && examReview) {
+      examReview.onSelect(event.extendedProps.canonicalExamId, event.id);
+    } else if (event.extendedProps.kind === "external" && planning && context) {
       const external = event.extendedProps.externalEvent;
       const eventWeek = segmentDate
         ? calendarWeeks(segmentDate, addCalendarDays(segmentDate, 1))[0]
@@ -216,7 +231,9 @@ export function EventCalendar(props: EventCalendarProps) {
       ?.focus();
   };
   const itemLabel = (event: EventApi) =>
-    `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
+    event.extendedProps.kind === "exam-review"
+      ? (event.extendedProps.reviewLabel as string)
+      : `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
     const next = {
@@ -235,11 +252,13 @@ export function EventCalendar(props: EventCalendarProps) {
   };
   return (
     <section
-      className={`calendar-region ${planning ? "planner-calendar" : "student-category-calendar"} ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
+      className={`calendar-region ${examReview ? "academic-review-calendar" : planning ? "planner-calendar" : "student-category-calendar"} ${mobile && view.startsWith("list") ? "mobile-calendar" : ""}`}
       aria-label={
-        planning
-          ? "Planning calendar with academic exams"
-          : "Student events calendar"
+        examReview
+          ? "Private academic exam review calendar"
+          : planning
+            ? "Planning calendar with academic exams"
+            : "Student events calendar"
       }
     >
       <div className="range-heading">
@@ -269,7 +288,7 @@ export function EventCalendar(props: EventCalendarProps) {
             ? "Unable to load events."
             : count === null
               ? "Loading events…"
-              : `${count} ${planning ? "calendar items" : count === 1 ? "event" : "events"} in this range`}
+              : `${count} ${examReview ? "canonical exam occurrences" : planning ? "calendar items" : count === 1 ? "event" : "events"} in this range`}
         </p>
       </div>
       {error && (
@@ -312,7 +331,7 @@ export function EventCalendar(props: EventCalendarProps) {
           onOpen={openWeek}
         />
       )}
-      {!planning && <CategoryLegend />}
+      {!planning && !examReview && <CategoryLegend />}
       <div
         ref={surface}
         className={`calendar-surface ${monthSummaries ? "planner-month-surface" : ""} ${planning?.showDensity ? "density-enabled" : ""}`}
@@ -424,21 +443,29 @@ export function EventCalendar(props: EventCalendarProps) {
           dayCellWillUnmount={(info) => {
             info.el.querySelector(".week-row-link")?.remove();
           }}
-          allDayText="All day"
+          allDayText={examReview ? "Date options" : "All day"}
           noEventsContent={() => (
             <div className="empty-state">
               <h3>
-                {planning
-                  ? "No visible planning items in this range"
-                  : "No published events in this range"}
+                {examReview
+                  ? "No staged exam occurrences in this range"
+                  : planning
+                    ? "No visible planning items in this range"
+                    : "No published events in this range"}
               </h3>
               <p>
-                {planning
-                  ? "Try another date or restore the calendar display. Analysis remains tied to the proposal."
-                  : "Try another date, adjust your search, or clear your filters."}
+                {examReview
+                  ? "Choose a reported or possible testing date. This review does not publish records."
+                  : planning
+                    ? "Try another date or restore the calendar display. Analysis remains tied to the proposal."
+                    : "Try another date, adjust your search, or clear your filters."}
               </p>
               <button className="control" onClick={onReset}>
-                {planning ? "Restore calendar display" : "Clear filters"}
+                {examReview
+                  ? "Return to first exam date"
+                  : planning
+                    ? "Restore calendar display"
+                    : "Clear filters"}
               </button>
             </div>
           )}

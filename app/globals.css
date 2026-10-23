@@ -1039,6 +1039,26 @@ button.planner-analyze:hover {
 .fc .planner-exam.exam-date-only {
   border-style: dashed;
 }
+.fc .planner-exam.exam-possible-date {
+  border-style: dashed;
+  outline: 1px dashed var(--color-academic);
+  outline-offset: -4px;
+}
+.exam-review-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.exam-review-notes,
+.exam-review-claim {
+  margin-top: 20px;
+  overflow-wrap: anywhere;
+}
+.exam-review-notes summary {
+  cursor: pointer;
+}
 .fc .planner-proposal {
   border: 2px dashed var(--color-primary);
   background: var(--color-day-group);

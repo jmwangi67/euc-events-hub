@@ -1,6 +1,6 @@
 # EUC Events Hub
 
-A student-led foundation for engineering event discovery and organization planning at Penn State. Milestone 1B adds a public student calendar on the Milestone 1A fixture-backed foundation. All events, exams and example student organizations are fictional and visibly labeled Example or Demo. Publicly sourced institutional host identities do not verify any event or imply official Penn State programming. The current PR also adds the Milestone 1C local organization planner.
+A student-led foundation for engineering event discovery and organization planning at Penn State. Milestone 1B adds a public student calendar on the Milestone 1A fixture-backed foundation. Public/production events, exams and example student organizations are fictional and visibly labeled Example or Demo. Publicly sourced institutional host identities do not verify any event or imply official Penn State programming. The current PR also adds the Milestone 1C local organization planner and Milestone 2A.0 offline academic exam staging with a separately enabled private local review.
 
 ## Local development
 
@@ -118,7 +118,7 @@ The calendar label is **All Times Eastern (ET)**. Timed labels use `America/New_
 
 ## Scope and limitations
 
-This application supplies fixture-backed student discovery and a local organization-planner prototype. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, numerical overall scoring, or priority allocation. Fixture IDs, break dates and academic audience mappings are fictional development examples. Final source formats, calendar cancellation behavior, and production ownership remain future decisions. Exam overlays are planner-only; calendar imports and officer accounts remain deferred. The shell is not a claim of formal WCAG compliance or university endorsement.
+This application supplies fixture-backed student discovery and a local organization-planner prototype. There is no persistence, authentication, live ingestion, newsletter delivery, production hosting, numerical overall scoring, or priority allocation. Fixture IDs, break dates and academic audience mappings are fictional development examples. A versioned offline JSON/CSV exam import and separate development-only private review are available under Milestone 2A.0; production uploads and publication remain deferred. Calendar cancellation behavior and production ownership remain future decisions. Exam overlays are planner-only; live calendar imports and officer accounts remain deferred. The shell is not a claim of formal WCAG compliance or university endorsement.
 
 ### Development dependency review (October 15, 2026)
 
@@ -203,3 +203,11 @@ The existing organization registry now holds structured host classifications, ve
 The planner's secondary sidebar is removed. **Filters & Audience** groups proposal-host selection, analytical majors/years/clusters and independent calendar display controls in compact native dropdowns. Closing it preserves selections and shows a scope/restriction summary and count. The local proposal remains separately collapsible, with all validation and repeated-time controls preserved. The full-width calendar retains all five layouts, inline Month/2 Weeks weekly summaries, density, cautions, dialogs and independent indicators.
 
 See [ADR 005](docs/decisions/005-student-discovery-and-host-identity.md) for migration, authoritative host sources, abbreviation limits and the complete control inventory. [Updated discovery/hosting previews](docs/previews/planner/discovery-hosting/README.md) include category colors, badges, filters, guide, planner layouts, mobile/tablet and color-vision simulations. Owner visual acceptance remains required before merging; PR #5 stays open.
+
+## Milestone 2A.0: local academic exam staging
+
+Use `npm run exams:validate -- --input <private-json-or-csv>` and `npm run exams:import -- --input <private-input> --output <private-json>` with files under gitignored `data/local/exams/`. A version 1 Zod contract retains stable occurrences, source claims, date alternatives, possible-only dates, uncertain clocks, sections, audience review and separate publication rights. Re-import is idempotent; alternatives remain one exam.
+
+The [local import guide](docs/LOCAL_EXAM_IMPORT.md) includes explicit Windows PowerShell commands. Enable `EUC_PRIVATE_EXAM_PREVIEW=1`, select `EUC_EXAM_PREVIEW_DATASET=private`, set `EUC_EXAM_DATASET_PATH` to the local JSON, and bind development to `127.0.0.1`. `/planner` stays fictional; its local link opens the separate `/planner/exam-preview`. This guarded read-only review never publishes records or feeds unreviewed data into numerical analysis. Production denies access even with the flag set. Automated preview tests force the separate invented dataset (`npm run test:exam-preview`).
+
+The supplied private archive was locally validated: 84 canonical occurrences, zero invalid/conflicting records, and zero preparation-eligible records. Source confirmation, authorization and audience mappings remain unreviewed; validation does not make the schedule official. Real records and local diagnostics are excluded from Git and public artifacts. See [ADR 006](docs/decisions/006-local-exam-import-and-review.md), the [milestone completion checklist](docs/milestones/2A-ACADEMIC-EXAM-ADMINISTRATION.md), and [invented screenshots/validation](docs/previews/planner/exam-import/README.md). Database storage, individual admin authentication/authorization, audit history, editable review queues, XLSX uploads and publication remain Milestone 2A.1 dependencies. Owner local testing/review is still required before further development or merge.

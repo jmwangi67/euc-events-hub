@@ -76,6 +76,11 @@ export function CalendarItemContent({
           (planner ? " · Engineering · Example Event" : " · Example Event")}
       </span>
       {hostContent}
+      {info.event.extendedProps.reviewDates && (
+        <span className="event-location">
+          {info.event.extendedProps.reviewDates}
+        </span>
+      )}
       {info.event.extendedProps.location && (
         <span className="event-location">
           {info.event.extendedProps.location}
@@ -116,6 +121,11 @@ export function CalendarItemContent({
               (planner ? " · Engineering · Example Event" : " · Example Event")}
           </span>
           {hostContent}
+          {info.event.extendedProps.reviewDates && (
+            <span className="event-location">
+              {info.event.extendedProps.reviewDates}
+            </span>
+          )}
           {info.event.extendedProps.location && (
             <span className="event-location">
               {info.event.extendedProps.location}
