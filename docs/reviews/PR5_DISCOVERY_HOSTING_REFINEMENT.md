@@ -41,6 +41,14 @@ Final command counts and CI status belong in the gallery and PR delivery report.
 
 ## Honest limits and owner decisions
 
+### Student organizations versus university hosts
+
+The October 22 clarification restricts student organization choices on `/` and the planner's proposed-event organization selector to explicit student-organization records, including the existing fictional groups and sourced BMES/SWE. The complete host registry remains available to cards, abbreviated/full host names, paw badges, details and scheduling analysis. Schema validation rejects student-cluster memberships on university, unknown or unclassified hosts; discovery cluster matching and guide membership lists also require student organizations.
+
+University-hosted/co-hosted events remain discoverable by major or the new University Events restriction. Its URL, history, reset and active-count behavior are covered. The planner's separate university-card visibility checkbox defaults on under the published-event master switch, and never narrows proposal conflicts, weekly context or density inputs. Ten additional unit cases and eight browser workflows bring validation to **345 unit tests and 107 browser tests**, retaining all prior coverage. [Current screenshots and validation](../previews/planner/organization-membership/README.md) cover both interfaces. No event data or scheduling/time methodology changed.
+
+### Continuing prototype limitations
+
 Events remain fictional, incomplete and unsaved. Public institutional identity sources do not verify an event or partnership. Most compact department labels are owner-proposed UI abbreviations, not a claim of official adoption. Official mark replacement would require applicable branding/trademark authorization; the current original generic SVG does not claim that status. Unresolved purposes/host types/memberships remain flagged or excluded from restrictive matches rather than guessed.
 
 Color-vision simulations show converging hues, so textual category labels remain essential. Automated contrast, keyboard and reflow checks are not a formal accessibility certification. Existing uncalibrated preparation and non-exam policy limitations persist; no numerical overall/non-exam score or automatic date ranking is approved. The remaining acceptance step is the owner's local-browser visual review before any merge.

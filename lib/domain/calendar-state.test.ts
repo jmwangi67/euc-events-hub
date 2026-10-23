@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getEvents, getMajors, getOrganizations } from "../data/fixtures";
+import {
+  getEvents,
+  getMajors,
+  getStudentOrganizations,
+} from "../data/fixtures";
 import {
   clearDiscoveryFilters,
   discoveryFilters,
@@ -8,7 +12,7 @@ import {
 } from "./calendar-state";
 const options = {
   majorIds: getMajors().map((major) => major.id),
-  organizationIds: getOrganizations().map((org) => org.id),
+  organizationIds: getStudentOrganizations().map((org) => org.id),
 };
 const parse = (query = "") =>
   parseCalendarState(new URLSearchParams(query), "2026-10-19", options);
@@ -93,6 +97,7 @@ describe("student discovery and shareable state", () => {
       majorIds: [],
       organizationIds: [],
       clusterIds: [],
+      universityOnly: false,
       categories: [],
       search: "",
     });

@@ -8,6 +8,7 @@ import {
   eventHosts,
   hostNames,
   hostingIdentity,
+  studentOrganizations,
 } from "./hosting";
 import {
   clearDiscoveryFilters,
@@ -26,7 +27,7 @@ import { ALL_LEVELS } from "./planning-audience";
 const base = events.find((event) => event.id === "example-industry")!;
 const registryOptions = {
   majorIds: ["bme", "che", "me"],
-  organizationIds: organizations.map((org) => org.id),
+  organizationIds: studentOrganizations(organizations).map((org) => org.id),
   clusterIds: getOrganizationClusters().map((cluster) => cluster.id),
 };
 const parse = (query: string) =>

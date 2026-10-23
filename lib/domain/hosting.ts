@@ -1,4 +1,23 @@
 import type { Event, Organization } from "./models";
+/** Selectable memberships require an explicit student-organization classification. */
+export function isStudentOrganization(host: Organization) {
+  return host.hostType === "student-organization";
+}
+export function studentOrganizations(registry: readonly Organization[]) {
+  return registry.filter(isStudentOrganization);
+}
+/** Known university involvement, independent of scope or unresolved co-hosts. */
+export function hasUniversityHost(
+  event: Pick<Event, "hostOrganizationIds">,
+  registry: readonly Organization[],
+) {
+  return registry.some(
+    (host) =>
+      event.hostOrganizationIds.includes(host.id) &&
+      host.hostType === "university-unit" &&
+      host.institutionId === "psu",
+  );
+}
 export type HostingIdentity = "psu-hosted" | "co-hosted" | null;
 /** Unresolved hosts suppress institutional claims; names and scope never classify. */
 export function hostingIdentity(

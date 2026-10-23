@@ -8,6 +8,7 @@ export type PlanningCalendarOptions = {
   audience: PlanningAudience;
   proposal: Proposal | null;
   showEvents: boolean;
+  showUniversityEvents: boolean;
   showExams: boolean;
   showPsuWide: boolean;
   showCampusLocal: boolean;

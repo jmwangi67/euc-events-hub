@@ -1,5 +1,7 @@
 # PR #5 student discovery, hosting and planner previews
 
+These captures document commit `72f842d`. The subsequent [organization-membership clarification gallery](../organization-membership/README.md) shows the current student-only selectors and separate University Events controls.
+
 Fictional events and proposed local scenarios only. Publicly sourced institutional host names establish identity, not event verification or endorsement. The SVG paw artwork is original and generic; it is not an official Penn State mark. Owner visual acceptance remains pending.
 
 ## Student discovery and hosting

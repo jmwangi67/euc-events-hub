@@ -20,6 +20,7 @@ import {
   type Proposal,
 } from "../../lib/domain/planning";
 import { getEventById } from "../../lib/data/fixtures";
+import { studentOrganizations } from "../../lib/domain/hosting";
 import { getProposalIntelligenceContext } from "../../lib/data/planner";
 import { analyzePlanningProposal } from "../../lib/domain/proposal-analysis";
 import { ProposalFactors } from "./proposal-factors";
@@ -73,8 +74,12 @@ export function OrganizationPlanner({
   organizations: Organization[];
   initialDate: string;
 }) {
+  const studentOrgs = useMemo(
+    () => studentOrganizations(organizations),
+    [organizations],
+  );
   const initialOrg =
-    organizations.find((org) => org.defaultMajorIds.length) ?? organizations[0];
+    studentOrgs.find((org) => org.defaultMajorIds.length) ?? studentOrgs[0];
   const [organizationId, setOrganizationId] = useState(initialOrg.id);
   const [majorIds, setMajorIds] = useState(() => planningAudience(initialOrg));
   const [academicLevels, setAcademicLevels] = useState<AcademicLevel[]>([
@@ -92,6 +97,7 @@ export function OrganizationPlanner({
   const [date, setDate] = useState(initialDate);
   const [view, setView] = useState<PlannerCalendarView>("dayGridMonth");
   const [showEvents, setShowEvents] = useState(true);
+  const [showUniversityEvents, setShowUniversityEvents] = useState(true);
   const [showExams, setShowExams] = useState(true);
   const [showPsuWide, setShowPsuWide] = useState(true);
   const [showCampusLocal, setShowCampusLocal] = useState(true);
@@ -104,7 +110,7 @@ export function OrganizationPlanner({
   const mobile = useCompactCalendar();
   const activeView = mobile && view !== "timeGridDay" ? "listMonth" : view;
   const selectedEvent = selectedId ? getEventById(selectedId) : undefined;
-  const organization = organizations.find((org) => org.id === organizationId)!;
+  const organization = studentOrgs.find((org) => org.id === organizationId)!;
   const filters = useMemo(
     () => ({ audience: { mode: "recommended" as const, majorIds } }),
     [majorIds],
@@ -126,6 +132,7 @@ export function OrganizationPlanner({
   const focusProposal = useCallback(() => titleInput.current?.focus(), []);
   const restoreDisplay = useCallback(() => {
     setShowEvents(true);
+    setShowUniversityEvents(true);
     setShowExams(true);
     setShowPsuWide(true);
     setShowCampusLocal(true);
@@ -136,6 +143,7 @@ export function OrganizationPlanner({
       audience,
       proposal,
       showEvents,
+      showUniversityEvents,
       showExams,
       showPsuWide,
       showCampusLocal,
@@ -148,6 +156,7 @@ export function OrganizationPlanner({
       audience,
       proposal,
       showEvents,
+      showUniversityEvents,
       showExams,
       showPsuWide,
       showCampusLocal,
@@ -236,7 +245,7 @@ export function OrganizationPlanner({
     setDate(easternDate(result.data.start));
   }
   function sample() {
-    const org = organizations.find((org) => org.id === "example-process")!;
+    const org = studentOrgs.find((org) => org.id === "example-process")!;
     setOrganizationId(org.id);
     setMajorIds(planningAudience(org));
     setAcademicLevels([...ALL_LEVELS]);
@@ -254,7 +263,14 @@ export function OrganizationPlanner({
   }
   const activeFilterCount = plannerControlCount(
     audience,
-    [showEvents, showExams, showPsuWide, showCampusLocal, showNational],
+    [
+      showEvents,
+      showUniversityEvents,
+      showExams,
+      showPsuWide,
+      showCampusLocal,
+      showNational,
+    ],
     showDensity,
   );
   return (
@@ -306,6 +322,7 @@ export function OrganizationPlanner({
             {
               [
                 showEvents,
+                showUniversityEvents,
                 showExams,
                 showPsuWide,
                 showCampusLocal,
@@ -315,6 +332,7 @@ export function OrganizationPlanner({
             hidden calendar layers
             {[
               showEvents,
+              showUniversityEvents,
               showExams,
               showPsuWide,
               showCampusLocal,
@@ -322,6 +340,7 @@ export function OrganizationPlanner({
             ].some((value) => !value)
               ? ` (${[
                   ["Published events", showEvents],
+                  ["University Events", showUniversityEvents],
                   ["Academic exams", showExams],
                   ["PSU-wide", showPsuWide],
                   ["Local", showCampusLocal],
@@ -348,7 +367,7 @@ export function OrganizationPlanner({
               aria-label="Example organization"
               value={organizationId}
               onChange={(e) => {
-                const org = organizations.find(
+                const org = studentOrgs.find(
                   (org) => org.id === e.target.value,
                 )!;
                 setOrganizationId(org.id);
@@ -357,12 +376,15 @@ export function OrganizationPlanner({
                 setErrors({});
               }}
             >
-              {organizations.map((org) => (
+              {studentOrgs.map((org) => (
                 <option key={org.id} value={org.id}>
                   {org.name}
                 </option>
               ))}
             </select>
+            <span className="field-help">
+              Student organizations only. University units remain event hosts.
+            </span>
           </label>
           <AudienceControls
             majors={majors}
@@ -379,7 +401,7 @@ export function OrganizationPlanner({
           />
           <SelectionDropdown
             title="Calendar layers"
-            summary={`${[showEvents, showExams, showPsuWide, showCampusLocal, showNational].filter(Boolean).length} visible${showDensity ? " · density on" : ""}`}
+            summary={`${[showEvents, showEvents && showUniversityEvents, showExams, showPsuWide, showCampusLocal, showNational].filter(Boolean).length} visible${showDensity ? " · density on" : ""}`}
           >
             <fieldset className="planner-display">
               <legend>Calendar display only</legend>
@@ -391,6 +413,19 @@ export function OrganizationPlanner({
                 />
                 Show published events
               </label>
+              <label className="choice">
+                <input
+                  type="checkbox"
+                  checked={showUniversityEvents}
+                  disabled={!showEvents}
+                  onChange={(e) => setShowUniversityEvents(e.target.checked)}
+                />
+                Show University Events
+              </label>
+              <p className="field-help">
+                University-hosted and co-hosted published events. Published
+                events must also be enabled. This does not change analysis.
+              </p>
               <label className="choice">
                 <input
                   type="checkbox"

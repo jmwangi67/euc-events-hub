@@ -6,6 +6,7 @@ import {
   CATEGORY_DESCRIPTIONS,
   EVENT_CATEGORIES,
 } from "../../lib/domain/event-categories";
+import { studentOrganizations } from "../../lib/domain/hosting";
 export function DiscoveryGuide({
   clusters,
   organizations,
@@ -55,8 +56,8 @@ export function DiscoveryGuide({
                   <strong>{cluster.name}</strong>
                   <p>{cluster.description}</p>
                   <p className="field-help">
-                    Documented hosts:{" "}
-                    {organizations
+                    Student organization members:{" "}
+                    {studentOrganizations(organizations)
                       .filter((org) => org.clusterIds?.includes(cluster.id))
                       .map((org) => org.name)
                       .join(", ") || "Membership not documented"}

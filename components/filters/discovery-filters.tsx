@@ -8,6 +8,7 @@ import type {
   OrganizationCluster,
 } from "../../lib/domain/models";
 import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
+import { studentOrganizations } from "../../lib/domain/hosting";
 
 type Props = {
   state: DiscoveryState;
@@ -51,6 +52,7 @@ export function DiscoveryFilters({
     state.clusterIds.length +
     state.categories.length +
     state.majorIds.length +
+    Number(state.universityOnly) +
     (state.search.trim() ? 1 : 0);
   return (
     <aside className="filters-panel" aria-labelledby="filters-title">
@@ -95,6 +97,20 @@ export function DiscoveryFilters({
             />
             Recommended Events
           </label>
+          <label className="choice">
+            <input
+              type="checkbox"
+              checked={state.universityOnly}
+              onChange={(e) =>
+                onChange({ ...state, universityOnly: e.target.checked })
+              }
+            />
+            University Events
+          </label>
+          <p className="field-help">
+            University hosts include departments, colleges and schools. Other
+            active filters still apply.
+          </p>
         </fieldset>
         <FilterGroup title="Majors">
           <fieldset aria-describedby="major-help">
@@ -130,8 +146,11 @@ export function DiscoveryFilters({
         <FilterGroup title="Organizations">
           <fieldset className="filter-options-scroll">
             <legend className="sr-only">Organizations</legend>
-            <p className="field-help">Any host unless selected.</p>
-            {organizations.map((org) => (
+            <p className="field-help">
+              Student organizations only. Find department-hosted events by major
+              or University Events.
+            </p>
+            {studentOrganizations(organizations).map((org) => (
               <label className="choice" key={org.id}>
                 <input
                   type="checkbox"

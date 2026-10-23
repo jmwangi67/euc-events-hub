@@ -15,6 +15,7 @@ export type DiscoveryState = {
   majorIds: string[];
   organizationIds: string[];
   clusterIds: string[];
+  universityOnly: boolean;
   categories: import("./models").EventCategory[];
   search: string;
 };
@@ -26,6 +27,7 @@ export const clearDiscoveryFilters = (
   majorIds: [],
   organizationIds: [],
   clusterIds: [],
+  universityOnly: false,
   categories: [],
   search: "",
 });
@@ -35,6 +37,7 @@ export function parseCalendarState(
   today: string,
   options: {
     majorIds: string[];
+    /** IDs of explicitly classified student organizations, never the full host registry. */
     organizationIds: string[];
     clusterIds?: string[];
   },
@@ -55,6 +58,7 @@ export function parseCalendarState(
     majorIds: values("majors", options.majorIds),
     organizationIds: values("organizations", options.organizationIds),
     clusterIds: values("clusters", options.clusterIds ?? []),
+    universityOnly: params.get("university") === "1",
     categories: [
       ...new Set(
         (params.get("categories") ?? "")
@@ -82,6 +86,7 @@ export function serializeCalendarState(state: DiscoveryState): string {
     params.set("organizations", state.organizationIds.join(","));
   if (state.clusterIds.length)
     params.set("clusters", state.clusterIds.join(","));
+  if (state.universityOnly) params.set("university", "1");
   if (state.categories.length)
     params.set("categories", state.categories.join(","));
   if (state.search) params.set("q", state.search);
@@ -94,6 +99,7 @@ export function discoveryFilters(state: DiscoveryState): EventFilters {
       : { mode: "recommended", majorIds: state.majorIds },
     organizationIds: state.organizationIds,
     clusterIds: state.clusterIds,
+    universityOnly: state.universityOnly,
     categories: state.categories,
     search: state.search,
   };

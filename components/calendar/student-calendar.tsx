@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Major, Organization } from "../../lib/domain/models";
+import { studentOrganizations } from "../../lib/domain/hosting";
 import { getOrganizationClusters } from "../../lib/data/weekly-planning";
 import { getEventById } from "../../lib/data/fixtures";
 import {
@@ -57,7 +58,9 @@ export function StudentCalendar({
           easternDate(new Date().toISOString()),
           {
             majorIds: majors.map((m) => m.id),
-            organizationIds: organizations.map((org) => org.id),
+            organizationIds: studentOrganizations(organizations).map(
+              (org) => org.id,
+            ),
             clusterIds: clusters.map((cluster) => cluster.id),
           },
         ),
@@ -126,11 +129,13 @@ export function StudentCalendar({
               }
             />
             <p className="field-help">
-              {!state.majorIds.length
-                ? "All published events"
-                : state.majorIds.length
-                  ? "Recommended for your selected majors, including college-wide events"
-                  : "Select majors in filters to add recommendations. Showing college-wide events."}
+              {state.universityOnly
+                ? "University-hosted published events; other selected filters also apply."
+                : !state.majorIds.length
+                  ? "All published events"
+                  : state.majorIds.length
+                    ? "Recommended for your selected majors, including college-wide events"
+                    : "Select majors in filters to add recommendations. Showing college-wide events."}
             </p>
           </div>
           <EventCalendar

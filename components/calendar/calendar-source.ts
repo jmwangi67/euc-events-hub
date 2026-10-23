@@ -2,6 +2,7 @@ import {
   eventHosts,
   hostNames,
   hostingIdentity,
+  hasUniversityHost,
 } from "../../lib/domain/hosting";
 import type { EventInput } from "@fullcalendar/core";
 import {
@@ -56,7 +57,9 @@ export function loadCalendarItems(
     .filter(
       (event) =>
         !planning ||
-        eventAudienceMatch(event, planning.audience, organizations).relevant,
+        (eventAudienceMatch(event, planning.audience, organizations).relevant &&
+          (planning.showUniversityEvents ||
+            !hasUniversityHost(event, organizations))),
     )
     .map((event) => {
       const mapped = toCalendarEvent(event);

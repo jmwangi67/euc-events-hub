@@ -42,32 +42,42 @@ export const organizationClusterSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
 });
-export const organizationSchema = z.object({
-  id,
-  name: z.string().min(1),
-  description: z.string().optional(),
-  defaultMajorIds: z.array(id),
-  classification: z.string().optional(),
-  hostType: z
-    .enum(["student-organization", "university-unit", "unknown"])
-    .optional(),
-  institutionId: id.optional(),
-  unitType: z
-    .enum([
-      "college",
-      "department",
-      "school",
-      "administrative-unit",
-      "official-faculty-staff",
-    ])
-    .optional(),
-  shortName: z.string().min(1).optional(),
-  compactName: z.string().min(1).optional(),
-  parentUnitIds: z.array(id).optional(),
-  source: sourceSchema.optional(),
-  networkIds: z.array(id).default([]),
-  clusterIds: z.array(id).optional(),
-});
+export const organizationSchema = z
+  .object({
+    id,
+    name: z.string().min(1),
+    description: z.string().optional(),
+    defaultMajorIds: z.array(id),
+    classification: z.string().optional(),
+    hostType: z
+      .enum(["student-organization", "university-unit", "unknown"])
+      .optional(),
+    institutionId: id.optional(),
+    unitType: z
+      .enum([
+        "college",
+        "department",
+        "school",
+        "administrative-unit",
+        "official-faculty-staff",
+      ])
+      .optional(),
+    shortName: z.string().min(1).optional(),
+    compactName: z.string().min(1).optional(),
+    parentUnitIds: z.array(id).optional(),
+    source: sourceSchema.optional(),
+    networkIds: z.array(id).default([]),
+    clusterIds: z.array(id).optional(),
+  })
+  .superRefine((host, ctx) => {
+    if (host.clusterIds?.length && host.hostType !== "student-organization")
+      ctx.addIssue({
+        code: "custom",
+        path: ["clusterIds"],
+        message:
+          "Student organization cluster membership requires a student organization.",
+      });
+  });
 const eventFields = {
   id,
   title: z.string().min(1),

@@ -3,6 +3,7 @@ import { dateOnlySchema } from "../domain/models";
 import type { Event, EventCategory, Exam } from "../domain/models";
 import { isEventRelevant } from "../domain/relevance";
 import type { MajorSelection } from "../domain/relevance";
+import { hasUniversityHost, studentOrganizations } from "../domain/hosting";
 import { addCalendarDays, easternDayStart } from "../time/eastern";
 
 export type DateWindow = { start: string; end: string };
@@ -11,6 +12,7 @@ export type EventFilters = {
   organizationIds?: readonly string[];
   categories?: readonly EventCategory[];
   clusterIds?: readonly string[];
+  universityOnly?: boolean;
   search?: string;
 };
 
@@ -54,6 +56,7 @@ export function getEvents(
 ): Event[] {
   const window = parseWindow({ start, end });
   const search = filters.search?.trim().toLowerCase() ?? "";
+  const studentHosts = studentOrganizations(organizations);
   const matching = eventFixtures.filter(
     (event) =>
       event.status === "published" &&
@@ -64,11 +67,14 @@ export function getEvents(
         organizations,
       ) &&
       (!filters.organizationIds?.length ||
-        filters.organizationIds.some((id) =>
-          event.hostOrganizationIds.includes(id),
+        filters.organizationIds.some(
+          (id) =>
+            studentHosts.some((org) => org.id === id) &&
+            event.hostOrganizationIds.includes(id),
         )) &&
+      (!filters.universityOnly || hasUniversityHost(event, organizations)) &&
       (!filters.clusterIds?.length ||
-        organizations.some(
+        studentHosts.some(
           (org) =>
             event.hostOrganizationIds.includes(org.id) &&
             org.clusterIds?.some((id) => filters.clusterIds!.includes(id)),
@@ -107,8 +113,13 @@ export function getEventById(
 export function getMajors() {
   return structuredClone(majors);
 }
+/** Complete host registry, including university units; used by details and analysis. */
 export function getOrganizations() {
   return structuredClone(organizations);
+}
+/** Student choices only; university and unresolved hosts are never selectable. */
+export function getStudentOrganizations() {
+  return structuredClone(studentOrganizations(organizations));
 }
 /** Analysis can retain full source identities; display queries keep their original range semantics. */
 export function getExams(

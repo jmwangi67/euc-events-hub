@@ -40,6 +40,16 @@ Category, scope, title, faculty attendance and campus location never establish h
 
 The icon is an original generic SVG paw, not a Penn State mark. White badges use blue #1E407C with a subtle #B8C7DB border. No Unicode paw emoji, generic building icon, university-specific card background, or white inner-border treatment is used. Official mark replacement would require applicable brand/trademark authorization; the prototype does not claim it. Institutional identity sources do not verify the fictional events or imply university endorsement.
 
+## October 22 clarification: selectable student organizations
+
+The shared registry retains university units as event hosts/descriptors, never as selectable student organizations. `getOrganizations()` supplies the complete host registry to event details, rendering and analysis; `getStudentOrganizations()` and the shared `studentOrganizations` selector expose only explicit `hostType: "student-organization"` records. Unknown/unclassified hosts are also excluded from selectable choices. Names, abbreviations and locations do not establish membership. The same selector restricts the student calendar's organization choices and URL allowlist, the planner's proposed-event organization selector, and community-guide membership lists. Existing fictional student groups and sourced BMES/SWE records remain available; no new student group is invented.
+
+Student-organization cluster memberships require explicit student-organization classification in the schema, and public cluster matching checks student hosts only. University affiliations remain in `parentUnitIds`/institutional identity; planner analytical relevance still uses explicit event targeting and its existing independent audience rules.
+
+Students can find department events by major or the **University Events** checkbox (`university=1`). It narrows to published events with at least one explicitly registered Penn State university host, including university/student co-hosts, AND other active discovery restrictions. It preserves URL/history/reset semantics and contributes one active filter. Old department/unknown organization URL IDs are ignored by the UI allowlist; direct organization-filter queries cannot select them. All Events/unrestricted queries still retain university and unresolved events.
+
+The planner adds **Show University Events**, enabled by default under published-event visibility. It hides only university-hosted/co-hosted published event cards and is disabled while the existing published-events master switch is off. It does not redefine PSU-wide external scope, hide exams, or change proposal/weekly analysis, density inputs or policy calculations. University events remain eligible constraints even with their cards hidden. Full names, abbreviations, parent affiliations and paw badges remain unchanged. [Clarification previews and validation](../previews/planner/organization-membership/README.md) show both interfaces.
+
 ## Verified names and proposed calendar labels
 
 Registry sources were checked on October 21, 2026:
