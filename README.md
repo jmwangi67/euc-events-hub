@@ -40,6 +40,12 @@ The calendar opens on the current Eastern date. “View sample dates” navigate
 
 Organization choices and community memberships contain explicitly classified student organizations only. University departments, colleges, schools and administrative units remain in the host registry for event cards, paw badges, full-name details and scheduling analysis. Discover their events through major relevance or **University Events** (`university=1`), which combines with other active restrictions. Clear filters also resets this checkbox. The planner's proposed-event organization selector is student-only; **Show University Events** controls university-hosted/co-hosted published cards while leaving eligible scheduling constraints and density inputs unchanged. The existing published-events master switch must also be on. PSU-wide external commitments retain their separate display control. See the [clarification preview gallery](docs/previews/planner/organization-membership/README.md).
 
+## Planned Milestone 2A: Admin-managed exam datasets
+
+The next academic-data workstream will allow authorized EUC admins to import, review, correct and publish term-based exam records without changing application code. [Milestone 2A plan](docs/milestones/2A-ACADEMIC-EXAM-ADMINISTRATION.md) documents the staged data contract, review workflow, source-confirmation semantics, testing and security prerequisites. Production admin editing depends on future database and authentication foundations.
+
+**Do not commit real source-derived exam schedules to the public fixture directory.** Keep authorized local staging files under gitignored `data/local/`. The current calendar still uses fictional exams and does not automatically ingest local files; testing source-based multi-day eTesting windows requires a subsequent import/schema implementation and publication-rights review.
+
 ## Browser verification
 
 A small Playwright suite exercises complete student discovery workflows against a production build. It uses a Los Angeles browser time zone to verify Eastern display and reviews 320, 375, 430, 768, and 1440px layouts, including native dialogs and keyboard behavior.
