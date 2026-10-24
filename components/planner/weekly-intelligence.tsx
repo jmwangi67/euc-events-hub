@@ -55,7 +55,7 @@ export function WeeklySummaryCell({
         data-calendar-event-id={`week:${week.start}`}
         onClick={() => onSelect(week)}
         aria-haspopup="dialog"
-        aria-label={`Weekly summary: ${weekLabel(week)}. ${c.uniqueTotal} unique commitments: ${c.collegeWide} College-wide, ${c.otherEvents} other relevant events, ${c.exams} mapped exams, ${c.psuWide} PSU-wide, ${c.campusLocal} Local, ${c.national} National; ${c.uncertainExams} audience-uncertain exams. Open details.`}
+        aria-label={`Weekly summary: ${weekLabel(week)}. ${c.uniqueTotal} unique commitments: ${c.collegeWide} College-wide, ${c.otherEvents} other relevant events, ${c.exams} mapped exams, ${c.psuWide} PSU-wide, ${c.campusLocal} Local, ${c.national} National; ${c.uncertainExams} audience-uncertain exams. Open weekly summary details.`}
       >
         <span className="week-summary-date">{compactWeekLabel(week)}</span>
         <span>
@@ -92,7 +92,7 @@ export function WeeklySummaryCell({
         {c.uncertainExams > 0 && (
           <span>{c.uncertainExams} audience-uncertain exams</span>
         )}
-        <span className="field-help">View weekly details →</span>
+        <span className="field-help">Weekly summary details →</span>
       </button>
       {onFocusWeek && (
         <button

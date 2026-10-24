@@ -104,9 +104,9 @@ test("scope cards retain their exact readable palette above hourly density and r
     })),
   );
   const bandPalette = {
-    "density-one": "rgb(198, 204, 214)",
-    "density-two": "rgb(167, 155, 184)",
-    "density-three-plus": "rgb(116, 95, 137)",
+    "density-one": "rgb(224, 200, 235)",
+    "density-two": "rgb(192, 156, 214)",
+    "density-three-plus": "rgb(147, 103, 181)",
   };
   for (const segment of actualBands) {
     expect(segment.background).toBe(
@@ -185,10 +185,10 @@ test("all density colors have factual labels and display toggles do not alter th
   ])
     await expect(legend.getByText(label, { exact: true })).toBeVisible();
   const expected = [
-    "rgb(242, 244, 247)",
-    "rgb(198, 204, 214)",
-    "rgb(167, 155, 184)",
-    "rgb(116, 95, 137)",
+    "rgb(241, 232, 245)",
+    "rgb(224, 200, 235)",
+    "rgb(192, 156, 214)",
+    "rgb(147, 103, 181)",
   ];
   expect(
     await page
@@ -199,15 +199,17 @@ test("all density colors have factual labels and display toggles do not alter th
   ).toEqual(expected);
   const date = page.locator('.fc-daygrid-day[data-date="2026-10-21"]');
   await expect(date).toHaveClass(/density-three-plus/);
-  await expect(date.locator(".density-cell-count")).toHaveText("3+ timed");
-  await expect(date.locator(".density-cell-count")).toHaveAttribute(
-    "aria-label",
-    /Peak known-time subgroup density/,
-  );
+  await expect(page.locator(".density-cell-count")).toHaveCount(0);
   await expect(date.locator(".fc-daygrid-more-link")).toHaveCSS(
     "background-color",
     "rgb(255, 255, 255)",
   );
+  const number = date.locator(".fc-daygrid-day-number");
+  await expect(number).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  const ink = (await number.evaluate((el) => getComputedStyle(el).color))
+    .match(/\d+/g)!
+    .map(Number);
+  expect(contrast(ink, [255, 255, 255])).toBeGreaterThanOrEqual(4.5);
   const classes = await date.getAttribute("class");
   const guidance = await page
     .getByRole("region", { name: "Calendar scheduling guidance" })

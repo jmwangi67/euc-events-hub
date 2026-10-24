@@ -1,3 +1,4 @@
+import { EventTypeIcon } from "./event-type-icon";
 import { HostingBadge } from "./hosting-badge";
 import type { EventApi, EventContentArg } from "@fullcalendar/core";
 import {
@@ -26,10 +27,12 @@ export function CalendarItemContent({
   )
     return (
       <span className="external-indicator">
-        <span aria-hidden="true">◆</span>{" "}
+        <EventTypeIcon props={info.event.extendedProps} />
         {info.event.title.replace(/^(?:Synthetic |Example )/, "")}
         <span className="event-scope-label">
-          {externalScopeLabel(info.event.extendedProps.externalEvent.scope)} ·
+          {externalScopeLabel(info.event.extendedProps.externalEvent.scope)} ·{" "}
+          {!info.event.extendedProps.externalEvent.timeKnown &&
+            "Time unknown · "}
           Example Event
         </span>
         <span className="sr-only">
@@ -69,7 +72,12 @@ export function CalendarItemContent({
           </span>
         ))}
       </span>
-      <span className="event-title">{compactTitle(info.event.title)}</span>
+      <span className="event-title">
+        {(planner || info.event.extendedProps.kind === "exam-review") && (
+          <EventTypeIcon props={info.event.extendedProps} />
+        )}
+        {compactTitle(info.event.title)}
+      </span>
       <span className="event-category">
         {categoryLabel}
         {!info.event.extendedProps.kind &&
@@ -101,7 +109,12 @@ export function CalendarItemContent({
     >
       {mobile ? (
         <span className="mobile-list-content">
-          <span className="event-title">{compactTitle(info.event.title)}</span>
+          <span className="event-title">
+            {(planner || info.event.extendedProps.kind === "exam-review") && (
+              <EventTypeIcon props={info.event.extendedProps} />
+            )}
+            {compactTitle(info.event.title)}
+          </span>
           <span className="list-event-times" aria-hidden="true">
             {cardTimes.map((part, index) => {
               const isNote = /Next day|From prev day|^\+\d+ days$/.test(part);

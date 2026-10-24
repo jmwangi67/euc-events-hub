@@ -19,6 +19,7 @@ export function toCalendarEvent(event: Event): EventInput {
     classNames: [`category-${event.category}`],
     extendedProps: {
       category: categoryLabel(event.category),
+      eventType: event.category,
       subtype: event.subtype,
       categoryMappingNote: event.categoryMappingNote,
       location: event.location,

@@ -1,4 +1,5 @@
 "use client";
+import { plannerEventOrder } from "./planner-presentation";
 import { CategoryLegend } from "./category-legend";
 import { useCallback, useRef, useState, useMemo, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
@@ -222,7 +223,16 @@ export function EventCalendar(props: EventCalendarProps) {
   useEffect(() => {
     weekAction.current = (start: string) => {
       const week = weeks.find((week) => week.start === start);
-      if (week) openWeek(week);
+      if (week) {
+        changeView("timeGridWeek");
+        onDateChange(week.start);
+        requestAnimationFrame(() =>
+          surface.current
+            ?.closest("section")
+            ?.querySelector<HTMLElement>(".range-heading h2")
+            ?.focus(),
+        );
+      }
     };
   });
   const focusCalendarWeek = (week: WeeklySummary) => {
@@ -378,27 +388,18 @@ export function EventCalendar(props: EventCalendarProps) {
             year: showGroupYear ? "numeric" : undefined,
           }}
           listDaySideFormat={false}
-          eventOrder="start,title"
-          eventOrderStrict={mobile && view.startsWith("list")}
+          eventOrder={
+            planning && view.startsWith("dayGrid")
+              ? plannerEventOrder
+              : "start,title"
+          }
+          eventOrderStrict={
+            (!!planning && view.startsWith("dayGrid")) ||
+            (mobile && view.startsWith("list"))
+          }
           eventInteractive
           navLinks={false}
-          dayCellContent={(info) => {
-            if (!planning?.showDensity || !view.startsWith("dayGrid"))
-              return info.dayNumberText;
-            const date = easternDate(info.date.toISOString());
-            const count = densityDays.get(date)?.maximumConcurrent ?? 0;
-            return (
-              <>
-                {info.dayNumberText}
-                <span
-                  className="density-cell-count"
-                  aria-label={`Peak known-time subgroup density on ${date}: ${count >= 3 ? "3 or more" : count} simultaneous commitments`}
-                >
-                  {count >= 3 ? "3+" : count} timed
-                </span>
-              </>
-            );
-          }}
+          dayCellContent={(info) => info.dayNumberText}
           dayCellClassNames={(info) => {
             const date = easternDate(info.date.toISOString());
             const week = weeks.find(
@@ -427,13 +428,12 @@ export function EventCalendar(props: EventCalendarProps) {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "week-row-link";
-            button.textContent = "Week details";
+            button.textContent = "View 1 Week →";
             button.dataset.calendarEventId = `week:${week.start}`;
             button.setAttribute(
               "aria-label",
-              `Week details: ${weekLabel(week)}. Open weekly summary.`,
+              `View 1 Week: ${weekLabel(week)}`,
             );
-            button.setAttribute("aria-haspopup", "dialog");
             button.onclick = (event) => {
               event.stopPropagation();
               weekAction.current(week.start);

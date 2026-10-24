@@ -227,13 +227,14 @@ test("Sunday week controls provide logical keyboard access and restore focus acr
 }) => {
   await sample(page);
   const trigger = page.getByRole("button", {
-    name: /^Week details: Oct 18, 2026/,
+    name: /^View 1 Week: Oct 18, 2026/,
   });
   await trigger.focus();
   await page.keyboard.press("Space");
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(trigger).toBeFocused();
+  await expect(page.locator(".fc-timeGridWeek-view")).toBeVisible();
+  await expect(page.getByLabel("Go to date", { exact: true })).toHaveValue(
+    "2026-10-18",
+  );
   const summary = page.getByRole("button", {
     name: /^Weekly summary: Oct 18, 2026/,
   });
@@ -241,11 +242,9 @@ test("Sunday week controls provide logical keyboard access and restore focus acr
     "aria-label",
     /College-wide.*PSU-wide.*audience-uncertain/,
   );
-  await page
-    .getByRole("button", { name: /^Focus this week in calendar: Oct 18, 2026/ })
-    .click();
-  await expect(trigger).toBeFocused();
+  await summary.focus();
   await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toBeVisible();
   await page.setViewportSize({ width: 375, height: 1100 });
   await expect(page.locator(".fc-listMonth-view")).toBeVisible();
   await page.keyboard.press("Escape");

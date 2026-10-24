@@ -83,7 +83,8 @@ export function SchedulingDensityLegend({
         selected major × academic-level subgroup. Subgroups are not added
         together. Documented all-day commitments are listed separately; unknown
         hours stay as date-level cautions. These counts are not attendance
-        estimates or pressure scores.
+        estimates or pressure scores. Zero known-time commitments does not mean
+        an empty or safe scheduling day.
       </p>
       {segments && (
         <details className="density-interval-details">

@@ -24,10 +24,12 @@
   --color-scope-engineering-surface: #ffffff;
   --color-scope-engineering-border: #9aa9ba;
   --color-scope-engineering-foreground: #001e44;
-  --color-density-none: #f2f4f7;
-  --color-density-one: #c6ccd6;
-  --color-density-two: #a79bb8;
-  --color-density-three-plus: #745f89;
+  --color-planner-grid: #b5c1cf;
+  --color-planner-frame: #8c9bad;
+  --color-density-none: #f1e8f5;
+  --color-density-one: #e0c8eb;
+  --color-density-two: #c09cd6;
+  --color-density-three-plus: #9367b5;
   --color-foreground: #001e44;
   --color-foreground-muted: #475569;
   --color-foreground-inverse: #ffffff;
@@ -1832,15 +1834,7 @@ button.planner-analyze:hover {
 .density-enabled .fc-timegrid-slot-lane {
   background: var(--color-density-none);
 }
-.density-cell-count {
-  display: inline-block;
-  margin-left: 4px;
-  padding-left: 4px;
-  border-left: 1px solid var(--color-event-card-border);
-  font-size: 10px;
-  font-weight: 500;
-  white-space: nowrap;
-}
+
 .density-interval-details {
   margin: 7px 0;
 }
@@ -2333,4 +2327,51 @@ button.planner-analyze:hover {
     margin: 0;
     font-size: 11px;
   }
+}
+
+/* Planner structural frame includes the integrated summary column. */
+.planner-calendar .calendar-surface {
+  border: 2px solid var(--color-planner-frame);
+  background: var(--color-surface);
+  border-radius: 2px;
+}
+.planner-calendar .calendar-surface .fc {
+  --fc-border-color: var(--color-planner-grid);
+}
+.planner-calendar .fc-scrollgrid {
+  border: 0;
+}
+.planner-calendar .weekly-summary-column {
+  border-right: 0;
+  border-left: 1px solid var(--color-planner-grid);
+}
+.planner-calendar .weekly-summary-cell {
+  border-bottom: 2px solid var(--color-planner-grid);
+}
+.planner-calendar .weekly-column-heading {
+  border-color: var(--color-planner-grid);
+}
+.planner-calendar .fc-daygrid-body tr:not(:last-child) > td {
+  border-bottom-width: 2px;
+}
+.planner-calendar .fc-scrollgrid-section-header > th {
+  border-bottom: 2px solid var(--color-planner-grid);
+}
+.event-type-icon {
+  width: 13px;
+  height: 13px;
+  display: inline-block;
+  flex: none;
+  vertical-align: -2px;
+  margin-right: 4px;
+}
+.planner-calendar .fc-scrollgrid-section > :last-child,
+.planner-calendar .fc-daygrid-body td:last-child,
+.planner-calendar .fc-col-header th:last-child {
+  border-right: 0;
+}
+.planner-calendar .fc-scrollgrid-section:last-child > td,
+.planner-calendar .fc-daygrid-body tr:last-child > td,
+.planner-calendar .weekly-summary-cell:last-child {
+  border-bottom: 0;
 }

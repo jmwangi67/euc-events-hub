@@ -16,7 +16,9 @@ export function useWeekLayout(
       );
       if (!rows.length) return;
       const header =
-        rows[0].getBoundingClientRect().top - root.getBoundingClientRect().top;
+        rows[0].getBoundingClientRect().top -
+        root.getBoundingClientRect().top -
+        root.clientTop;
       const heights = rows.map((row) => row.getBoundingClientRect().height);
       setLayout((current) =>
         Math.abs(current.header - header) < 0.1 &&

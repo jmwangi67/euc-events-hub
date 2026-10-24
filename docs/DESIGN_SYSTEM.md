@@ -609,3 +609,15 @@ Welcome text remains restrained, with a closed-by-default category/community gui
 ## Milestone 2A.0: local academic review
 
 The separate development review reuses neutral academic-exam styling and responsive chronological grouping. It displays **Private exam data preview — unverified** and an explicit non-official schedule warning. Unknown-hour date alternatives use a **Date options** band and time-unknown labels, without drawing fabricated hour blocks. Additional possible dates use text plus dashed borders; color alone does not convey uncertainty. Known clocks explain their explicit/source-default basis. Range totals count canonical occurrences rather than rendered date segments. Native details retain source/status/audience/permission information and Enter/Space/Escape focus behavior. No category legend, non-exam density or numerical preparation is shown in this review. [Public review screenshots](previews/planner/exam-import/README.md) use invented records only; real source screenshots must stay private.
+
+## Planner hierarchy and navigation refinement
+
+Planner Month and 2 Weeks use strict deterministic event ordering: multi-date date-wide spans, then single-date untimed/all-day records, then chronological timed events. Ties use start, longer duration, title and stable public occurrence ID. FullCalendar retains continuous horizontal segments and exclusive ends; this changes presentation only. Unknown-hour external commitments retain Time unknown and never become verified all-day occupancy. The public student ordering is unchanged.
+
+Density uses the existing factual subgroup concurrency calculation with purple semantic surfaces: none #F1E8F5, one #E0C8EB, two #C09CD6, three-plus #9367B5. Date headers have no numerical density badges. The legend and optional interval disclosure explain counts; zero known-time commitments does not imply an empty/safe day. Opaque event scope cards, white date-number/control surfaces and keyboard outlines remain above shading. Cautions remain independent of density visibility.
+
+The planner frame uses a restrained 2px #8C9BAD outer border around grid and integrated weekly summaries, 1px #B5C1CF day divisions and stronger week/header separation. These are centralized structural tokens. No shadows are added.
+
+Sunday's View 1 Week control navigates to the matching Eastern Sunday–Saturday hourly view, preserving audience/display state. It is a navigation button without dialog semantics. Weekly summary details remains a separate dialog action in the summary interface; the focus-this-week action remains available in the integrated column. Existing date/view callbacks own navigation.
+
+Planner titles use original 13px line SVG icons selected only from structured categories, external classifications or exam kind. Music, trophy, briefcase, tools, users, celebration, calendar and academic-cap shapes remain separate from scope colors. Neutral calendar is the fallback; titles never select an icon. Icons are decorative to assistive technology and do not replace title, time, scope, source or uncertainty text. No dependencies or official marks are added.
