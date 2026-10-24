@@ -1,7 +1,17 @@
 "use client";
-import { useEffect, useRef } from "react";
-import type { Event, Major, Organization } from "../../lib/domain/models";
-import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
+import { EventTypeIcon } from "./event-type-icon";
+import { HostingBadge } from "./hosting-badge";
+import { departmentHosted, hostingIdentity } from "../../lib/domain/hosting";
+import { DetailsDialog } from "./details-dialog";
+import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
+import type {
+  Event,
+  Major,
+  Organization,
+  OrganizationCluster,
+} from "../../lib/domain/models";
+import { categoryLabel } from "../../lib/domain/event-categories";
+import { sourceLabel, verificationLabel } from "../../lib/domain/source-labels";
 import { formatEventTime } from "../../lib/time/eastern";
 
 type Props = {
@@ -9,10 +19,15 @@ type Props = {
   majors: Major[];
   organizations: Organization[];
   onClose: () => void;
+  planningClusters?: OrganizationCluster[];
 };
-export function EventDetails({ event, majors, organizations, onClose }: Props) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const heading = useRef<HTMLHeadingElement>(null);
+export function EventDetails({
+  event,
+  majors,
+  organizations,
+  onClose,
+  planningClusters,
+}: Props) {
   const hosts = organizations.filter((org) =>
     event.hostOrganizationIds.includes(org.id),
   );
@@ -30,105 +45,100 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
           .filter((major) => audienceIds.includes(major.id))
           .map((major) => major.name)
           .join(", ") || "Audience not provided";
-  useEffect(() => {
-    const element = dialog.current!;
-    const previousFocus = document.activeElement as HTMLElement | null;
-    element.showModal();
-    heading.current?.focus();
-    return () => {
-      element.close();
-      // FullCalendar may replace the opener during a responsive view change.
-      const trigger =
-        previousFocus?.isConnected &&
-        previousFocus.dataset.calendarEventId === event.id
-          ? previousFocus
-          : document.querySelector<HTMLElement>(
-              `[data-calendar-event-id="${CSS.escape(event.id)}"]`,
-            );
-      trigger?.focus();
-    };
-  }, [event.id]);
   return (
-    <dialog
-      ref={dialog}
-      className="event-dialog"
-      aria-labelledby="event-detail-title"
-      aria-describedby={
+    <DetailsDialog
+      triggerId={event.id}
+      title={event.title}
+      titleId="event-detail-title"
+      label="Event details"
+      describedBy={
         event.source.verification === "synthetic"
           ? "event-example-note"
           : undefined
       }
-      onKeyDown={(key) => {
-        if (key.key !== "Tab") return;
-        const controls = Array.from(
-          key.currentTarget.querySelectorAll<HTMLElement>(
-            "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])",
-          ),
-        );
-        const first = controls[0];
-        const last = controls[controls.length - 1];
-        if (!first) return;
-        if (!controls.includes(document.activeElement as HTMLElement)) {
-          key.preventDefault();
-          (key.shiftKey ? last : first).focus();
-        } else if (key.shiftKey && document.activeElement === first) {
-          key.preventDefault();
-          last.focus();
-        } else if (!key.shiftKey && document.activeElement === last) {
-          key.preventDefault();
-          first.focus();
-        }
-      }}
-      onCancel={(cancel) => {
-        // Native dismissal restores focus before its queued close notification.
-        // Clear React's selection now, so immediate reactivation is not a no-op.
-        cancel.preventDefault();
-        onClose();
-      }}
       onClose={onClose}
-      onClick={(e) => {
-        if (e.target !== e.currentTarget) return;
-        const box = e.currentTarget.getBoundingClientRect();
-        if (
-          e.clientX < box.left ||
-          e.clientX > box.right ||
-          e.clientY < box.top ||
-          e.clientY > box.bottom
-        )
-          onClose();
-      }}
     >
-      <div className="dialog-top">
-        <span className="eyebrow">Event details</span>
-        <button
-          className="control"
-          onClick={onClose}
-          aria-label="Close event details"
-        >
-          Close ×
-        </button>
-      </div>
-      <h2 id="event-detail-title" ref={heading} tabIndex={-1}>
-        {event.title}
-      </h2>
       {event.source.verification === "synthetic" && (
         <p className="example-note" id="event-example-note">
-          Fictional development example. This is not an official Penn State
-          event.
+          Example scenario — not a real or verified event. This is not an
+          official Penn State schedule.
         </p>
       )}
+      <HostingBadge identity={hostingIdentity(event, organizations)} />
       <p className="detail-time">{formatEventTime(event)}</p>
       <dl className="event-facts">
+        {departmentHosted(event, organizations) && (
+          <div>
+            <dt>Host type</dt>
+            <dd>Department-hosted</dd>
+          </div>
+        )}
         <div>
-          <dt>Host organization</dt>
+          <dt>
+            {hosts.length > 1 ? "Host organizations" : "Host organization"}
+          </dt>
           <dd>
             {hosts.map((host) => host.name).join(", ") ||
               "Host details not provided"}
+            {hosts
+              .filter((host) => host.parentUnitIds?.length)
+              .map((host) => (
+                <span className="field-help" key={`parent-${host.id}`}>
+                  {host.name} · Parent units:{" "}
+                  {host
+                    .parentUnitIds!.map(
+                      (id) =>
+                        organizations.find((unit) => unit.id === id)?.name ??
+                        "Parent unit not documented",
+                    )
+                    .join(" + ")}
+                  .
+                </span>
+              ))}
+            {hosts
+              .filter((host) => host.source)
+              .map((host) => (
+                <span key={host.id} className="field-help">
+                  Host identity only:{" "}
+                  {host.source!.url ? (
+                    <a href={host.source!.url} target="_blank" rel="noreferrer">
+                      {host.name} source (opens a new tab)
+                    </a>
+                  ) : (
+                    sourceLabel(host.source!)
+                  )}
+                  . This does not verify the event.
+                </span>
+              ))}
           </dd>
         </div>
         <div>
           <dt>Category</dt>
-          <dd>{EVENT_CATEGORIES[event.category]}</dd>
+          <dd>
+            {categoryLabel(event.category)}
+            {event.categoryMappingNote && event.category === null && (
+              <span className="field-help">{event.categoryMappingNote}</span>
+            )}
+            {event.subtype && (
+              <span className="field-help">
+                Subtype:{" "}
+                {event.subtype === "thon" ? (
+                  <>
+                    <EventTypeIcon props={{ subtype: "thon" }} large />
+                    THON event
+                  </>
+                ) : event.subtype === "career-fair" ? (
+                  "Career fair"
+                ) : event.subtype === "corporate-recruiting" ? (
+                  "Corporate recruiting session"
+                ) : event.subtype === "networking" ? (
+                  "Networking event"
+                ) : (
+                  "Educational research seminar"
+                )}
+              </span>
+            )}
+          </dd>
         </div>
         <div>
           <dt>Location</dt>
@@ -148,26 +158,79 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
                 Inferred from the host organizations’ documented audience.
               </span>
             )}
-            {event.audienceEligibility && <p>{event.audienceEligibility}</p>}
           </dd>
         </div>
+        {event.audienceEligibility && (
+          <div>
+            <dt>Audience eligibility</dt>
+            <dd>{event.audienceEligibility}</dd>
+          </div>
+        )}
+        {(planningClusters || !!event.targetAcademicLevels?.length) && (
+          <div>
+            <dt>Academic-year audience</dt>
+            <dd>
+              {event.targetAcademicLevels?.length
+                ? event.targetAcademicLevels
+                    .map((level) => ACADEMIC_LEVELS[level])
+                    .join(", ")
+                : "No documented academic-year restriction."}
+            </dd>
+          </div>
+        )}
+        {planningClusters && (
+          <>
+            <div>
+              <dt>Organization-cluster targeting</dt>
+              <dd>
+                {event.targetClusterIds?.length
+                  ? event.targetClusterIds
+                      .map(
+                        (id) =>
+                          planningClusters.find((cluster) => cluster.id === id)
+                            ?.name ?? id,
+                      )
+                      .join(", ")
+                  : "Unspecified; host membership does not imply event targeting."}
+              </dd>
+            </div>
+          </>
+        )}
         <div>
           <dt>Source</dt>
           <dd>
             {event.source.url ? (
               <a href={event.source.url} rel="noreferrer" target="_blank">
-                {event.source.label} (opens a new tab)
+                {sourceLabel(event.source)} (opens a new tab)
               </a>
             ) : (
-              event.source.label
+              sourceLabel(event.source)
             )}
             <span className="field-help">
-              Verification: {event.source.verification} · Status: published
+              Verification: {verificationLabel(event.source.verification)}
             </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Record status</dt>
+          <dd>
+            {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
+            {event.source.verification === "synthetic" && (
+              <span className="field-help">
+                Example record status only; this demo has not published an
+                actual event.
+              </span>
+            )}
           </dd>
         </div>
       </dl>
       <h3>About this event</h3>
+      {departmentHosted(event, organizations) && (
+        <p className="department-host-note">
+          Department-hosted · Hosted by:{" "}
+          {hosts.map((host) => host.name).join(" + ")}
+        </p>
+      )}
       <p className="detail-description">
         {event.description || "No description has been provided."}
       </p>
@@ -190,6 +253,6 @@ export function EventDetails({ event, majors, organizations, onClose }: Props) {
           </a>
         </p>
       )}
-    </dialog>
+    </DetailsDialog>
   );
 }

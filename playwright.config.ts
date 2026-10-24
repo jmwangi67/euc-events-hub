@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests",
+  testIgnore: "**/exam-preview/**",
   fullyParallel: false,
   workers: 1,
   use: {
@@ -19,6 +20,10 @@ export default defineConfig({
     gracefulShutdown: { signal: "SIGTERM", timeout: 5000 },
     url: "http://127.0.0.1:3000",
     reuseExistingServer: false,
-    env: { NEXT_TELEMETRY_DISABLED: "1" },
+    env: {
+      NEXT_TELEMETRY_DISABLED: "1",
+      EUC_PRIVATE_EXAM_PREVIEW: "1",
+      EUC_EXAM_PREVIEW_DATASET: "synthetic",
+    },
   },
 });

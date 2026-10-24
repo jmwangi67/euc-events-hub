@@ -8,7 +8,7 @@ import { SiteHeader } from "../components/site-header";
 export const metadata: Metadata = {
   title: "EUC Events Hub — Student Calendar",
   description:
-    "Discover engineering events by major, organization, and category. All example data is synthetic.",
+    "Discover engineering events by major, organization, and category. Example events are fictional and not verified schedules.",
 };
 export default function RootLayout({
   children,

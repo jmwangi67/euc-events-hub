@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+  eventCategorySchema,
+  eventSubtypeSchema,
+  legacyCategorySchema,
+  migrateLegacyEvent,
+} from "./event-taxonomy";
+export { eventCategorySchema } from "./event-taxonomy";
 import { DISPLAY_TIME_ZONE } from "../time/constants";
 
 const id = z.string().trim().min(1);
@@ -12,7 +19,7 @@ export const instantSchema = z.iso
   );
 const httpUrl = z.url({ protocol: /^https?$/ });
 const verification = z.enum(["synthetic", "unverified", "verified"]);
-const sourceSchema = z.object({
+export const sourceSchema = z.object({
   label: z.string().min(1),
   url: httpUrl.optional(),
   verification,
@@ -23,24 +30,54 @@ export const majorSchema = z.object({
   name: z.string().min(1),
   abbreviation: z.string().min(1),
 });
-export const organizationSchema = z.object({
+export const academicLevelSchema = z.enum([
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth-plus",
+]);
+export const organizationClusterSchema = z.object({
   id,
   name: z.string().min(1),
-  description: z.string().optional(),
-  defaultMajorIds: z.array(id),
-  classification: z.string().optional(),
-  networkIds: z.array(id).default([]),
+  description: z.string().min(1),
 });
-export const eventCategorySchema = z.enum([
-  "corporate-recruiting",
-  "technical-workshop",
-  "professional-development",
-  "networking",
-  "career-fair",
-  "student-organization",
-  "research",
-  "competition",
-]);
+export const organizationSchema = z
+  .object({
+    id,
+    name: z.string().min(1),
+    description: z.string().optional(),
+    defaultMajorIds: z.array(id),
+    classification: z.string().optional(),
+    hostType: z
+      .enum(["student-organization", "university-unit", "unknown"])
+      .optional(),
+    institutionId: id.optional(),
+    unitType: z
+      .enum([
+        "college",
+        "department",
+        "school",
+        "administrative-unit",
+        "official-faculty-staff",
+      ])
+      .optional(),
+    shortName: z.string().min(1).optional(),
+    compactName: z.string().min(1).optional(),
+    parentUnitIds: z.array(id).optional(),
+    source: sourceSchema.optional(),
+    networkIds: z.array(id).default([]),
+    clusterIds: z.array(id).optional(),
+  })
+  .superRefine((host, ctx) => {
+    if (host.clusterIds?.length && host.hostType !== "student-organization")
+      ctx.addIssue({
+        code: "custom",
+        path: ["clusterIds"],
+        message:
+          "Student organization cluster membership requires a student organization.",
+      });
+  });
 const eventFields = {
   id,
   title: z.string().min(1),
@@ -50,16 +87,21 @@ const eventFields = {
   targetMajorIds: z.array(id),
   targeting: z.enum(["explicit", "inherited", "unclassified"]),
   collegeWide: z.boolean(),
-  category: eventCategorySchema,
+  category: eventCategorySchema.nullable(),
+  subtype: eventSubtypeSchema.optional(),
+  legacyCategory: legacyCategorySchema.optional(),
+  categoryMappingNote: z.string().min(1).optional(),
   tags: z.array(z.string().min(1)).default([]),
   audienceEligibility: z.string().optional(),
+  targetAcademicLevels: z.array(academicLevelSchema).optional(),
+  targetClusterIds: z.array(id).optional(),
   status: z.enum(["draft", "published", "tentative", "canceled"]),
   location: z.string().optional(),
   virtualMeetingUrl: httpUrl.optional(),
   registrationUrl: httpUrl.optional(),
   source: sourceSchema,
 };
-export const eventSchema = z
+const canonicalEventSchema = z
   .discriminatedUnion("allDay", [
     z.object({
       ...eventFields,
@@ -75,6 +117,35 @@ export const eventSchema = z
     }),
   ])
   .superRefine((event, ctx) => {
+    if (
+      ["career-fair", "corporate-recruiting", "networking"].includes(
+        event.legacyCategory ?? "",
+      ) &&
+      event.subtype !== event.legacyCategory
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["subtype"],
+        message:
+          "Legacy career category and subtype disagree; reconcile the source claim.",
+      });
+    if (event.category === null && !event.categoryMappingNote)
+      ctx.addIssue({
+        code: "custom",
+        path: ["categoryMappingNote"],
+        message: "Unresolved category needs an explanation.",
+      });
+    if (
+      ["career-fair", "corporate-recruiting", "networking"].includes(
+        event.subtype ?? "",
+      ) &&
+      event.category !== "career-networking"
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["subtype"],
+        message: "Career subtypes require Career & Networking.",
+      });
     const ordered = event.allDay
       ? event.end > event.start
       : Date.parse(event.end) > Date.parse(event.start);
@@ -104,6 +175,10 @@ export const eventSchema = z
       });
     }
   });
+export const eventSchema = z.preprocess(
+  migrateLegacyEvent,
+  canonicalEventSchema,
+);
 const examFields = {
   id,
   courseId: id,
@@ -111,6 +186,8 @@ const examFields = {
   date: dateOnlySchema,
   sectionScope: z.array(z.string().min(1)),
   relevantMajorIds: z.array(id),
+  typicalAcademicLevels: z.array(academicLevelSchema).optional(),
+  courseScope: z.enum(["general-stem", "major-specific"]).optional(),
   source: sourceSchema,
 };
 export const examSchema = z
@@ -161,3 +238,6 @@ export type Organization = z.infer<typeof organizationSchema>;
 export type Event = z.infer<typeof eventSchema>;
 export type Exam = z.infer<typeof examSchema>;
 export type EventCategory = z.infer<typeof eventCategorySchema>;
+
+export type AcademicLevel = z.infer<typeof academicLevelSchema>;
+export type OrganizationCluster = z.infer<typeof organizationClusterSchema>;

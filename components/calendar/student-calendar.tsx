@@ -1,12 +1,8 @@
 "use client";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Major, Organization } from "../../lib/domain/models";
+import { studentOrganizations } from "../../lib/domain/hosting";
+import { getOrganizationClusters } from "../../lib/data/weekly-planning";
 import { getEventById } from "../../lib/data/fixtures";
 import {
   clearDiscoveryFilters,
@@ -17,16 +13,11 @@ import {
 import type { DiscoveryState } from "../../lib/domain/calendar-state";
 import { easternDate } from "../../lib/time/eastern";
 import { DiscoveryFilters } from "../filters/discovery-filters";
+import { DiscoveryGuide } from "../filters/discovery-guide";
 import { EventCalendar } from "./event-calendar";
 import { EventDetails } from "./event-details";
 
-const subscribeToMobile = (listener: () => void) => {
-  const media = window.matchMedia("(max-width: 1023px)");
-  media.addEventListener("change", listener);
-  return () => media.removeEventListener("change", listener);
-};
-const getMobile = () => window.matchMedia("(max-width: 1023px)").matches;
-const getServerMobile = () => false;
+import { useCompactCalendar } from "./use-compact-calendar";
 type Props = {
   initialState: DiscoveryState;
   majors: Major[];
@@ -37,22 +28,19 @@ export function StudentCalendar({
   majors,
   organizations,
 }: Props) {
+  const clusters = useMemo(() => getOrganizationClusters(), []);
   const [state, setState] = useState(initialState);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const mobile = useSyncExternalStore(
-    subscribeToMobile,
-    getMobile,
-    getServerMobile,
-  );
+  const mobile = useCompactCalendar();
   const view =
     mobile && state.view !== "timeGridDay"
       ? "listMonth"
       : (state.view ?? "dayGridMonth");
   const filters = useMemo(() => discoveryFilters(state), [state]);
   const selectedEvent = selectedId ? getEventById(selectedId) : undefined;
-  const update = useCallback((next: DiscoveryState) => {
+  const update = useCallback((next: DiscoveryState, replace = false) => {
     setState(next);
-    window.history.replaceState(
+    window.history[replace ? "replaceState" : "pushState"](
       window.history.state,
       "",
       `?${serializeCalendarState(next)}`,
@@ -70,13 +58,16 @@ export function StudentCalendar({
           easternDate(new Date().toISOString()),
           {
             majorIds: majors.map((m) => m.id),
-            organizationIds: organizations.map((org) => org.id),
+            organizationIds: studentOrganizations(organizations).map(
+              (org) => org.id,
+            ),
+            clusterIds: clusters.map((cluster) => cluster.id),
           },
         ),
       );
     window.addEventListener("popstate", restore);
     return () => window.removeEventListener("popstate", restore);
-  }, [majors, organizations]);
+  }, [majors, organizations, clusters]);
   return (
     <>
       <div className="development-notice">
@@ -90,18 +81,36 @@ export function StudentCalendar({
           View sample dates
         </button>
       </div>
-      <div className="page-heading">
+      <div className="page-heading student-welcome">
         <div>
           <p className="eyebrow">Student calendar</p>
-          <h1>Engineering events</h1>
-          <p>Find opportunities across engineering majors.</p>
+          <h1>Hey, find your next event here!</h1>
+          <p className="welcome-context">
+            Discover engineering events happening on campus, hosted by faculty,
+            staff, and students just like you. Whether you’re looking to build
+            your skills, meet people, explore opportunities, or just have fun,
+            there’s something worth checking out.
+          </p>
+          <p className="welcome-desktop-help">
+            Filter by your major, student organization cluster, or event
+            category to find what interests you. Combine filters to narrow
+            things down—or search event titles and descriptions if you already
+            know what you’re looking for.
+          </p>
+          <p className="welcome-mobile-help">
+            Discover engineering events hosted by faculty, staff and students.
+            Filter by major, organization, community or activity—or search
+            titles and descriptions.
+          </p>
         </div>
       </div>
+      <DiscoveryGuide clusters={clusters} organizations={organizations} />
       <div className="discovery-layout">
         <DiscoveryFilters
           state={state}
           majors={majors}
           organizations={organizations}
+          clusters={clusters}
           onChange={update}
           onReset={reset}
         />
@@ -115,14 +124,18 @@ export function StudentCalendar({
               placeholder="Search titles and descriptions"
               maxLength={200}
               value={state.search}
-              onChange={(e) => update({ ...state, search: e.target.value })}
+              onChange={(e) =>
+                update({ ...state, search: e.target.value }, true)
+              }
             />
             <p className="field-help">
-              {state.mode === "all"
-                ? "All published events"
-                : state.majorIds.length
-                  ? "Recommended for your selected majors, including college-wide events"
-                  : "Select majors in filters to add recommendations. Showing college-wide events."}
+              {state.universityOnly
+                ? "University-hosted published events; other selected filters also apply."
+                : !state.majorIds.length
+                  ? "All published events"
+                  : state.majorIds.length
+                    ? "Recommended for your selected majors, including college-wide events"
+                    : "Select majors in filters to add recommendations. Showing college-wide events."}
             </p>
           </div>
           <EventCalendar
