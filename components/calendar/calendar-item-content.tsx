@@ -27,7 +27,10 @@ export function CalendarItemContent({
   )
     return (
       <span className="external-indicator">
-        <EventTypeIcon props={info.event.extendedProps} />
+        <EventTypeIcon
+          props={info.event.extendedProps}
+          large={!info.view.type.startsWith("dayGrid")}
+        />
         {info.event.title.replace(/^(?:Synthetic |Example )/, "")}
         <span className="event-scope-label">
           {externalScopeLabel(info.event.extendedProps.externalEvent.scope)} ·{" "}
@@ -73,8 +76,13 @@ export function CalendarItemContent({
         ))}
       </span>
       <span className="event-title">
-        {(planner || info.event.extendedProps.kind === "exam-review") && (
-          <EventTypeIcon props={info.event.extendedProps} />
+        {(planner ||
+          info.event.extendedProps.kind === "exam-review" ||
+          info.event.extendedProps.subtype === "thon") && (
+          <EventTypeIcon
+            props={info.event.extendedProps}
+            large={!info.view.type.startsWith("dayGrid")}
+          />
         )}
         {compactTitle(info.event.title)}
       </span>
@@ -110,8 +118,13 @@ export function CalendarItemContent({
       {mobile ? (
         <span className="mobile-list-content">
           <span className="event-title">
-            {(planner || info.event.extendedProps.kind === "exam-review") && (
-              <EventTypeIcon props={info.event.extendedProps} />
+            {(planner ||
+              info.event.extendedProps.kind === "exam-review" ||
+              info.event.extendedProps.subtype === "thon") && (
+              <EventTypeIcon
+                props={info.event.extendedProps}
+                large={!info.view.type.startsWith("dayGrid")}
+              />
             )}
             {compactTitle(info.event.title)}
           </span>

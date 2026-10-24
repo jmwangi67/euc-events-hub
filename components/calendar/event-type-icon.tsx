@@ -1,3 +1,4 @@
+import { ThonMark } from "./thon-mark";
 import { eventIconType } from "./planner-presentation";
 const paths: Record<string, string> = {
   exam: "m2 9 10-5 10 5-10 5L2 9m4 2v6q6 5 12 0v-6m4-2v8",
@@ -11,8 +12,19 @@ const paths: Record<string, string> = {
   celebration: "m3 21 5-14 9 9-14 5m9-17 2-2m3 9 4-1M15 6l3 2 3-3",
   calendar: "M3 5h18v16H3V5m4-3v6m10-6v6M3 11h18",
 };
-export function EventTypeIcon({ props }: { props: Record<string, unknown> }) {
-  const type = eventIconType(props);
+export function EventTypeIcon({
+  props,
+  large = false,
+  useThonMark = true,
+}: {
+  props: Record<string, unknown>;
+  large?: boolean;
+  useThonMark?: boolean;
+}) {
+  const classification = eventIconType(props);
+  if (classification === "thon" && useThonMark)
+    return <ThonMark large={large} />;
+  const type = classification === "thon" ? "users" : classification;
   return (
     <svg
       className="event-type-icon"

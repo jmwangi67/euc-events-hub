@@ -58,6 +58,7 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-thon",
     title: "Example THON planning scenario",
     category: "thon",
+    subtype: "thon",
     scope: "psu-wide",
     analysis: "broad-context",
     analysisReason:

@@ -9,6 +9,7 @@ export const eventCategorySchema = z.enum([
   "social-recreational",
 ]);
 export const eventSubtypeSchema = z.enum([
+  "thon",
   "career-fair",
   "corporate-recruiting",
   "networking",

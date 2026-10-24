@@ -30,7 +30,9 @@ export function plannerEventOrder(first: unknown, second: unknown) {
 }
 export function eventIconType(props: Record<string, unknown>) {
   if (props.kind === "exam" || props.kind === "exam-review") return "exam";
-  const external = props.externalEvent as { category?: string } | undefined;
+  const external = props.externalEvent as
+    { category?: string; subtype?: string } | undefined;
+  if (props.subtype === "thon" || external?.subtype === "thon") return "thon";
   const type = external?.category ?? props.eventType;
   const icons: Record<string, string> = {
     concert: "music",

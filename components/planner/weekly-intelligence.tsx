@@ -1,4 +1,5 @@
 "use client";
+import { EventTypeIcon } from "../calendar/event-type-icon";
 import type { WeeklySummary } from "../../lib/domain/weekly-planning";
 import { SCHEDULING_FACTORS } from "../../lib/domain/weekly-planning";
 import type { PlanningAudience } from "../../lib/domain/planning-audience";
@@ -145,7 +146,12 @@ export function WeeklyDetails({
       <ul className="weekly-detail-records">
         {week.events.map((event) => (
           <li key={event.id}>
-            <strong>{event.title}</strong>
+            <strong>
+              {"subtype" in event && event.subtype === "thon" && (
+                <EventTypeIcon props={{ subtype: "thon" }} large />
+              )}
+              {event.title}
+            </strong>
             <span>{formatEventTime(event)}</span>
             <span>{clusterTargetingLabel(event)}</span>
             <span>
@@ -188,7 +194,12 @@ export function WeeklyDetails({
       <ul className="weekly-detail-records">
         {week.externalEvents.map((event) => (
           <li key={event.id}>
-            <strong>{event.title}</strong>
+            <strong>
+              {"subtype" in event && event.subtype === "thon" && (
+                <EventTypeIcon props={{ subtype: "thon" }} large />
+              )}
+              {event.title}
+            </strong>
             <span>
               {EXTERNAL_CATEGORIES[event.category]} ·{" "}
               {externalScopeLabel(event.scope)}

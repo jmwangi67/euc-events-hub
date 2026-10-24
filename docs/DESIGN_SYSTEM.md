@@ -621,3 +621,9 @@ The planner frame uses a restrained 2px #8C9BAD outer border around grid and int
 Sunday's View 1 Week control navigates to the matching Eastern Sunday–Saturday hourly view, preserving audience/display state. It is a navigation button without dialog semantics. Weekly summary details remains a separate dialog action in the summary interface; the focus-this-week action remains available in the integrated column. Existing date/view callbacks own navigation.
 
 Planner titles use original 13px line SVG icons selected only from structured categories, external classifications or exam kind. Music, trophy, briefcase, tools, users, celebration, calendar and academic-cap shapes remain separate from scope colors. Neutral calendar is the fallback; titles never select an icon. Icons are decorative to assistive technology and do not replace title, time, scope, source or uncertainty text. No dependencies or official marks are added.
+
+### Dedicated THON mark
+
+Use the owner's supplied four-diamond geometry for explicitly recorded `subtype: "thon"` events only. The external THON scenario now records that subtype in addition to its existing classification; this metadata does not change scheduling eligibility or policy. A THON classification without the subtype retains the generic community icon. Titles and generic philanthropy/service/community categories never select the mark.
+
+`ThonMark` is a small local inline SVG using the supplied currentColor geometry. Its separate `--color-thon-icon` token defaults to Penn State blue #1E407C; it neither reads category colors nor controls institutional hosting paw badges. Use 13px for compact date-grid cards and 16px for larger views/details. It is decorative when the adjacent event text supplies the identity. `EventTypeIcon` retains a `useThonMark={false}` generic-users fallback for future branding replacement. The supplied mark does not independently verify an event or imply institutional endorsement.

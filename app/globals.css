@@ -24,6 +24,7 @@
   --color-scope-engineering-surface: #ffffff;
   --color-scope-engineering-border: #9aa9ba;
   --color-scope-engineering-foreground: #001e44;
+  --color-thon-icon: #1e407c;
   --color-planner-grid: #b5c1cf;
   --color-planner-frame: #8c9bad;
   --color-density-none: #f1e8f5;
@@ -2374,4 +2375,15 @@ button.planner-analyze:hover {
 .planner-calendar .fc-daygrid-body tr:last-child > td,
 .planner-calendar .weekly-summary-cell:last-child {
   border-bottom: 0;
+}
+
+/* THON identity is independent of category and institutional-host palettes. */
+.thon-icon {
+  color: var(--color-thon-icon);
+  width: 13px;
+  height: 13px;
+}
+.thon-icon.thon-icon-large {
+  width: 16px;
+  height: 16px;
 }

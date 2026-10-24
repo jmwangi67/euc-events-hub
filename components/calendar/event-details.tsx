@@ -1,4 +1,5 @@
 "use client";
+import { EventTypeIcon } from "./event-type-icon";
 import { HostingBadge } from "./hosting-badge";
 import { departmentHosted, hostingIdentity } from "../../lib/domain/hosting";
 import { DetailsDialog } from "./details-dialog";
@@ -121,13 +122,20 @@ export function EventDetails({
             {event.subtype && (
               <span className="field-help">
                 Subtype:{" "}
-                {event.subtype === "career-fair"
-                  ? "Career fair"
-                  : event.subtype === "corporate-recruiting"
-                    ? "Corporate recruiting session"
-                    : event.subtype === "networking"
-                      ? "Networking event"
-                      : "Educational research seminar"}
+                {event.subtype === "thon" ? (
+                  <>
+                    <EventTypeIcon props={{ subtype: "thon" }} large />
+                    THON event
+                  </>
+                ) : event.subtype === "career-fair" ? (
+                  "Career fair"
+                ) : event.subtype === "corporate-recruiting" ? (
+                  "Corporate recruiting session"
+                ) : event.subtype === "networking" ? (
+                  "Networking event"
+                ) : (
+                  "Educational research seminar"
+                )}
               </span>
             )}
           </dd>

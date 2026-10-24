@@ -38,6 +38,7 @@ const fields = {
   targetAcademicLevels: z.array(academicLevelSchema).optional(),
   targetClusterIds: z.array(z.string().min(1)).optional(),
   // Explicit source-backed policy metadata; an event title never selects a policy.
+  subtype: z.literal("thon").optional(),
   impactPolicy: z.enum(["major-local-music", "academic-break"]).optional(),
   policyRationale: z.string().min(1).optional(),
   geography: z.string().min(1),
@@ -82,6 +83,12 @@ export const externalEventSchema = z
         code: "custom",
         path: ["startDate"],
         message: "Date bounds must cover the known Eastern interval exactly.",
+      });
+    if (event.subtype === "thon" && event.category !== "thon")
+      ctx.addIssue({
+        code: "custom",
+        path: ["subtype"],
+        message: "THON subtype requires an explicitly classified THON event.",
       });
     const national =
       event.category === "election" || event.category === "super-bowl";
