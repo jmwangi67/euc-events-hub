@@ -103,6 +103,20 @@ export function EventCalendar(props: EventCalendarProps) {
     () => new Map(scheduling?.days.map((day) => [day.date, day]) ?? []),
     [scheduling],
   );
+  useEffect(() => {
+    surface.current
+      ?.querySelectorAll<HTMLElement>(".fc-daygrid-day[data-date]")
+      .forEach((cell) => {
+        if (planning?.showDensity && view.startsWith("dayGrid")) {
+          const count =
+            densityDays.get(cell.dataset.date!)?.maximumConcurrent ?? 0;
+          cell.setAttribute(
+            "aria-description",
+            `${cell.dataset.date}: peak known-time non-exam subgroup density, ${count >= 3 ? "3 or more" : count} simultaneous commitments. This is not a pressure or safety rating; unknown hours and date-wide commitments are separate.`,
+          );
+        } else cell.removeAttribute("aria-description");
+      });
+  }, [densityDays, planning?.showDensity, view]);
   const weeks = useMemo(
     () =>
       planningAudience && context

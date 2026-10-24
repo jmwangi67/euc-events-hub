@@ -199,6 +199,10 @@ test("all density colors have factual labels and display toggles do not alter th
   ).toEqual(expected);
   const date = page.locator('.fc-daygrid-day[data-date="2026-10-21"]');
   await expect(date).toHaveClass(/density-three-plus/);
+  await expect(date).toHaveAttribute(
+    "aria-description",
+    /3 or more simultaneous commitments/,
+  );
   await expect(page.locator(".density-cell-count")).toHaveCount(0);
   await expect(date.locator(".fc-daygrid-more-link")).toHaveCSS(
     "background-color",
@@ -235,6 +239,7 @@ test("all density colors have factual labels and display toggles do not alter th
   await page
     .getByRole("checkbox", { name: "Show scheduling density", exact: true })
     .uncheck();
+  await expect(date).not.toHaveAttribute("aria-description");
   await expect(
     page.getByRole("region", { name: "Scheduling Density", exact: true }),
   ).toHaveCount(0);
