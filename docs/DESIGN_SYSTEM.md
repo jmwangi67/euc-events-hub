@@ -572,12 +572,12 @@ Scheduling density has a separate legend and background palette:
 
 | Factual band                | Token                | Background |
 | --------------------------- | -------------------- | ---------- |
-| 0 known-time commitments    | `density-none`       | #F2F4F7    |
-| 1 simultaneous commitment   | `density-one`        | #C6CCD6    |
-| 2 simultaneous commitments  | `density-two`        | #A79BB8    |
-| 3+ simultaneous commitments | `density-three-plus` | #745F89    |
+| 0 known-time commitments    | `density-none`       | #F1E8F5    |
+| 1 simultaneous commitment   | `density-one`        | #E0C8EB    |
+| 2 simultaneous commitments  | `density-two`        | #C09CD6    |
+| 3+ simultaneous commitments | `density-three-plus` | #9367B5    |
 
-These bands describe the maximum concurrency within any selected major × academic-year subgroup, never a sum across students or a calibrated pressure level. All-day and uncertain-hour commitments remain separately listed. The overlay starts off, applies behind cards, and never changes their scope colors. Month/2 Weeks have readable date-cell counts; hourly views have background-only noninteractive segments and a textual interval disclosure; List/mobile have factual labels. The deep density background uses white date/label text where required. Scope-card text contrasts are checked in browser tests; this is not a formal accessibility certification.
+These bands describe the maximum concurrency within any selected major × academic-year subgroup, never a sum across students or a calibrated pressure level. All-day and uncertain-hour commitments remain separately listed. The overlay starts off, applies behind cards, and never changes their scope colors. Month/2 Weeks communicate density through background color without date-header numerical badges; hourly views have background-only noninteractive segments and a textual interval disclosure; List/mobile retain factual labels. White surfaces under date numbers and controls preserve dark readable text over the deepest shade. Scope-card text contrasts are checked in browser tests; this is not a formal accessibility certification.
 
 Scheduling guidance forms a third layer. Avoid scheduling (principally THON) outranks scheduling caution, then factual Review conflicts. Text and icons distinguish these from National amber cards, and they remain visible with the overlay disabled. A compact highest-priority banner leads to optional complete daily reasons and source information. Context-only Local activity is labeled and excluded from analytical density.
 
