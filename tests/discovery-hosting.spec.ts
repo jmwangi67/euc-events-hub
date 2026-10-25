@@ -205,10 +205,10 @@ test("all nine hosting arrangements use structured badges and responsive full ho
     card(page, "discovery-cohost").locator(".hosts-compact"),
   ).toBeVisible();
   const pawSizes = await card(page, "discovery-coe")
-    .locator("svg")
+    .locator(".hosting-badge svg")
     .evaluate((el) => el.getBoundingClientRect().height);
   const coSizes = await card(page, "discovery-cohost")
-    .locator("svg")
+    .locator(".hosting-badge svg")
     .first()
     .evaluate((el) => el.getBoundingClientRect().height);
   expect(pawSizes).toBeGreaterThan(coSizes);

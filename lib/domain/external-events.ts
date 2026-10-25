@@ -39,6 +39,8 @@ const fields = {
   targetClusterIds: z.array(z.string().min(1)).optional(),
   // Explicit source-backed policy metadata; an event title never selects a policy.
   subtype: z.literal("thon").optional(),
+  // Curated display precision only; timeKnown/analytical uncertainty is unchanged.
+  dateWide: z.boolean().optional(),
   impactPolicy: z.enum(["major-local-music", "academic-break"]).optional(),
   policyRationale: z.string().min(1).optional(),
   geography: z.string().min(1),

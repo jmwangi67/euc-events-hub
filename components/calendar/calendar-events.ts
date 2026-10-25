@@ -40,7 +40,7 @@ export function listEventTimes(
       Date.parse(easternDate(event.start))) /
     86400000;
   // Same-period ranges fit as a unit; otherwise break only between full clocks.
-  const labels = /AM.*PM|PM.*AM/.test(range) ? range.split(/(?<=–)/) : [range];
+  const labels = [range];
   if (elapsed) labels.push(`(${elapsed}`);
   if (days > 0) labels.push(days === 1 ? "Next day" : `+${days} days`);
   return labels;

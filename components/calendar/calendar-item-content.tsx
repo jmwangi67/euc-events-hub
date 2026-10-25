@@ -1,18 +1,12 @@
 import { EventTypeIcon } from "./event-type-icon";
 import { HostingBadge } from "./hosting-badge";
+import { externalScopeLabel } from "../../lib/domain/source-labels";
 import type { EventApi, EventContentArg } from "@fullcalendar/core";
-import {
-  externalScopeLabel,
-  verificationLabel,
-} from "../../lib/domain/source-labels";
-const compactTitle = (title: string) =>
-  title.replace(/^(?:Synthetic example: |Example Event: )/, "");
 export function CalendarItemContent({
   info,
   mobile,
   itemLabel,
   selectItem,
-  planner,
 }: {
   info: EventContentArg;
   mobile: boolean;
@@ -20,88 +14,74 @@ export function CalendarItemContent({
   selectItem: (event: EventApi) => void;
   planner: boolean;
 }) {
-  if (info.event.extendedProps.kind === "density") return null;
-  if (
-    info.event.extendedProps.kind === "external" &&
-    info.view.type.startsWith("dayGrid")
-  )
-    return (
-      <span className="external-indicator">
-        <EventTypeIcon
-          props={info.event.extendedProps}
-          large={!info.view.type.startsWith("dayGrid")}
-        />
-        {info.event.title.replace(/^(?:Synthetic |Example )/, "")}
-        <span className="event-scope-label">
-          {externalScopeLabel(info.event.extendedProps.externalEvent.scope)} ·{" "}
-          {!info.event.extendedProps.externalEvent.timeKnown &&
-            "Time unknown · "}
-          Example Event
-        </span>
-        <span className="sr-only">
-          {" "}
-          · {info.event.extendedProps.timeLabel} · See weekly summary
-        </span>
-      </span>
-    );
-  const cardTimes = (info.event.extendedProps.listTimes as string[]).map(
-    (label) =>
-      label === "Next day" && !info.isStart ? "From prev day" : label,
-  );
-  const categoryLabel =
-    info.event.extendedProps.kind === "exam" &&
-    info.view.type.startsWith("dayGrid")
-      ? `Academic Exam${!info.event.extendedProps.exam.relevantMajorIds.length ? " · Audience unknown" : ""} · ${verificationLabel(info.event.extendedProps.exam.source.verification)}`
-      : info.event.extendedProps.category;
-  const hostContent = !info.event.extendedProps.kind && (
+  const p = info.event.extendedProps;
+  if (p.kind === "density") return null;
+  const grid = info.view.type.startsWith("dayGrid");
+  const external = p.kind === "external" ? p.externalEvent : null;
+  const times = p.segmentTime
+    ? [p.segmentTime, p.segmentNote]
+    : (p.listTimes as string[]).map((label) =>
+        label === "Next day" && !info.isStart ? "From prev day" : label,
+      );
+  const identity = external ? externalScopeLabel(external.scope) : null;
+  const clocks = (
     <>
-      <HostingBadge identity={info.event.extendedProps.hostingIdentity} />
-      {info.event.extendedProps.hosts && (
-        <span className="event-hosts">
-          <span className="hosts-full">{info.event.extendedProps.hosts}</span>
-          <span className="hosts-compact" aria-hidden="true">
-            {info.event.extendedProps.compactHosts}
-          </span>
+      {times.filter(Boolean).map((part: string, i: number) => (
+        <span
+          className={`time-part ${i === 0 ? "clock-range" : "time-note"}`}
+          key={i}
+        >
+          {part}
         </span>
-      )}
+      ))}
     </>
   );
-  const content = (
-    <span className="calendar-event-content">
-      <span className="event-time">
-        {cardTimes.map((part, index) => (
-          <span className="time-part" key={index}>
-            {part}
+  const hosts = !p.kind && (
+    <span className="host-identity">
+      <HostingBadge identity={p.hostingIdentity} />
+      {p.hosts && (
+        <span className="event-hosts">
+          <span className="hosts-full">{p.hosts}</span>
+          <span className="hosts-compact" aria-hidden="true">
+            {p.compactHosts}
           </span>
-        ))}
+        </span>
+      )}
+    </span>
+  );
+  const title = (
+    <span className="event-title">
+      <span className="event-title-icon">
+        <EventTypeIcon props={p} large={!grid} />
       </span>
-      <span className="event-title">
-        {(planner ||
-          info.event.extendedProps.kind === "exam-review" ||
-          info.event.extendedProps.subtype === "thon") && (
-          <EventTypeIcon
-            props={info.event.extendedProps}
-            large={!info.view.type.startsWith("dayGrid")}
-          />
-        )}
-        {compactTitle(info.event.title)}
-      </span>
+      <span className="event-title-text">{info.event.title}</span>
+    </span>
+  );
+  const content = (
+    <span
+      className={`calendar-event-content ${grid && p.compactGrid ? "compact-card" : ""} ${mobile ? "mobile-list-content" : ""}`}
+    >
+      {mobile ? title : null}
+      {!(grid && external?.dateWide && !external.timeKnown) && (
+        <span
+          className={
+            info.view.type.startsWith("list")
+              ? "list-event-times"
+              : "event-time"
+          }
+        >
+          {clocks}
+        </span>
+      )}
+      {!mobile ? title : null}
+      {identity && <span className="compact-identity">{identity}</span>}
       <span className="event-category">
-        {categoryLabel}
-        {!info.event.extendedProps.kind &&
-          (planner ? " · Engineering · Example Event" : " · Example Event")}
+        {p.category}
+        {!p.kind && " · Example Event"}
       </span>
-      {hostContent}
-      {info.event.extendedProps.reviewDates && (
-        <span className="event-location">
-          {info.event.extendedProps.reviewDates}
-        </span>
-      )}
-      {info.event.extendedProps.location && (
-        <span className="event-location">
-          {info.event.extendedProps.location}
-        </span>
-      )}
+      {hosts}
+      {p.reviewDates && <span className="event-location">{p.reviewDates}</span>}
+      {p.location && <span className="event-location">{p.location}</span>}
     </span>
   );
   return info.view.type.startsWith("list") ? (
@@ -109,67 +89,14 @@ export function CalendarItemContent({
       type="button"
       className={`list-event-trigger ${mobile ? "mobile-list-event" : ""}`}
       data-calendar-event-id={info.event.id}
+      data-canonical-event-id={p.canonicalEventId ?? info.event.id}
       aria-label={itemLabel(info.event)}
-      onClick={(click) => {
-        click.stopPropagation();
+      onClick={(e) => {
+        e.stopPropagation();
         selectItem(info.event);
       }}
     >
-      {mobile ? (
-        <span className="mobile-list-content">
-          <span className="event-title">
-            {(planner ||
-              info.event.extendedProps.kind === "exam-review" ||
-              info.event.extendedProps.subtype === "thon") && (
-              <EventTypeIcon
-                props={info.event.extendedProps}
-                large={!info.view.type.startsWith("dayGrid")}
-              />
-            )}
-            {compactTitle(info.event.title)}
-          </span>
-          <span className="list-event-times" aria-hidden="true">
-            {cardTimes.map((part, index) => {
-              const isNote = /Next day|From prev day|^\+\d+ days$/.test(part);
-              return (
-                <span
-                  className={`time-part ${isNote ? "time-note" : ""}`}
-                  key={index}
-                >
-                  {isNote ? `(${part})` : part}
-                </span>
-              );
-            })}
-          </span>
-          <span className="event-category">
-            {info.event.extendedProps.category}
-            {!info.event.extendedProps.kind &&
-              (planner ? " · Engineering · Example Event" : " · Example Event")}
-          </span>
-          {hostContent}
-          {info.event.extendedProps.reviewDates && (
-            <span className="event-location">
-              {info.event.extendedProps.reviewDates}
-            </span>
-          )}
-          {info.event.extendedProps.location && (
-            <span className="event-location">
-              {info.event.extendedProps.location}
-            </span>
-          )}
-        </span>
-      ) : (
-        <>
-          <span className="list-event-times" aria-hidden="true">
-            {cardTimes.map((time, index) => (
-              <span key={time + index}>
-                <span className="time-part">{time}</span>
-              </span>
-            ))}
-          </span>
-          {content}
-        </>
-      )}
+      {content}
     </button>
   ) : (
     content

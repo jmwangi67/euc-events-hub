@@ -227,7 +227,7 @@ test("Sunday week controls provide logical keyboard access and restore focus acr
 }) => {
   await sample(page);
   const trigger = page.getByRole("button", {
-    name: /^View 1 Week: Oct 18, 2026/,
+    name: /^Focus this week in calendar: Oct 18, 2026/,
   });
   await trigger.focus();
   await page.keyboard.press("Space");

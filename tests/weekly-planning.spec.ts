@@ -107,7 +107,9 @@ test("desktop month adds one aligned eighth summary cell per week and keeps stud
     })
     .toBe(true);
   await expect(
-    page.locator(".planner-month-surface .external-indicator").first(),
+    page
+      .locator(".planner-month-surface .planner-external .event-title")
+      .first(),
   ).toBeVisible();
   await expect(page.locator(".experimental-day-preparation")).toHaveCount(0);
   await page.getByLabel("Go to date", { exact: true }).fill("2026-12-31");
@@ -160,7 +162,7 @@ test("external layers default visible and hiding them leaves analysis and weekly
     .locator(".planner-display")
     .screenshot({ path: "work/intelligence-toggles.png" });
 });
-test("external indicator opens its associated week and restores its keyboard focus", async ({
+test("external event opens its own details and restores keyboard focus", async ({
   page,
 }) => {
   await sample(page);
@@ -170,9 +172,17 @@ test("external indicator opens its associated week and restores its keyboard foc
   for (const key of ["Enter", "Space"]) {
     await trigger.focus();
     await page.keyboard.press(key);
-    await expect(page.getByRole("dialog")).toContainText(
-      "Example major election scenario",
-    );
+    await expect(
+      page
+        .getByRole("dialog")
+        .getByText("External event details", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("dialog").getByRole("heading", {
+        name: "Example major election scenario",
+        exact: true,
+      }),
+    ).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(trigger).toBeFocused();
   }

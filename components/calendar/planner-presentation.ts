@@ -33,6 +33,7 @@ export function eventIconType(props: Record<string, unknown>) {
   const external = props.externalEvent as
     { category?: string; subtype?: string } | undefined;
   if (props.subtype === "thon" || external?.subtype === "thon") return "thon";
+  if (props.subtype === "research-seminar") return "research";
   const type = external?.category ?? props.eventType;
   const icons: Record<string, string> = {
     concert: "music",

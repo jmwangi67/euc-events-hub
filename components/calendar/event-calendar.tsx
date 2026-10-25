@@ -1,4 +1,7 @@
 "use client";
+import { dayGridItems } from "./display-items";
+import { ExternalEventDetails } from "./external-event-details";
+import type { ExternalEvent } from "../../lib/domain/external-events";
 import { plannerEventOrder } from "./planner-presentation";
 import { CategoryLegend } from "./category-legend";
 import { useCallback, useRef, useState, useMemo, useEffect } from "react";
@@ -24,7 +27,6 @@ import {
   calendarWeeks,
   summarizeWeek,
   type WeeklySummary,
-  weekForInstant,
 } from "../../lib/domain/weekly-planning";
 import {
   PLANNER_VIEWS,
@@ -33,7 +35,6 @@ import {
 import {
   WeeklySummaryCell,
   WeeklyDetails,
-  weekLabel,
 } from "../planner/weekly-intelligence";
 import { PressurePanel } from "../planner/pressure-panel";
 import { CompactWeeklySummaries } from "../planner/compact-weekly-summaries";
@@ -80,6 +81,10 @@ export function EventCalendar(props: EventCalendarProps) {
     start: date,
     end: addCalendarDays(date, 1),
   });
+  const [externalSelection, setExternalSelection] = useState<{
+    event: ExternalEvent;
+    triggerId: string;
+  } | null>(null);
   const [weekTriggerId, setWeekTriggerId] = useState("");
   const [selectedWeek, setSelectedWeek] = useState<WeeklySummary | null>(null);
   const [summarySelection, setSummarySelection] = useState<{
@@ -160,12 +165,16 @@ export function EventCalendar(props: EventCalendarProps) {
               range.endStr.slice(0, 10),
             )
           : null;
-        const items =
+        const canonicalItems =
           reviewExams && examReview
             ? stagedExamCalendarItems(reviewExams, examReview.dataset)
             : loadCalendarItems(range, filters, planning);
+        const items =
+          view.startsWith("dayGrid") && !examReview
+            ? dayGridItems(canonicalItems)
+            : canonicalItems;
         setError(false);
-        setCount(reviewExams ? reviewExams.length : items.length);
+        setCount(reviewExams ? reviewExams.length : canonicalItems.length);
         success(
           planning?.showDensity && view.startsWith("timeGrid")
             ? [
@@ -202,25 +211,20 @@ export function EventCalendar(props: EventCalendarProps) {
     api[direction]();
     onDateChange(easternDate(api.getDate().toISOString()));
   };
-  const selectItem = (event: EventApi, segmentDate?: string) => {
-    setWeekTriggerId(event.id);
-    if (event.extendedProps.kind === "exam-review" && examReview) {
+  const selectItem = (event: EventApi) => {
+    const id = event.extendedProps.canonicalEventId ?? event.id;
+    if (event.extendedProps.kind === "exam-review" && examReview)
       examReview.onSelect(event.extendedProps.canonicalExamId, event.id);
-    } else if (event.extendedProps.kind === "external" && planning && context) {
-      const external = event.extendedProps.externalEvent;
-      const eventWeek = segmentDate
-        ? calendarWeeks(segmentDate, addCalendarDays(segmentDate, 1))[0]
-        : external.timeKnown
-          ? weekForInstant(external.start)
-          : calendarWeeks(external.startDate, external.endDate)[0];
-      const week = weeks.find((w) => w.start === eventWeek.start) ?? weeks[0];
-      if (week)
-        setSelectedWeek(summarizeWeek(week, planning.audience, context));
-    } else if (event.extendedProps.kind === "exam")
+    else if (event.extendedProps.kind === "external")
+      setExternalSelection({
+        event: event.extendedProps.externalEvent,
+        triggerId: event.id,
+      });
+    else if (event.extendedProps.kind === "exam")
       planning?.onExamSelect(event.extendedProps.exam as Exam);
     else if (event.extendedProps.kind === "proposal")
       planning?.onProposalSelect();
-    else onEventSelect(event.id);
+    else onEventSelect(id);
   };
   const selection = useRef(selectItem);
   useEffect(() => {
@@ -231,33 +235,21 @@ export function EventCalendar(props: EventCalendarProps) {
     setWeekTriggerId(`week:${week.start}`);
     setSelectedWeek(week);
   };
-  const weekAction = useRef((start: string) => {
-    void start;
-  });
-  useEffect(() => {
-    weekAction.current = (start: string) => {
-      const week = weeks.find((week) => week.start === start);
-      if (week) {
-        changeView("timeGridWeek");
-        onDateChange(week.start);
-        requestAnimationFrame(() =>
-          surface.current
-            ?.closest("section")
-            ?.querySelector<HTMLElement>(".range-heading h2")
-            ?.focus(),
-        );
-      }
-    };
-  });
   const focusCalendarWeek = (week: WeeklySummary) => {
-    surface.current
-      ?.querySelector<HTMLElement>(`[data-date="${week.start}"] .week-row-link`)
-      ?.focus();
+    changeView("timeGridWeek");
+    onDateChange(week.start);
+    setSummarySelection({ date: week.start, start: week.start });
+    requestAnimationFrame(() =>
+      surface.current
+        ?.closest("section")
+        ?.querySelector<HTMLElement>(".range-heading h2")
+        ?.focus(),
+    );
   };
   const itemLabel = (event: EventApi) =>
     event.extendedProps.kind === "exam-review"
       ? (event.extendedProps.reviewLabel as string)
-      : `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open weekly summary details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
+      : `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open external event details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
     const next = {
@@ -286,7 +278,9 @@ export function EventCalendar(props: EventCalendarProps) {
       }
     >
       <div className="range-heading">
-        <h2 aria-live="polite">{title || "Loading calendar…"}</h2>
+        <h2 aria-live="polite" tabIndex={-1}>
+          {title || "Loading calendar…"}
+        </h2>
         <span className="timezone-label">All Times Eastern (ET)</span>
       </div>
       <CalendarToolbar
@@ -353,6 +347,7 @@ export function EventCalendar(props: EventCalendarProps) {
           activeWeek={activeSummaryWeek}
           onWeekChange={(start) => setSummarySelection({ date, start })}
           onOpen={openWeek}
+          onFocusWeek={focusCalendarWeek}
         />
       )}
       {!planning && !examReview && <CategoryLegend />}
@@ -382,7 +377,7 @@ export function EventCalendar(props: EventCalendarProps) {
           fixedWeekCount={false}
           stickyHeaderDates={planning ? false : undefined}
           slotEventOverlap={planning ? false : undefined}
-          dayMaxEvents={3}
+          dayMaxEvents={4}
           events={source}
           datesSet={datesSet}
           nowIndicator
@@ -432,31 +427,6 @@ export function EventCalendar(props: EventCalendarProps) {
               classes.push("has-scheduling-guidance");
             return classes;
           }}
-          dayCellDidMount={(info) => {
-            if (!monthSummaries) return;
-            const date = easternDate(info.date.toISOString());
-            const week = calendarWeeks(date, addCalendarDays(date, 1))[0];
-            if (week.start !== date) return;
-            const top = info.el.querySelector(".fc-daygrid-day-top");
-            if (!top) return;
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "week-row-link";
-            button.textContent = "View 1 Week →";
-            button.dataset.calendarEventId = `week:${week.start}`;
-            button.setAttribute(
-              "aria-label",
-              `View 1 Week: ${weekLabel(week)}`,
-            );
-            button.onclick = (event) => {
-              event.stopPropagation();
-              weekAction.current(week.start);
-            };
-            top.append(button);
-          }}
-          dayCellWillUnmount={(info) => {
-            info.el.querySelector(".week-row-link")?.remove();
-          }}
           allDayText={examReview ? "Date options" : "All day"}
           noEventsContent={() => (
             <div className="empty-state">
@@ -486,12 +456,8 @@ export function EventCalendar(props: EventCalendarProps) {
           eventClick={(info) => {
             info.jsEvent.preventDefault();
             if (info.event.extendedProps.kind === "density") return;
-            selectItem(
-              info.event,
-              (info.jsEvent.target as HTMLElement).closest<HTMLElement>(
-                "[data-date]",
-              )?.dataset.date,
-            );
+            info.jsEvent.stopPropagation();
+            selectItem(info.event);
           }}
           eventContent={(info) => (
             <CalendarItemContent
@@ -512,15 +478,15 @@ export function EventCalendar(props: EventCalendarProps) {
             if (info.view.type.startsWith("list")) return;
             const trigger = info.el;
             trigger.dataset.calendarEventId = info.event.id;
+            trigger.dataset.canonicalEventId =
+              info.event.extendedProps.canonicalEventId ?? info.event.id;
             trigger.tabIndex = 0;
             trigger.setAttribute("role", "button");
             trigger.onkeydown = (key) => {
               if (key.key === "Enter" || key.key === " ") {
                 key.preventDefault();
-                selection.current(
-                  info.event,
-                  trigger.closest<HTMLElement>("[data-date]")?.dataset.date,
-                );
+                key.stopPropagation();
+                selection.current(info.event);
               }
             };
             trigger.setAttribute("aria-label", itemLabel(info.event));
@@ -549,6 +515,13 @@ export function EventCalendar(props: EventCalendarProps) {
           </aside>
         )}
       </div>
+      {externalSelection && (
+        <ExternalEventDetails
+          event={externalSelection.event}
+          triggerId={externalSelection.triggerId}
+          onClose={() => setExternalSelection(null)}
+        />
+      )}
       {selectedWeek && planning && (
         <WeeklyDetails
           triggerId={weekTriggerId}

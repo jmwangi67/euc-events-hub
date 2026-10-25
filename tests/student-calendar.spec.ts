@@ -203,7 +203,11 @@ for (const view of [
   }) => {
     await page.goto(`/?date=2026-10-19&view=${view}`);
     const trigger = event(page, "Engineering welcome");
-    await expect(trigger.locator(".event-time")).toHaveText("5:00–6:00 PM");
+    await expect(
+      trigger.locator(
+        view === "listMonth" ? ".list-event-times" : ".event-time",
+      ),
+    ).toHaveText("5:00–6:00 PM");
     await trigger.focus();
     for (const key of ["Enter", "Space", "Enter", "Space"]) {
       await test.step(`${key} opens, Escape closes and restores the original event`, async () => {
@@ -461,7 +465,9 @@ for (const width of [320, 375, 430, 768]) {
     ];
     for (const [title, time, category, host] of expected) {
       const row = event(page, title);
-      await expect(row.locator(".event-title")).toHaveText(title);
+      await expect(row.locator(".event-title")).toHaveText(
+        `Example Event: ${title}`,
+      );
       await expect(row.locator(".list-event-times")).toHaveText(time);
       await expect(row.locator(".event-category")).toContainText(category);
       await expect(row.locator(".event-hosts")).toContainText(host);
@@ -507,10 +513,10 @@ for (const width of [320, 375, 430, 768]) {
     const rows = page.locator(".mobile-list-event");
     await expect(rows).toHaveCount(4);
     await expect(rows.locator(".event-title")).toHaveText([
-      "Project showcase",
-      "Engineering career panel",
-      "Biomedical design workshop",
-      "Late-night build session",
+      "Example Event: Project showcase",
+      "Example Event: Engineering career panel",
+      "Example Event: Biomedical design workshop",
+      "Example Event: Late-night build session",
     ]);
     await expect(rows.nth(0).locator(".list-event-times")).toHaveText(
       "All day",

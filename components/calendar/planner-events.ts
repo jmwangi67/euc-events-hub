@@ -62,7 +62,7 @@ export function toExternalCalendarItem(
 ): EventInput {
   const timeLabel = event.timeKnown
     ? formatEventTime({ allDay: false, start: event.start, end: event.end })
-    : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · Time unknown`;
+    : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · ${externalTimingLabel(event)}`;
   return {
     id: `external:${event.id}`,
     title: event.title,
@@ -77,7 +77,18 @@ export function toExternalCalendarItem(
       timeLabel,
       listTimes: event.timeKnown
         ? listEventTimes({ allDay: false, start: event.start, end: event.end })
-        : ["Time unknown"],
+        : [externalTimingLabel(event)],
     },
   };
+}
+
+/** Explicit display precision never promotes unknown hours into timed analysis. */
+export function externalTimingLabel(
+  event: import("../../lib/domain/external-events").ExternalEvent,
+) {
+  return event.timeKnown
+    ? formatEventTime({ allDay: false, start: event.start, end: event.end })
+    : event.dateWide
+      ? "Date-wide commitment"
+      : "Time TBD";
 }

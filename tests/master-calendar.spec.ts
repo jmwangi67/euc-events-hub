@@ -267,10 +267,13 @@ test("planner retains all five layouts with independent density and weekly focus
     await expect(page.locator(".fc-timegrid-body")).toHaveCount(hourly ? 1 : 0);
     if (name === "Month" || name === "2 Weeks") {
       const focus = page
-        .getByRole("button", { name: /^Focus this week in calendar:/ })
+        .getByRole("button", {
+          name: /^Focus this week in calendar: Oct 18, 2026/,
+        })
         .first();
       await focus.click();
-      await expect(page.locator(".week-row-link").first()).toBeFocused();
+      await expect(page.locator(".fc-timeGridWeek-view")).toBeVisible();
+      await expect(page.locator(".week-row-link")).toHaveCount(0);
     }
     if (name === "List")
       await expect(page.locator(".density-day-badge").first()).toBeVisible();

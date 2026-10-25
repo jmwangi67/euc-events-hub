@@ -115,6 +115,10 @@ export function EventDetails({
         <div>
           <dt>Category</dt>
           <dd>
+            <EventTypeIcon
+              props={{ eventType: event.category, subtype: event.subtype }}
+              large
+            />
             {categoryLabel(event.category)}
             {event.categoryMappingNote && event.category === null && (
               <span className="field-help">{event.categoryMappingNote}</span>
@@ -122,20 +126,15 @@ export function EventDetails({
             {event.subtype && (
               <span className="field-help">
                 Subtype:{" "}
-                {event.subtype === "thon" ? (
-                  <>
-                    <EventTypeIcon props={{ subtype: "thon" }} large />
-                    THON event
-                  </>
-                ) : event.subtype === "career-fair" ? (
-                  "Career fair"
-                ) : event.subtype === "corporate-recruiting" ? (
-                  "Corporate recruiting session"
-                ) : event.subtype === "networking" ? (
-                  "Networking event"
-                ) : (
-                  "Educational research seminar"
-                )}
+                {event.subtype === "thon"
+                  ? "THON event"
+                  : event.subtype === "career-fair"
+                    ? "Career fair"
+                    : event.subtype === "corporate-recruiting"
+                      ? "Corporate recruiting session"
+                      : event.subtype === "networking"
+                        ? "Networking event"
+                        : "Educational research seminar"}
               </span>
             )}
           </dd>

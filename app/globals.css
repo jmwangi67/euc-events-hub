@@ -2387,3 +2387,158 @@ button.planner-analyze:hover {
   width: 16px;
   height: 16px;
 }
+/* Separation is independent of card typography (the established 1.4 line height). */
+.fc .fc-daygrid-event {
+  margin: 3px 5px;
+  container-type: inline-size;
+}
+.fc .fc-daygrid-event-harness {
+  margin-bottom: 4px;
+}
+.fc .fc-popover .fc-daygrid-event {
+  margin: 4px;
+}
+.fc .event-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+.fc .event-title-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 1.4em;
+}
+.fc .event-title-text {
+  display: inline;
+  min-width: 0;
+}
+.fc .event-title-icon .event-type-icon {
+  margin: 0;
+  vertical-align: middle;
+}
+.thon-icon {
+  vertical-align: -0.15em;
+}
+.compact-identity {
+  display: none !important;
+}
+.fc .compact-card .compact-identity,
+.fc .fc-popover .compact-identity {
+  display: block !important;
+  font-size: 11px;
+  color: inherit;
+}
+.fc .compact-card :is(.event-category, .event-location),
+.fc .fc-popover :is(.event-category, .event-location) {
+  display: none;
+}
+.fc .compact-card .event-title {
+  font-size: 13px;
+}
+.fc .event-time .clock-range {
+  white-space: normal;
+}
+@container (min-width: 146px) {
+  .fc .event-time .clock-range {
+    white-space: nowrap;
+  }
+}
+.fc .timed-day-segment {
+  border-inline-start-width: 3px;
+}
+.fc .timed-day-segment .time-note {
+  font-size: 10px;
+  font-weight: 500;
+}
+.fc .list-event-trigger .calendar-event-content {
+  display: block;
+}
+.fc .list-event-trigger .list-event-times {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.fc .list-event-trigger .list-event-times .time-part {
+  display: inline-block;
+}
+.fc .fc-list-event .event-time {
+  display: none;
+}
+.icon-inventory {
+  overflow-x: auto;
+}
+.icon-inventory h1 {
+  font-size: 24px;
+  font-weight: 600;
+}
+.icon-inventory p {
+  margin: 12px 0 20px;
+  max-width: 75ch;
+}
+.icon-inventory table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+}
+.icon-inventory :is(th, td) {
+  border: 1px solid var(--color-border);
+  padding: 10px;
+  text-align: left;
+  font-size: 13px;
+}
+.icon-inventory small {
+  display: block;
+  font-weight: 400;
+  color: var(--color-foreground-muted);
+}
+.fc .list-event-trigger {
+  display: block;
+}
+.fc .list-event-trigger:not(.mobile-list-event) .calendar-event-content {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  column-gap: 12px;
+}
+.fc
+  .list-event-trigger:not(.mobile-list-event)
+  .calendar-event-content
+  > :not(.list-event-times) {
+  grid-column: 2;
+}
+.fc .list-event-trigger:not(.mobile-list-event) .list-event-times {
+  grid-column: 1;
+  grid-row: 1 / span 6;
+  align-content: start;
+}
+
+.fc .calendar-event-content .host-identity {
+  display: block;
+}
+.fc .compact-card .host-identity .event-hosts {
+  display: inline;
+  font-size: 11px;
+}
+.fc .compact-card .hosts-full {
+  display: none;
+}
+.fc .compact-card .hosts-compact {
+  display: inline;
+}
+.fc .host-identity .hosting-badge {
+  margin-right: 4px;
+}
+@container (min-width: 431px) {
+  .student-category-calendar .fc-timegrid-event .host-identity {
+    display: contents;
+  }
+}
+/* Magnify the actual component geometry only on the development review page. */
+.icon-inventory .event-type-icon {
+  width: 24px;
+  height: 24px;
+}
+/* Mobile title rules must retain the shared inline icon/text alignment. */
+.fc .mobile-list-content .event-title {
+  display: flex;
+}

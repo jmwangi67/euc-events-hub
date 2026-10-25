@@ -29,6 +29,7 @@ export const externalEvents = externalEventSchema.array().parse([
   {
     ...base,
     id: "scenario-homecoming",
+    dateWide: true,
     title: "Example Homecoming weekend",
     category: "homecoming",
     scope: "psu-wide",
@@ -58,6 +59,7 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-thon",
     title: "Example THON planning scenario",
     category: "thon",
+    dateWide: true,
     subtype: "thon",
     scope: "psu-wide",
     analysis: "broad-context",
@@ -150,6 +152,7 @@ export const externalEvents = externalEventSchema.array().parse([
     id: "scenario-academic-break",
     title: "Example academic break — not official dates",
     category: "academic-break",
+    dateWide: true,
     scope: "psu-wide",
     analysis: "broad-context",
     analysisReason:

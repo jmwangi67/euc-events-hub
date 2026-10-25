@@ -1,7 +1,9 @@
 import { ThonMark } from "./thon-mark";
 import { eventIconType } from "./planner-presentation";
 const paths: Record<string, string> = {
-  exam: "m2 9 10-5 10 5-10 5L2 9m4 2v6q6 5 12 0v-6m4-2v8",
+  exam: "M4 3h12v6M4 3v18h7m-4-14h5m-5 4h4m-4 4h3m3 6 2-5 6-6 3 3-6 6-5 2m5-7 3 3",
+  research:
+    "M9 3h6m-5 0v6l-6 10q-1 2 2 2h12q3 0 2-2L14 9V3M7 14h10m-7 3h1m3 1h1",
   music: "M9 18V5l11-2v13M9 6l11-2M9 18a3 3 0 1 1-3-3h3m11 1a3 3 0 1 1-3-3h3",
   trophy:
     "M7 3h10v6a5 5 0 0 1-10 0V3m0 2H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v6m-5 1h10",

@@ -15,6 +15,7 @@ import {
 import { EXTERNAL_CATEGORIES } from "../../lib/domain/external-events";
 import { AudienceUncertainty } from "./preparation-details";
 import { DetailsDialog } from "../calendar/details-dialog";
+import { externalTimingLabel } from "../calendar/planner-events";
 import { examTimeLabel } from "../calendar/planner-events";
 import {
   sourceLabel,
@@ -102,7 +103,7 @@ export function WeeklySummaryCell({
           onClick={() => onFocusWeek(week)}
           aria-label={`Focus this week in calendar: ${weekLabel(week)}`}
         >
-          Focus this week in calendar ↑
+          Focus this week in calendar
         </button>
       )}
     </div>
@@ -211,7 +212,7 @@ export function WeeklyDetails({
                     start: event.start,
                     end: event.end,
                   })
-                : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · Time unknown`}
+                : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · ${externalTimingLabel(event)}`}
             </span>
             <span>
               {event.analysisReason}{" "}

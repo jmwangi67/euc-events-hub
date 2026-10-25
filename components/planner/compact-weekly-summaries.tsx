@@ -9,11 +9,13 @@ export function CompactWeeklySummaries({
   activeWeek,
   onWeekChange,
   onOpen,
+  onFocusWeek,
 }: {
   weeks: WeeklySummary[];
   activeWeek: WeeklySummary;
   onWeekChange: (start: string) => void;
   onOpen: (week: WeeklySummary) => void;
+  onFocusWeek: (week: WeeklySummary) => void;
 }) {
   return (
     <section
@@ -46,7 +48,11 @@ export function CompactWeeklySummaries({
         All analysis layers included, even when hidden. Counts are factual;
         overall scoring methodology awaits review.
       </p>
-      <WeeklySummaryCell week={activeWeek} onSelect={onOpen} />
+      <WeeklySummaryCell
+        week={activeWeek}
+        onSelect={onOpen}
+        onFocusWeek={onFocusWeek}
+      />
     </section>
   );
 }

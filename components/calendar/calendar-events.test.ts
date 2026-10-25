@@ -72,8 +72,7 @@ it("formats compact Eastern ranges with date-rollover and all-day cues", () => {
     "All day",
   ]);
   expect(listEventTimes(getEventById("example-night-build")!)).toEqual([
-    "11:30 PM–",
-    "12:30 AM",
+    "11:30 PM–12:30 AM",
     "Next day",
   ]);
   const repeatedHour = {
@@ -121,7 +120,7 @@ it("keeps accurate, chronological ranges for multiple events sharing one Eastern
   expect(mapped.map((event) => event.extendedProps?.listTimes)).toEqual([
     ["10:00–11:00 AM"],
     ["2:00–3:30 PM"],
-    ["11:30 PM–", "12:30 AM", "Next day"],
+    ["11:30 PM–12:30 AM", "Next day"],
   ]);
 });
 

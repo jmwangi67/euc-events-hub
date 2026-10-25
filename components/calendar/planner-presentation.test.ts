@@ -57,6 +57,7 @@ it("preserves a cross-month unknown-hour occurrence and its exclusive end", asyn
   const item = toExternalCalendarItem({
     ...original,
     id: "invented-cross-month-review",
+    dateWide: false,
     timeKnown: false,
     start: undefined,
     end: undefined,
@@ -68,6 +69,6 @@ it("preserves a cross-month unknown-hour occurrence and its exclusive end", asyn
     start: "2026-10-30",
     end: "2026-11-03",
     allDay: true,
-    extendedProps: { listTimes: ["Time unknown"] },
+    extendedProps: { listTimes: ["Time TBD"] },
   });
 });

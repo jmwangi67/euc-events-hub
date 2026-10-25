@@ -32,10 +32,11 @@ export function DetailsDialog({
       // FullCalendar may replace the opener during a responsive view change.
       const trigger =
         previousFocus?.isConnected &&
-        previousFocus.dataset.calendarEventId === triggerId
+        (previousFocus.dataset.calendarEventId === triggerId ||
+          previousFocus.dataset.canonicalEventId === triggerId)
           ? previousFocus
           : (calendarRegion?.querySelector<HTMLElement>(
-              `[data-calendar-event-id="${CSS.escape(triggerId)}"]`,
+              `[data-calendar-event-id="${CSS.escape(previousFocus?.dataset.calendarEventId ?? triggerId)}"]`,
             ) ??
             document.querySelector<HTMLElement>(
               `[data-calendar-event-id="${CSS.escape(triggerId)}"]`,
@@ -49,7 +50,20 @@ export function DetailsDialog({
       className="event-dialog"
       aria-labelledby={titleId}
       aria-describedby={describedBy}
+      onMouseDown={(event) => event.stopPropagation()}
+      onKeyDownCapture={(key) => {
+        if (key.key !== "Escape") return;
+        key.preventDefault();
+        key.stopPropagation();
+        key.nativeEvent.stopImmediatePropagation();
+        onClose();
+      }}
       onKeyDown={(key) => {
+        // Escape dismisses this modal, not FullCalendar's underlying popover.
+        if (key.key === "Escape") {
+          key.stopPropagation();
+          return;
+        }
         if (key.key !== "Tab") return;
         const controls = Array.from(
           key.currentTarget.querySelectorAll<HTMLElement>(
@@ -74,6 +88,7 @@ export function DetailsDialog({
         // Native dismissal restores focus before its queued close notification.
         // Clear React's selection now, so immediate reactivation is not a no-op.
         cancel.preventDefault();
+        cancel.stopPropagation();
         onClose();
       }}
       onClose={(event) => {

@@ -24,7 +24,7 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
       const home = page
         .locator('[data-calendar-event-id="external:scenario-homecoming"]')
         .first();
-      await expect(home).toContainText("Time unknown");
+      await expect(home).not.toContainText("Time unknown");
       await expect(
         page.locator('.fc-daygrid-day[data-date="2026-10-23"]'),
       ).toHaveCSS("border-left-color", "rgb(181, 193, 207)");
@@ -70,7 +70,7 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
         .locator(".calendar-region")
         .screenshot({ path: `work/hierarchy-two-weeks-${width}.png` });
       const nav = page.getByRole("button", {
-        name: /^View 1 Week: Oct 18, 2026/,
+        name: /^Focus this week in calendar: Oct 18, 2026/,
       });
       await expect(nav).not.toHaveAttribute("aria-haspopup", "dialog");
       await nav.focus();
@@ -93,7 +93,9 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
       await page.getByRole("button", { name: "Month", exact: true }).click();
       await page.getByLabel("Go to date", { exact: true }).fill("2026-10-01");
       await page
-        .getByRole("button", { name: /^View 1 Week: Sep 27, 2026/ })
+        .getByRole("button", {
+          name: /^Focus this week in calendar: Sep 27, 2026/,
+        })
         .click();
       await expect(page.getByLabel("Go to date", { exact: true })).toHaveValue(
         "2026-09-27",
@@ -101,7 +103,9 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
       await page.getByRole("button", { name: "Month", exact: true }).click();
       await page.getByLabel("Go to date", { exact: true }).fill("2026-12-31");
       await page
-        .getByRole("button", { name: /^View 1 Week: Dec 27, 2026/ })
+        .getByRole("button", {
+          name: /^Focus this week in calendar: Dec 27, 2026/,
+        })
         .click();
       await expect(page.getByLabel("Go to date", { exact: true })).toHaveValue(
         "2026-12-27",

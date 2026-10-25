@@ -1,4 +1,5 @@
 "use client";
+import { EventTypeIcon } from "../calendar/event-type-icon";
 import type { Exam, Major } from "../../lib/domain/models";
 import { ACADEMIC_LEVELS } from "../../lib/domain/planning-audience";
 import {
@@ -32,7 +33,10 @@ export function ExamDetails({
             ? "Unverified academic information. Confirm with the course organizer."
             : "Source marked verified. Confirm current details with the course organizer."}
       </p>
-      <p className="detail-time">{examTimeLabel(exam)}</p>
+      <p className="detail-time">
+        <EventTypeIcon props={{ kind: "exam" }} large />
+        {examTimeLabel(exam)}
+      </p>
       {!exam.timeKnown && (
         <p className="planner-warning">
           Time unknown. This is a date-level constraint, not a confirmed timed
