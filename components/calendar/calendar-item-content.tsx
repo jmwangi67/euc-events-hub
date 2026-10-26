@@ -17,6 +17,9 @@ export function CalendarItemContent({
   const p = info.event.extendedProps;
   if (p.kind === "density") return null;
   const grid = info.view.type.startsWith("dayGrid");
+  const hourly = info.view.type.startsWith("timeGrid") && !info.event.allDay;
+  const headerCard = info.view.type.startsWith("timeGrid") && info.event.allDay;
+  const compact = (grid || hourly || headerCard) && p.kind !== "exam-review";
   const external = p.kind === "external" ? p.externalEvent : null;
   const times = p.segmentTime
     ? [p.segmentTime, p.segmentNote]
@@ -84,6 +87,32 @@ export function CalendarItemContent({
       {p.location && <span className="event-location">{p.location}</span>}
     </span>
   );
+  if (compact) {
+    const showTime = !(external?.dateWide && !external.timeKnown);
+    return (
+      <span
+        className={`calendar-event-content ${hourly ? "hourly-card" : headerCard ? "all-day-card" : "month-card"}`}
+      >
+        {(showTime || p.location) && (
+          <span className="card-first-line">
+            {showTime && <span className="event-time">{clocks}</span>}
+            {p.location && (
+              <span className="event-location">
+                {showTime ? ", " : ""}
+                {p.location}
+              </span>
+            )}
+          </span>
+        )}
+        {title}
+        {identity ? (
+          <span className="card-detail compact-identity">{identity}</span>
+        ) : !p.kind && (p.hosts || p.hostingIdentity) ? (
+          <span className="card-detail">{hosts}</span>
+        ) : null}
+      </span>
+    );
+  }
   return info.view.type.startsWith("list") ? (
     <button
       type="button"

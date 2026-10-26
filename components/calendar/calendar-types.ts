@@ -18,6 +18,8 @@ export type PlanningCalendarOptions = {
   onProposalSelect: () => void;
 };
 type BaseProps = {
+  /** Synthetic, development-only visual scenarios; never used by public routes. */
+  previewItems?: import("@fullcalendar/core").EventInput[];
   date: string;
   filters: EventFilters;
   onDateChange: (date: string) => void;

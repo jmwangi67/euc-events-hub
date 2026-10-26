@@ -4,13 +4,8 @@ import {
   easternDate,
   easternDayStart,
   formatEventClockRange,
+  formatEventClock,
 } from "../../lib/time/eastern";
-const clock = (instant: string) =>
-  new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(instant));
 /** Display-only day slices. Source records/analysis stay canonical and untouched. */
 export function dayGridItems(items: EventInput[]): EventInput[] {
   const counts = new Map<string, number>();
@@ -59,12 +54,15 @@ export function dayGridItems(items: EventInput[]): EventInput[] {
         segmentDate: date,
         segmentTime:
           index === 0
-            ? formatEventClockRange({
-                start: originalStart,
-                end: originalEnd,
-              })
+            ? formatEventClockRange(
+                {
+                  start: originalStart,
+                  end: originalEnd,
+                },
+                true,
+              )
             : index === days.length - 1
-              ? `Ends ${clock(originalEnd)}`
+              ? `Ends ${formatEventClock(originalEnd, true)}`
               : "Continues from previous day",
         segmentNote:
           index === 0

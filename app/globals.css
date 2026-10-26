@@ -351,7 +351,7 @@ button.control[aria-pressed="true"] {
   cursor: pointer;
 }
 .fc .fc-timegrid-event .fc-event-main {
-  overflow: auto;
+  overflow: hidden;
 }
 .fc .fc-list-event-title a {
   color: var(--color-foreground);
@@ -2018,41 +2018,6 @@ button.planner-analyze:hover {
 .fc-timegrid-event {
   container-type: inline-size;
 }
-@container (min-width: 431px) {
-  .student-category-calendar .fc-timegrid-event .calendar-event-content {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr) max-content;
-    grid-template-areas:
-      "time title badge"
-      "category hosts hosts"
-      "location location location";
-    align-items: start;
-    column-gap: 12px;
-    row-gap: 3px;
-  }
-  .student-category-calendar .fc-timegrid-event .event-time {
-    grid-area: time;
-  }
-  .student-category-calendar .fc-timegrid-event .event-title {
-    grid-area: title;
-  }
-  .student-category-calendar .fc-timegrid-event .hosting-badge {
-    grid-area: badge;
-    margin-top: 0;
-  }
-  .student-category-calendar .fc-timegrid-event .event-category {
-    grid-area: category;
-    margin-top: 0;
-  }
-  .student-category-calendar .fc-timegrid-event .event-hosts {
-    grid-area: hosts;
-    margin-top: 0;
-  }
-  .student-category-calendar .fc-timegrid-event .event-location {
-    grid-area: location;
-    margin-top: 0;
-  }
-}
 @container (max-width: 430px) {
   .event-hosts .hosts-full {
     display: none;
@@ -2528,11 +2493,6 @@ button.planner-analyze:hover {
 .fc .host-identity .hosting-badge {
   margin-right: 4px;
 }
-@container (min-width: 431px) {
-  .student-category-calendar .fc-timegrid-event .host-identity {
-    display: contents;
-  }
-}
 /* Magnify the actual component geometry only on the development review page. */
 .icon-inventory .event-type-icon {
   width: 24px;
@@ -2541,4 +2501,197 @@ button.planner-analyze:hover {
 /* Mobile title rules must retain the shared inline icon/text alignment. */
 .fc .mobile-list-content .event-title {
   display: flex;
+}
+
+/* View-specific density: typography elsewhere keeps its established line height. */
+.calendar-surface {
+  --hourly-card-inset: 2px;
+  --hourly-card-gap: 1px;
+}
+.fc .fc-timegrid-event {
+  padding: var(--hourly-card-inset) 3px;
+  margin-bottom: var(--hourly-card-gap);
+  overflow: hidden;
+  container-type: size;
+}
+.fc .fc-timegrid-event .fc-event-main {
+  padding: 0;
+}
+.fc .fc-timegrid-event-short {
+  padding-block: 0;
+}
+/* FullCalendar reserves 20px for a resize handle even when editing is disabled. */
+.fc .fc-timegrid-event-harness {
+  margin-inline-end: 0 !important;
+}
+.fc .fc-timegrid-event:focus-visible {
+  outline-offset: -2px;
+}
+.fc .card-first-line {
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.fc .card-first-line .event-time {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+.fc .card-first-line .clock-range,
+.fc .card-first-line .event-location {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fc .card-first-line .clock-range {
+  min-width: 0;
+}
+.fc .card-first-line .time-note {
+  flex: none;
+  font-size: 10px;
+}
+.fc .card-first-line .event-location {
+  flex: 1 3 auto;
+  min-width: 0;
+  margin: 0;
+  font-weight: 400;
+  font-size: 12px;
+}
+.fc :is(.month-card, .all-day-card) .event-title {
+  white-space: nowrap;
+  overflow: hidden;
+  overflow-wrap: normal;
+}
+.fc :is(.month-card, .all-day-card) .event-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fc .card-detail,
+.fc .card-detail.compact-identity {
+  display: block !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  color: inherit;
+}
+.fc .card-detail .host-identity {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.fc .card-detail .hosting-badge {
+  display: inline-flex;
+  flex: none;
+  margin-top: 0;
+  padding: 0 2px;
+  font-size: 10px;
+}
+.fc .card-detail .event-hosts {
+  display: inline;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0;
+  font-size: 11px;
+}
+.fc .card-detail .hosts-full {
+  display: none;
+}
+.fc .card-detail .hosts-compact {
+  display: inline;
+}
+.fc .hourly-card .event-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.fc .hourly-card .event-title-icon {
+  display: inline-flex;
+  vertical-align: top;
+  margin-inline-end: 4px;
+}
+.fc .hourly-card .event-title-text {
+  display: inline;
+}
+@container (height < 72px) {
+  .hourly-card .card-detail {
+    display: none !important;
+  }
+}
+@container (height < 54px) {
+  .hourly-card .event-title {
+    -webkit-line-clamp: 1 !important;
+  }
+}
+@container (height < 32px) {
+  .hourly-card .card-first-line {
+    display: none;
+  }
+}
+@container (height < 20px) {
+  .hourly-card .event-title {
+    font-size: 10px;
+    line-height: 1;
+  }
+  .hourly-card .event-title-icon {
+    height: 1em;
+  }
+  .hourly-card .event-type-icon {
+    width: 10px;
+    height: 10px;
+  }
+}
+/* Normal-flow popover cards anchor FullCalendar's absolute focus hit areas. */
+.fc .fc-popover .fc-timegrid-event {
+  position: relative;
+  container-type: inline-size;
+  margin: 4px;
+}
+.fc .fc-popover .hourly-card .event-title {
+  -webkit-line-clamp: 2 !important;
+}
+.fc .fc-timegrid-more-link {
+  font-weight: 600;
+  overflow: hidden;
+}
+.fc .fc-timeGridWeek-view .fc-daygrid-day-frame,
+.fc .fc-timeGridDay-view .fc-daygrid-day-frame {
+  min-height: 0;
+}
+.fc :is(.fc-timeGridWeek-view, .fc-timeGridDay-view) .fc-daygrid-day-top {
+  display: none;
+}
+.fc :is(.fc-timeGridWeek-view, .fc-timeGridDay-view) .fc-daygrid-event {
+  padding: 2px 3px;
+  margin: 2px;
+}
+.fc :is(.fc-timeGridWeek-view, .fc-timeGridDay-view) .fc-daygrid-event-harness {
+  margin-bottom: 1px;
+}
+.fc .all-day-card .card-detail {
+  display: none !important;
+}
+.fc .all-day-card .event-time {
+  font-size: 11px;
+}
+@container (min-width: 431px) {
+  .fc .hourly-card .card-detail .hosts-full {
+    display: inline;
+  }
+  .fc .hourly-card .card-detail .hosts-compact {
+    display: none;
+  }
 }

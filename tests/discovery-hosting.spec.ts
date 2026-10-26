@@ -1,4 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
+import { categoryLabel } from "../lib/domain/event-categories";
+import type { EventCategory } from "../lib/domain/models";
 const card = (page: Page, id: string) =>
   page.locator(`[data-calendar-event-id="${id}"]`).first();
 async function noOverflow(page: Page) {
@@ -78,11 +80,16 @@ for (const view of [
         expect(colors).toEqual([bg, border, "rgb(28, 36, 48)"]);
         expect(contrast(bg, colors[2])).toBeGreaterThanOrEqual(4.5);
         const secondary = await trigger
-          .locator(".event-category")
+          .locator(view === "listMonth" ? ".event-category" : ".event-hosts")
           .evaluate((el) => getComputedStyle(el).color);
         expect(secondary).toBe("rgb(52, 64, 78)");
         expect(contrast(bg, secondary)).toBeGreaterThanOrEqual(4.5);
-        await expect(trigger.locator(".event-category")).not.toBeEmpty();
+        if (view === "listMonth")
+          await expect(trigger.locator(".event-category")).not.toBeEmpty();
+        else
+          expect(await trigger.getAttribute("aria-label")).toContain(
+            categoryLabel(id as EventCategory),
+          );
         observed.add(id);
       }
     }

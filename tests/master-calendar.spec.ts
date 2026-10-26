@@ -318,11 +318,11 @@ for (const width of [320, 375, 430, 768, 1024, 1440]) {
         page.locator(
           ".fc-list-event.category-general-body-meeting .mobile-list-event",
         ),
-      ).toContainText("6:00–7:00 PM");
+      ).toContainText("6–7 PM");
       const button = page.locator(
         '.fc-list-event.category-social-recreational .mobile-list-event[data-calendar-event-id="example-social"]',
       );
-      await expect(button).toContainText("6:30–8:00 PM");
+      await expect(button).toContainText("6:30–8 PM");
       await expect(button).toContainText("Social & Recreational");
     }
     await noOverflow(page);

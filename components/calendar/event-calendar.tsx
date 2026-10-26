@@ -71,12 +71,27 @@ export function EventCalendar(props: EventCalendarProps) {
     mobile,
     planning,
     examReview,
+    previewItems,
   } = props;
   const changeView = (id: PlannerCalendarView) => {
     if (props.planning) props.onViewChange(id);
     else if (id !== "dayGridTwoWeeks") props.onViewChange(id);
   };
   const surface = useRef<HTMLDivElement>(null);
+  const [timeStackLimit, setTimeStackLimit] = useState(3);
+  useEffect(() => {
+    const element = surface.current;
+    if (!element || !view.startsWith("timeGrid")) return;
+    const update = () => {
+      const column = element.querySelector(".fc-timegrid-col-events");
+      const width = column?.getBoundingClientRect().width ?? 0;
+      if (width) setTimeStackLimit(width < 168 ? 2 : 3);
+    };
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    update();
+    return () => observer.disconnect();
+  }, [view]);
   const [window, setWindow] = useState({
     start: date,
     end: addCalendarDays(date, 1),
@@ -168,7 +183,24 @@ export function EventCalendar(props: EventCalendarProps) {
         const canonicalItems =
           reviewExams && examReview
             ? stagedExamCalendarItems(reviewExams, examReview.dataset)
-            : loadCalendarItems(range, filters, planning);
+            : previewItems
+              ? previewItems.filter((item) => {
+                  const start = item.allDay
+                    ? String(item.start)
+                    : easternDate(String(item.start));
+                  const last = item.allDay
+                    ? addCalendarDays(String(item.end), -1)
+                    : easternDate(
+                        new Date(
+                          Date.parse(String(item.end)) - 1,
+                        ).toISOString(),
+                      );
+                  return (
+                    start < range.endStr.slice(0, 10) &&
+                    last >= range.startStr.slice(0, 10)
+                  );
+                })
+              : loadCalendarItems(range, filters, planning);
         const items =
           view.startsWith("dayGrid") && !examReview
             ? dayGridItems(canonicalItems)
@@ -198,7 +230,7 @@ export function EventCalendar(props: EventCalendarProps) {
         );
       }
     },
-    [filters, planning, view, examReview],
+    [filters, planning, view, examReview, previewItems],
   );
   useEffect(() => {
     const api = calendar.current?.getApi();
@@ -376,8 +408,14 @@ export function EventCalendar(props: EventCalendarProps) {
           scrollTime="12:00:00"
           fixedWeekCount={false}
           stickyHeaderDates={planning ? false : undefined}
-          slotEventOverlap={planning ? false : undefined}
-          dayMaxEvents={4}
+          slotEventOverlap
+          eventMaxStack={timeStackLimit}
+          eventMinHeight={1}
+          eventShortHeight={54}
+          dayMaxEvents={view.startsWith("timeGrid") ? undefined : 4}
+          // The timeGrid header is a compact region; every additional record
+          // remains available in FullCalendar's keyboard-operable popover.
+          dayMaxEventRows={view.startsWith("timeGrid") ? 2 : undefined}
           events={source}
           datesSet={datesSet}
           nowIndicator
@@ -400,10 +438,13 @@ export function EventCalendar(props: EventCalendarProps) {
           eventOrder={
             planning && view.startsWith("dayGrid")
               ? plannerEventOrder
-              : "start,title"
+              : view.startsWith("timeGrid")
+                ? "start,-duration,title"
+                : "start,title"
           }
           eventOrderStrict={
             (!!planning && view.startsWith("dayGrid")) ||
+            view.startsWith("timeGrid") ||
             (mobile && view.startsWith("list"))
           }
           eventInteractive

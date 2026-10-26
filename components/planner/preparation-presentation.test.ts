@@ -5,6 +5,7 @@ import type { PreparationContribution } from "../../lib/domain/exam-pressure";
 import type { Exam } from "../../lib/domain/models";
 import { PreparationRange } from "./preparation-range";
 import { PressurePanel } from "./pressure-panel";
+import { OtherSchedulingConstraints } from "./other-scheduling-constraints";
 import {
   PreparationCells,
   PreparationMethodology,
@@ -213,11 +214,23 @@ describe("independent scheduling indicators by default", () => {
     );
     expect(academic).toBe(empty);
     expect(empty).toContain('aria-label="Exam Preparation"');
-    expect(empty).toContain('aria-label="Other Scheduling Constraints"');
+    expect(empty).not.toContain('aria-label="Other Scheduling Constraints"');
     expect(empty).toContain(
       'data-overall-status="awaiting-methodology-review"',
     );
-    expect(empty).toContain('data-non-exam-score="unavailable"');
+    expect(empty).not.toContain('data-non-exam-score="unavailable"');
+    const nonExam = renderToStaticMarkup(
+      createElement(OtherSchedulingConstraints, props),
+    );
+    expect(
+      renderToStaticMarkup(
+        createElement(OtherSchedulingConstraints, {
+          ...props,
+          context: { ...props.context, exams: [exam] },
+        }),
+      ),
+    ).toBe(nonExam);
+    expect(nonExam).toContain('data-non-exam-score="unavailable"');
     expect(empty).not.toContain('data-preparation-range="true"');
     expect(empty).not.toContain("Advanced methodology &amp; sources");
   });
@@ -234,8 +247,15 @@ describe("independent scheduling indicators by default", () => {
     expect(html).toContain("Audience-uncertain academic constraints");
     expect(html).toContain("no numerical preparation");
     expect(html).not.toContain('data-preparation-range="true"');
-    const nonExam = html.slice(
-      html.indexOf('aria-label="Other Scheduling Constraints"'),
+    expect(html).not.toContain('aria-label="Other Scheduling Constraints"');
+    const nonExam = renderToStaticMarkup(
+      createElement(OtherSchedulingConstraints, {
+        ...props,
+        context: {
+          ...props.context,
+          exams: [{ ...exam, relevantMajorIds: [] }],
+        },
+      }),
     );
     expect(nonExam).not.toContain(exam.courseId);
     expect(nonExam).toContain("0 audience-relevant non-exam commitments");

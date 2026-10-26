@@ -34,7 +34,7 @@ export function listEventTimes(
   event: Pick<Event, "allDay" | "start" | "end">,
 ): string[] {
   if (event.allDay) return ["All day"];
-  const [range, elapsed] = formatEventClockRange(event).split(" (");
+  const [range, elapsed] = formatEventClockRange(event, true).split(" (");
   const days =
     (Date.parse(easternDate(event.end)) -
       Date.parse(easternDate(event.start))) /

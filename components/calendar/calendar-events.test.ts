@@ -65,9 +65,7 @@ describe("FullCalendar data mapping", () => {
 });
 
 it("formats compact Eastern ranges with date-rollover and all-day cues", () => {
-  expect(listEventTimes(getEventById("example-industry")!)).toEqual([
-    "4:00–5:00 PM",
-  ]);
+  expect(listEventTimes(getEventById("example-industry")!)).toEqual(["4–5 PM"]);
   expect(listEventTimes(getEventById("example-design-days")!)).toEqual([
     "All day",
   ]);
@@ -118,8 +116,8 @@ it("keeps accurate, chronological ranges for multiple events sharing one Eastern
     "late",
   ]);
   expect(mapped.map((event) => event.extendedProps?.listTimes)).toEqual([
-    ["10:00–11:00 AM"],
-    ["2:00–3:30 PM"],
+    ["10–11 AM"],
+    ["2–3:30 PM"],
     ["11:30 PM–12:30 AM", "Next day"],
   ]);
 });

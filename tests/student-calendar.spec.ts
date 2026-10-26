@@ -59,7 +59,7 @@ test("supports four views, date navigation, Eastern time and keyboard details", 
   page,
 }) => {
   await page.goto("/?date=2026-10-19&view=dayGridMonth");
-  await expect(event(page, "Engineering welcome")).toContainText("5:00");
+  await expect(event(page, "Engineering welcome")).toContainText("5–6 PM");
   await page.getByRole("button", { name: "Week", exact: true }).click();
   await expect(page.locator(".fc-timeGridWeek-view")).toBeVisible();
   await page.getByRole("button", { name: "Day", exact: true }).click();
@@ -207,7 +207,7 @@ for (const view of [
       trigger.locator(
         view === "listMonth" ? ".list-event-times" : ".event-time",
       ),
-    ).toHaveText("5:00–6:00 PM");
+    ).toHaveText("5–6 PM");
     await trigger.focus();
     for (const key of ["Enter", "Space", "Enter", "Space"]) {
       await test.step(`${key} opens, Escape closes and restores the original event`, async () => {
@@ -446,19 +446,19 @@ for (const width of [320, 375, 430, 768]) {
     const expected = [
       [
         "Engineering welcome",
-        "5:00–6:00 PM",
+        "5–6 PM",
         "Social & Recreational",
         "Example Engineering Council",
       ],
       [
         "Process lab workshop",
-        "6:00–7:30 PM",
+        "6–7:30 PM",
         "Technical Workshops",
         "Example Process Engineering Society",
       ],
       [
         "Bioprocess industry discussion",
-        "4:00–5:00 PM",
+        "4–5 PM",
         "Career & Networking",
         "Example Process Engineering Society",
       ],
@@ -522,10 +522,10 @@ for (const width of [320, 375, 430, 768]) {
       "All day",
     );
     await expect(rows.nth(1).locator(".list-event-times")).toHaveText(
-      "10:00–11:00 AM",
+      "10–11 AM",
     );
     await expect(rows.nth(2).locator(".list-event-times")).toHaveText(
-      "2:00–3:30 PM",
+      "2–3:30 PM",
     );
     await expect(rows.nth(3).locator(".list-event-times")).toContainText(
       "11:30 PM–12:30 AM",

@@ -16,10 +16,7 @@ async function sampleWeek(page: Page) {
 
 const examSection = (page: Page) =>
   page.getByRole("region", { name: "Exam Preparation", exact: true });
-const otherSection = (page: Page) =>
-  page
-    .locator(".pressure-preview")
-    .getByRole("region", { name: "Other Scheduling Constraints", exact: true });
+const otherSection = (page: Page) => page.locator(".calendar-guidance-details");
 
 test("exam ranges are opt-in, striped uncertainty is accessible, and advanced sources start closed", async ({
   page,
@@ -30,15 +27,12 @@ test("exam ranges are opt-in, striped uncertainty is accessible, and advanced so
   await expect(exams).toBeVisible();
   await expect(other).toBeVisible();
   await expect(
+    page.locator(".pressure-preview [data-non-exam-score]"),
+  ).toHaveCount(0);
+  await expect(
     exams.getByLabel("Preview experimental exam preparation", { exact: true }),
   ).not.toBeChecked();
   await expect(exams.locator("[data-preparation-range]")).toHaveCount(0);
-  await expect(
-    other.getByRole("img", {
-      name: "Numerical Other Scheduling Constraints score unavailable — awaiting methodology review",
-      exact: true,
-    }),
-  ).toBeVisible();
   await expect(page.locator(".overall-pressure-pending")).toHaveAttribute(
     "data-overall-status",
     "awaiting-methodology-review",
@@ -168,7 +162,9 @@ test("exam and non-exam indicators remain independent of display and density tog
       ),
   ).toEqual(ranges);
   await expect(other).toHaveText(factualSummary, { useInnerText: true });
-  await expect(other).toHaveAttribute("data-non-exam-score", "unavailable");
+  await expect(
+    page.locator(".pressure-preview [data-non-exam-score]"),
+  ).toHaveCount(0);
   await expect(other).not.toContainText("EXAMPLE-MATH");
   await expect(other).not.toContainText("EXAMPLE-UPPER-PROCESS");
   await expect(exams).toContainText("Academic exams only");

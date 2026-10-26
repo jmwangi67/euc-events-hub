@@ -16,7 +16,6 @@ import {
   AudienceUncertainty,
 } from "./preparation-details";
 import { PreparationRange } from "./preparation-range";
-import { OtherSchedulingConstraints } from "./other-scheduling-constraints";
 import styles from "./preparation.module.css";
 
 export function PressurePanel({
@@ -185,12 +184,6 @@ export function PressurePanel({
           )}
           <AudienceUncertainty exams={uncertain} sourceExams={context.exams} />
         </section>
-        <OtherSchedulingConstraints
-          start={start}
-          days={days}
-          audience={audience}
-          context={context}
-        />
       </div>
     </section>
   );
