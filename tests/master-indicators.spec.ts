@@ -1,4 +1,7 @@
-import { openPlannerChoices } from "./helpers/planner-controls";
+import {
+  openPlannerChoices,
+  openPlannerAnalysis,
+} from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 
 const peakCaveat =
@@ -12,6 +15,7 @@ async function sampleWeek(page: Page) {
     .click();
   await page.getByRole("button", { name: "1 Week", exact: true }).click();
   await expect(page.locator(".fc-timeGridWeek-view")).toBeVisible();
+  await openPlannerAnalysis(page);
 }
 
 const examSection = (page: Page) =>

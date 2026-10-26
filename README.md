@@ -223,3 +223,9 @@ Student and planner calendars share event icons, with an explicit research flask
 ### Hourly layering and compact cards
 
 Week/Day now use native FullCalendar horizontal overlap layers with bounded, keyboard-operable overflow. Hourly text clamps to available height without inner scrollbars; the all-day header is compact. Month/2-Weeks use at most three lines: bold compact time with regular-weight location, one icon/title line, then host or scope. Card clocks omit zero minutes while detailed labels retain precision. Week/Day retain scheduling reasons and sources without the standalone daily constraints panel. No source records, scheduling policies or formulas change. See [rendered examples, geometry decisions and tradeoffs](docs/previews/planner/layering/README.md). Development-only `/dev/calendar-layout` provides isolated fictional overlap fixtures and returns 404 in production.
+
+### Compact planner activity
+
+The planner now leads with the calendar and small five-dot activity rows beneath dates. One unique displayed commitment fills one dot, capped at five; PSU-wide and national external events always contribute even with their layers hidden. This view-filtered display remains separate from unchanged scheduling analysis. Proposals and shading are excluded. Exact counts and hidden broad-scope items are explained in accessible labels and Day context. Zero dots do not establish availability.
+
+Day has date-specific context and keyboard-operable previous/next controls at the grid edges. Weekly detail access and full reasons/sources remain below the grid, with integrated Month/2-Weeks side summaries preserved. Experimental exam preparation remains available through the closed analysis disclosure. See [ADR 007](docs/decisions/007-calendar-display-activity.md) and the [rendered review](docs/previews/planner/day-activity/README.md).

@@ -5,6 +5,8 @@ Date: 2026-10-16
 
 Additive update, 2026-10-18: [ADR 004](004-independent-scheduling-indicators.md) governs independent non-exam constraints, explicitly provisional attendance-policy advice, optional factual density, and the revised preparation presentation. All preparation mathematics and uncertainty rules below remain in force. References to deferred recommendations mean automatic candidate-date ranking; the specific THON/music/break/fair policy cautions in ADR 004 are now authorized.
 
+Presentation update, 2026-10-26: [ADR 007](007-calendar-display-activity.md) adds a separate view-filtered daily activity display and replaces the large top summaries. Its explicit PSU-wide/national display exception does not change any analytical input, formula or visibility-independence rule below.
+
 ## Scope and architecture
 
 The owner's PR #5 expansion and final refinement request supersede the original blanket numerical-pressure exclusion for Milestone 1C. Only an isolated experimental **exam-preparation** model is authorized. Overall status remains `awaiting-methodology-review` and its score remains `null`. No attendance predictions, overall thresholds, enrollment shares, automatic date-ranking recommendations, auth, persistence, live ingestion, deployment or dark mode are authorized.

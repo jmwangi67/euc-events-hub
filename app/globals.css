@@ -2695,3 +2695,161 @@ button.planner-analyze:hover {
     display: none;
   }
 }
+
+/* Calendar display activity is separate from analytical scheduling density. */
+.planner-calendar {
+  --color-activity-fill: var(--color-brand-blue);
+  --color-activity-outline: var(--color-foreground-muted);
+  --planner-card-gap: 5px;
+}
+.day-activity-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 8px;
+  flex: none;
+}
+.activity-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--color-activity-outline);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+.activity-dot.filled {
+  border-color: var(--color-activity-fill);
+  background: var(--color-activity-fill);
+}
+.planner-date-header,
+.planner-cell-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.planner-cell-date {
+  align-items: flex-end;
+  gap: 2px;
+}
+.planner-calendar .fc .fc-daygrid-day-number {
+  padding: 4px 6px;
+}
+.planner-date-header .fc-list-day-text {
+  float: none;
+}
+.fc-list-day .planner-date-header {
+  align-items: flex-start;
+}
+.planner-day-surface {
+  position: relative;
+}
+.planner-day-surface .fc-col-header-cell-cushion {
+  padding-inline: 42px;
+}
+.day-edge-nav {
+  position: absolute;
+  top: 4px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+.day-edge-nav.previous-day {
+  left: 4px;
+}
+.day-edge-nav.next-day {
+  right: 4px;
+}
+.planner-calendar-context {
+  margin-top: 12px;
+  min-width: 0;
+}
+.activity-explanation {
+  margin: 8px 0;
+}
+.planner-day-context,
+.planner-analysis-details {
+  margin: 10px 0;
+  font-size: 13px;
+}
+.planner-day-context > summary,
+.planner-analysis-details > summary {
+  cursor: pointer;
+  color: var(--color-primary);
+  font-weight: 500;
+  padding: 5px 0;
+}
+.day-context-items {
+  list-style: none;
+  padding: 0;
+}
+.day-context-items li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.day-context-items strong {
+  font-weight: 600;
+}
+.day-context-items span {
+  display: block;
+  color: var(--color-foreground-muted);
+}
+.planner-calendar .calendar-week-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+.calendar-week-actions label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+}
+.calendar-week-actions .control {
+  max-width: 100%;
+  min-width: 0;
+  font-size: 12px;
+}
+/* One restrained gap for planner date-grid and popover cards of every type. */
+.planner-calendar .fc .fc-daygrid-event {
+  margin: calc(var(--planner-card-gap) / 2) 4px;
+}
+.planner-calendar .fc .fc-daygrid-event-harness {
+  margin-bottom: 0;
+}
+.planner-calendar .fc .fc-popover .fc-event {
+  margin: 2px;
+}
+@media (forced-colors: active) {
+  .activity-dot {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+  .activity-dot.filled {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+}
+.empty-activity-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 12px 0;
+  text-align: left;
+}
+.empty-activity-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 12px;
+}

@@ -3,6 +3,8 @@
 Status: Approved for the owner's master PR #5 implementation request; visual acceptance and any numerical scoring methodology remain subject to owner review.
 Date: 2026-10-18
 
+Presentation update, 2026-10-26: [ADR 007](007-calendar-display-activity.md) adds a separate view-filtered daily activity display and replaces the large top summaries. Its explicit PSU-wide/national display exception does not change any analytical input, formula or visibility-independence rule below.
+
 ## Context and boundaries
 
 PR #5 needs understandable scheduling guidance without presenting an uncalibrated combined score. This decision adds a separate non-exam analysis and optional factual density visualization. It supplements [ADR 003](003-weekly-planning-intelligence.md), preserving its complete experimental exam-preparation mathematics, audience cells, uncertainty handling, source-conflict rules, and exact temporal boundaries.

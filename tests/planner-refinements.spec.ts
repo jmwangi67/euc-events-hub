@@ -1,4 +1,7 @@
-import { openPlannerChoices } from "./helpers/planner-controls";
+import {
+  openPlannerChoices,
+  openPlannerAnalysis,
+} from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 async function sample(page: Page) {
   await page.goto("/planner");
@@ -65,6 +68,7 @@ test("planner has five distinct views with hourly grids only in 1 Week and Day",
     await expect(page.locator(selector)).toBeVisible();
     await expect(page.locator(".fc-timegrid-body")).toHaveCount(hourly ? 1 : 0);
     await expect(page.locator(".pressure-preview")).toHaveCount(hourly ? 1 : 0);
+    if (hourly) await expect(page.locator(".pressure-preview")).toBeHidden();
     await expect(page.locator(".experimental-day-preparation")).toHaveCount(0);
     if (hourly)
       await expect(page.locator(".overall-pressure-pending")).toContainText(
@@ -190,6 +194,7 @@ test("eligibility explanations and preparation stay independent of display layer
     "awaiting-methodology-review",
   );
   await expect(page.locator(".preparation-value")).toHaveCount(0);
+  await openPlannerAnalysis(page);
   await page
     .getByLabel("Preview experimental exam preparation", { exact: true })
     .check();
@@ -254,30 +259,28 @@ test("Sunday week controls provide logical keyboard access and restore focus acr
   await page.keyboard.press("Escape");
   await expect(summary).toBeFocused();
 });
-test("compact weekly summaries are reachable above the chronological list and empty weeks are concise", async ({
+test("compact week controls remain below the list with full counts in accessible details", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 1100 });
   await sample(page);
-  const summaries = page.locator(".compact-weekly-summaries");
+  const controls = page.locator(".calendar-week-actions");
   const list = page.locator(".fc-listMonth-view");
-  expect((await summaries.boundingBox())!.y).toBeLessThan(
-    (await list.boundingBox())!.y,
+  expect((await controls.boundingBox())!.y).toBeGreaterThanOrEqual(
+    (await list.boundingBox())!.y + (await list.boundingBox())!.height,
   );
+  await expect(controls.locator(".weekly-counts")).toHaveCount(0);
+  const selector = page.getByLabel("Show weekly summary for", { exact: true });
+  await selector.selectOption("2026-10-04");
+  await controls.getByRole("button", { name: /Weekly summary:/ }).click();
+  await expect(page.getByRole("dialog")).toContainText("0 unique commitments");
+  await page.keyboard.press("Escape");
   await expect(
-    summaries.getByRole("button", { name: /Weekly summary: Oct 18, 2026/ }),
-  ).toBeVisible();
-  await page
-    .getByLabel("Show weekly summary for", { exact: true })
-    .selectOption("2026-10-04");
-  await expect(summaries.locator(".weekly-counts")).toHaveCount(0);
-  expect(
-    (await summaries.locator(".weekly-summary-cell").boundingBox())!.height,
-  ).toBeLessThan(130);
-  await page
-    .getByLabel("Show weekly summary for", { exact: true })
-    .selectOption("2026-10-18");
-  await expect(summaries.locator(".weekly-counts")).toBeVisible();
+    controls.getByRole("button", { name: /Weekly summary:/ }),
+  ).toBeFocused();
+  await selector.selectOption("2026-10-18");
+  await controls.getByRole("button", { name: /Weekly summary:/ }).click();
+  await expect(page.getByRole("dialog")).toContainText("17 unique commitments");
 });
 for (const width of [320, 375, 430, 768, 1024, 1280, 1440])
   test(`refined planner no overflow and aligned summaries at ${width}px`, async ({

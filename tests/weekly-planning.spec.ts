@@ -1,4 +1,7 @@
-import { openPlannerChoices } from "./helpers/planner-controls";
+import {
+  openPlannerChoices,
+  openPlannerAnalysis,
+} from "./helpers/planner-controls";
 import { test, expect, type Page } from "@playwright/test";
 async function sample(page: Page) {
   await page.goto("/planner");
@@ -205,6 +208,7 @@ test("week preparation preview is opt-in and distinct from overall scoring and d
     ),
   ).toBe(true);
   await expect(page.locator(".experimental-day-preparation")).toHaveCount(0);
+  await openPlannerAnalysis(page);
   await page
     .getByLabel("Preview experimental exam preparation", { exact: true })
     .check();

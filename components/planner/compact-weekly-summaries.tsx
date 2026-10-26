@@ -1,9 +1,6 @@
 import type { WeeklySummary } from "../../lib/domain/weekly-planning";
-import {
-  WeeklySummaryCell,
-  weekLabel,
-  compactWeekLabel,
-} from "./weekly-intelligence";
+import { weekLabel, compactWeekLabel } from "./weekly-intelligence";
+/** Small, below-grid access to the existing independent weekly analysis. */
 export function CompactWeeklySummaries({
   weeks,
   activeWeek,
@@ -17,42 +14,44 @@ export function CompactWeeklySummaries({
   onOpen: (week: WeeklySummary) => void;
   onFocusWeek: (week: WeeklySummary) => void;
 }) {
+  const c = activeWeek.counts;
   return (
-    <section
-      className="compact-weekly-summaries"
-      aria-label="Weekly scheduling summaries"
+    <nav
+      className="compact-weekly-summaries calendar-week-actions"
+      aria-label="Week detail controls"
     >
-      <div className="compact-week-heading">
-        <h3>Weekly scheduling summaries</h3>
-        <label>
-          Show weekly summary for
-          <select
-            aria-label="Show weekly summary for"
-            className="control"
-            value={activeWeek.start}
-            onChange={(event) => onWeekChange(event.target.value)}
-          >
-            {weeks.map((week) => (
-              <option
-                key={week.start}
-                value={week.start}
-                aria-label={`${weekLabel(week)} · ${week.counts.uniqueTotal} records`}
-              >
-                {compactWeekLabel(week)}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <p className="field-help">
-        All analysis layers included, even when hidden. Counts are factual;
-        overall scoring methodology awaits review.
-      </p>
-      <WeeklySummaryCell
-        week={activeWeek}
-        onSelect={onOpen}
-        onFocusWeek={onFocusWeek}
-      />
-    </section>
+      <label>
+        Week details for{" "}
+        <select
+          aria-label="Show weekly summary for"
+          className="control"
+          value={activeWeek.start}
+          onChange={(e) => onWeekChange(e.target.value)}
+        >
+          {weeks.map((week) => (
+            <option key={week.start} value={week.start}>
+              {compactWeekLabel(week)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
+        type="button"
+        className="control"
+        data-calendar-event-id={`week:${activeWeek.start}`}
+        aria-label={`Weekly summary: ${weekLabel(activeWeek)}. ${c.uniqueTotal} unique commitments: ${c.collegeWide} College-wide, ${c.otherEvents} other relevant events, ${c.exams} mapped exams, ${c.psuWide} PSU-wide, ${c.campusLocal} Local, ${c.national} National; ${c.uncertainExams} audience-uncertain exams. Open weekly summary details.`}
+        onClick={() => onOpen(activeWeek)}
+      >
+        Weekly summary details
+      </button>
+      <button
+        type="button"
+        className="control focus-week-control"
+        aria-label={`Focus this week in calendar: ${weekLabel(activeWeek)}`}
+        onClick={() => onFocusWeek(activeWeek)}
+      >
+        Focus this week in calendar
+      </button>
+    </nav>
   );
 }

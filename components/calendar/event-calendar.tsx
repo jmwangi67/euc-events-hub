@@ -14,13 +14,17 @@ import type {
   EventSourceFunc,
   DatesSetArg,
   EventApi,
+  DayHeaderContentArg,
 } from "@fullcalendar/core";
 import {
   DISPLAY_TIME_ZONE,
   easternDate,
   addCalendarDays,
+  formatAllDayDate,
 } from "../../lib/time/eastern";
 import type { Exam } from "../../lib/domain/models";
+import type { DisplayDay } from "./display-busyness";
+import { DayActivityDots, DayActivityContext } from "./day-activity";
 import { listRangeCrossesYears } from "./calendar-events";
 import { getWeeklyPlanningContext } from "../../lib/data/weekly-planning";
 import {
@@ -40,7 +44,11 @@ import { PressurePanel } from "../planner/pressure-panel";
 import { CompactWeeklySummaries } from "../planner/compact-weekly-summaries";
 import { CalendarToolbar } from "./calendar-toolbar";
 import { CalendarItemContent } from "./calendar-item-content";
-import { loadCalendarItems, loadCalendarScheduling } from "./calendar-source";
+import {
+  loadCalendarItems,
+  loadCalendarScheduling,
+  loadCalendarDisplayDays,
+} from "./calendar-source";
 import {
   CalendarSchedulingGuidance,
   EventScopeLegend,
@@ -119,6 +127,34 @@ export function EventCalendar(props: EventCalendarProps) {
         : null,
     [window, planningAudience],
   );
+  const displayDays = useMemo(
+    () =>
+      planning
+        ? loadCalendarDisplayDays(window, filters, planning)
+        : new Map<string, DisplayDay>(),
+    [window, filters, planning],
+  );
+  const displayDay = (day: string) =>
+    displayDays.get(day) ?? { date: day, items: [], filled: 0 };
+  const plannerDayHeader = (info: DayHeaderContentArg) => {
+    if (info.view.type.startsWith("dayGrid")) return info.text;
+    const date = easternDate(info.date.toISOString());
+    return (
+      <span className="planner-date-header">
+        <span
+          className={
+            info.view.type.startsWith("list")
+              ? "fc-list-day-text"
+              : "planner-date-label"
+          }
+          id={"textId" in info ? String(info.textId) : undefined}
+        >
+          {info.text}
+        </span>
+        <DayActivityDots day={displayDay(date)} />
+      </span>
+    );
+  };
   const densityDays = useMemo(
     () => new Map(scheduling?.days.map((day) => [day.date, day]) ?? []),
     [scheduling],
@@ -354,39 +390,31 @@ export function EventCalendar(props: EventCalendarProps) {
           }
         />
       )}
-      {planning && scheduling && (
-        <CalendarSchedulingGuidance
-          days={scheduling.days}
-          showDensity={!!planning.showDensity}
-          list={view.startsWith("list")}
-        />
-      )}
-      {planning && context && view.startsWith("timeGrid") && (
-        <PressurePanel
-          start={
-            view === "timeGridDay"
-              ? window.start
-              : (weeks[0]?.start ?? window.start)
-          }
-          days={view === "timeGridDay" ? 1 : 7}
-          audience={planning.audience}
-          context={context}
-        />
-      )}
-      {planning && !monthSummaries && activeSummaryWeek && (
-        <CompactWeeklySummaries
-          weeks={weeks}
-          activeWeek={activeSummaryWeek}
-          onWeekChange={(start) => setSummarySelection({ date, start })}
-          onOpen={openWeek}
-          onFocusWeek={focusCalendarWeek}
-        />
-      )}
       {!planning && !examReview && <CategoryLegend />}
       <div
         ref={surface}
-        className={`calendar-surface ${monthSummaries ? "planner-month-surface" : ""} ${planning?.showDensity ? "density-enabled" : ""}`}
+        className={`calendar-surface ${planning && view === "timeGridDay" ? "planner-day-surface" : ""} ${monthSummaries ? "planner-month-surface" : ""} ${planning?.showDensity ? "density-enabled" : ""}`}
       >
+        {planning && view === "timeGridDay" && (
+          <>
+            <button
+              type="button"
+              className="control day-edge-nav previous-day"
+              aria-label="Previous day"
+              onClick={() => navigate("prev")}
+            >
+              <span aria-hidden="true">←</span>
+            </button>
+            <button
+              type="button"
+              className="control day-edge-nav next-day"
+              aria-label="Next day"
+              onClick={() => navigate("next")}
+            >
+              <span aria-hidden="true">→</span>
+            </button>
+          </>
+        )}
         <FullCalendar
           key={view}
           ref={calendar}
@@ -449,7 +477,19 @@ export function EventCalendar(props: EventCalendarProps) {
           }
           eventInteractive
           navLinks={false}
-          dayCellContent={(info) => info.dayNumberText}
+          dayHeaderContent={planning ? plannerDayHeader : undefined}
+          dayCellContent={(info) =>
+            planning && view.startsWith("dayGrid") ? (
+              <span className="planner-cell-date">
+                <span>{info.dayNumberText}</span>
+                <DayActivityDots
+                  day={displayDay(easternDate(info.date.toISOString()))}
+                />
+              </span>
+            ) : (
+              info.dayNumberText
+            )
+          }
           dayCellClassNames={(info) => {
             const date = easternDate(info.date.toISOString());
             const week = weeks.find(
@@ -485,6 +525,21 @@ export function EventCalendar(props: EventCalendarProps) {
                     ? "Try another date or restore the calendar display. Analysis remains tied to the proposal."
                     : "Try another date, adjust your search, or clear your filters."}
               </p>
+              {planning && view.startsWith("list") && (
+                <div
+                  className="empty-activity-dates"
+                  aria-label="Broad-scope calendar activity"
+                >
+                  {[...displayDays.values()]
+                    .filter((day) => day.items.length > 0)
+                    .map((day) => (
+                      <span className="empty-activity-date" key={day.date}>
+                        <span>{formatAllDayDate(day.date)}</span>
+                        <DayActivityDots day={day} />
+                      </span>
+                    ))}
+                </div>
+              )}
               <button className="control" onClick={onReset}>
                 {examReview
                   ? "Return to first exam date"
@@ -556,6 +611,51 @@ export function EventCalendar(props: EventCalendarProps) {
           </aside>
         )}
       </div>
+      {planning && (
+        <div className="planner-calendar-context">
+          <p className="field-help activity-explanation">
+            Calendar activity: one dot per displayed commitment, up to five.
+            PSU-wide and national events always count, even when hidden.
+            Proposals are excluded. This is not a scheduling score.
+          </p>
+          {view === "timeGridDay" && (
+            <DayActivityContext day={displayDay(window.start)} />
+          )}
+          {!monthSummaries && view !== "timeGridDay" && activeSummaryWeek && (
+            <CompactWeeklySummaries
+              weeks={weeks}
+              activeWeek={activeSummaryWeek}
+              onWeekChange={(start) => setSummarySelection({ date, start })}
+              onOpen={openWeek}
+              onFocusWeek={focusCalendarWeek}
+            />
+          )}
+          {scheduling && (
+            <CalendarSchedulingGuidance
+              days={scheduling.days}
+              showDensity={!!planning.showDensity}
+              list={view.startsWith("list")}
+            />
+          )}
+          {context && view.startsWith("timeGrid") && (
+            <details className="planner-analysis-details">
+              <summary>
+                Inspect scheduling analysis and exam preparation
+              </summary>
+              <PressurePanel
+                start={
+                  view === "timeGridDay"
+                    ? window.start
+                    : (weeks[0]?.start ?? window.start)
+                }
+                days={view === "timeGridDay" ? 1 : 7}
+                audience={planning.audience}
+                context={context}
+              />
+            </details>
+          )}
+        </div>
+      )}
       {externalSelection && (
         <ExternalEventDetails
           event={externalSelection.event}

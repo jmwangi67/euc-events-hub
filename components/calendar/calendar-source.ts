@@ -28,6 +28,27 @@ import { analyzeNonExamScheduling } from "../../lib/domain/non-exam-scheduling";
 import { getWeeklyPlanningContext } from "../../lib/data/weekly-planning";
 import type { PlanningAudience } from "../../lib/domain/planning-audience";
 import { easternDayStart } from "../../lib/time/eastern";
+import { displayBusynessDays } from "./display-busyness";
+
+/** View-filtered display signal, with the owner's explicit broad-scope exception. */
+export function loadCalendarDisplayDays(
+  range: { start: string; end: string },
+  filters: EventFilters,
+  planning: PlanningCalendarOptions,
+) {
+  const visible = loadCalendarItems(
+    {
+      startStr: easternDayStart(range.start),
+      endStr: easternDayStart(range.end),
+    },
+    filters,
+    planning,
+  );
+  const mandatory = getExternalEvents(range)
+    .filter((event) => event.scope === "psu-wide" || event.scope === "national")
+    .map(toExternalCalendarItem);
+  return displayBusynessDays(range, visible, mandatory);
+}
 
 /** Analysis inputs are loaded independently of every calendar display toggle. */
 export function loadCalendarScheduling(

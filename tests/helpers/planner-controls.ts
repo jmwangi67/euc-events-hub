@@ -12,3 +12,9 @@ export async function openPlannerChoices(page: Page) {
       await dropdown.locator(":scope > summary").click();
   }
 }
+/** Detailed analysis is intentionally closed and below the calendar by default. */
+export async function openPlannerAnalysis(page: Page) {
+  const details = page.locator(".planner-analysis-details");
+  if (!(await details.evaluate((node) => (node as HTMLDetailsElement).open)))
+    await details.locator(":scope > summary").click();
+}
