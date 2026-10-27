@@ -1362,7 +1362,7 @@ button.planner-analyze:hover {
   min-height: 120px;
 }
 .planner-month-surface .planner-week-populated .fc-daygrid-day-frame {
-  min-height: 270px;
+  min-height: 300px;
 }
 .weekly-summary-cell {
   display: flex;
@@ -2698,9 +2698,43 @@ button.planner-analyze:hover {
 
 /* Calendar display activity is separate from analytical scheduling density. */
 .planner-calendar {
-  --color-activity-fill: var(--color-brand-blue);
+  --color-activity-green: #15803d;
+  --color-activity-yellow: #a16207;
+  --color-activity-orange: #c2410c;
+  --color-activity-red: #b91c1c;
+  --color-activity-label: #5c6b7d;
   --color-activity-outline: var(--color-foreground-muted);
   --planner-card-gap: 5px;
+}
+.day-activity-indicator {
+  display: inline-flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  vertical-align: top;
+}
+.day-activity-label {
+  color: var(--color-activity-label);
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+.day-activity-indicator:is(
+  [data-activity-filled="1"],
+  [data-activity-filled="2"]
+) {
+  --color-activity-fill: var(--color-activity-green);
+}
+.day-activity-indicator[data-activity-filled="3"] {
+  --color-activity-fill: var(--color-activity-yellow);
+}
+.day-activity-indicator[data-activity-filled="4"] {
+  --color-activity-fill: var(--color-activity-orange);
+}
+.day-activity-indicator[data-activity-filled="5"] {
+  --color-activity-fill: var(--color-activity-red);
 }
 .day-activity-dots {
   display: inline-flex;
@@ -2711,8 +2745,11 @@ button.planner-analyze:hover {
 }
 .activity-dot {
   display: block;
-  width: 6px;
-  height: 6px;
+  box-sizing: border-box;
+  flex: 0 0 6px;
+  inline-size: 6px;
+  block-size: 6px;
+  aspect-ratio: 1;
   border: 1px solid var(--color-activity-outline);
   border-radius: 50%;
   background: var(--color-surface);
@@ -2729,17 +2766,31 @@ button.planner-analyze:hover {
   gap: 3px;
 }
 .planner-cell-date {
-  align-items: flex-end;
   gap: 2px;
+}
+.planner-calendar .fc .fc-daygrid-day-top {
+  justify-content: center;
+}
+.planner-calendar .fc .fc-col-header-cell-cushion {
+  max-width: 100%;
 }
 .planner-calendar .fc .fc-daygrid-day-number {
   padding: 4px 6px;
+}
+/* Adjacent-month muting must not fade the activity labels or colored dots. */
+.planner-calendar .fc .fc-day-other .fc-daygrid-day-top,
+.planner-calendar .fc .fc-day-other .fc-daygrid-day-number {
+  opacity: 1;
+}
+.planner-calendar .fc .fc-day-other .planner-cell-date > span:first-child {
+  color: var(--color-foreground-muted);
 }
 .planner-date-header .fc-list-day-text {
   float: none;
 }
 .fc-list-day .planner-date-header {
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 .planner-day-surface {
   position: relative;

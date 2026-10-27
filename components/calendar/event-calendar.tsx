@@ -444,6 +444,9 @@ export function EventCalendar(props: EventCalendarProps) {
           // The timeGrid header is a compact region; every additional record
           // remains available in FullCalendar's keyboard-operable popover.
           dayMaxEventRows={view.startsWith("timeGrid") ? 2 : undefined}
+          // FullCalendar's num is the hidden segment count, never the day's
+          // total or activity-dot count (which may include hidden layers).
+          moreLinkContent={planning ? (info) => `+${info.num} more` : undefined}
           events={source}
           datesSet={datesSet}
           nowIndicator

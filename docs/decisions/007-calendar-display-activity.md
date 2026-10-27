@@ -70,3 +70,22 @@ date presence, not the duration, simultaneity, importance or certainty of an ite
 Deep analysis is still needed to assess a proposed time. The hidden PSU-wide and
 national exception means dot counts can exceed visible card counts; the interface
 states that rule explicitly.
+
+## Owner-approved dot presentation refinement
+
+The subsequent dot-refinement request adds centered display labels: Free, Open,
+Light, Moderate, Heavy and Extreme for zero through five filled dots. These words
+are presentation labels only. In particular, Free/Open do not establish
+availability, and Heavy/Extreme are not analytical thresholds or calibrated risk.
+Accessible text explicitly states the recorded-activity interpretation and
+retains the exact count even above five.
+
+Fixed border-box circles, a separate neutral outline, green/yellow/orange/red
+fills and the text label supply consistent, color-independent presentation.
+There are no changes to the counting function, source inclusion, mandatory
+PSU-wide/national exception, independent analytical models or student calendar.
+
+Native overflow counts hidden rendered segments, not activity dots or total
+records. The planner uses explicit `+N more` text. Regression checks distinguish
+three/four cards that fit from genuine overflow, including display-filter and
+range rerenders. FullCalendar continues owning placement and popover interaction.

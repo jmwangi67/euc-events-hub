@@ -229,3 +229,13 @@ Week/Day now use native FullCalendar horizontal overlap layers with bounded, key
 The planner now leads with the calendar and small five-dot activity rows beneath dates. One unique displayed commitment fills one dot, capped at five; PSU-wide and national external events always contribute even with their layers hidden. This view-filtered display remains separate from unchanged scheduling analysis. Proposals and shading are excluded. Exact counts and hidden broad-scope items are explained in accessible labels and Day context. Zero dots do not establish availability.
 
 Day has date-specific context and keyboard-operable previous/next controls at the grid edges. Weekly detail access and full reasons/sources remain below the grid, with integrated Month/2-Weeks side summaries preserved. Experimental exam preparation remains available through the closed analysis disclosure. See [ADR 007](docs/decisions/007-calendar-display-activity.md) and the [rendered review](docs/previews/planner/day-activity/README.md).
+
+### Planner dot labels and overflow refinement
+
+Daily activity dots now include the compact labels Free, Open, Light, Moderate,
+Heavy and Extreme (0–5 fills), uniform centered circles and accessible color
+mapping. The labels describe recorded display activity, not availability or a
+validated pressure score. Counts and hidden PSU-wide/national inclusion remain
+unchanged. Native `+N more` links count additional hidden cards only, separately
+from dots. See the [updated fictional preview gallery](docs/previews/planner/dot-refinement/README.md)
+for responsive screenshots, exact-fit/overflow examples and validation.

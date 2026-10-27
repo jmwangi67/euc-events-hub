@@ -11,7 +11,7 @@ async function sample(page: Page) {
     .click();
 }
 const dot = (page: Page, date: string) =>
-  page.locator(`.fc .day-activity-dots[data-activity-date="${date}"]`);
+  page.locator(`.fc .day-activity-indicator[data-activity-date="${date}"]`);
 async function capture(page: Page, name: string) {
   await page
     .locator(".calendar-region")
@@ -33,19 +33,22 @@ test("daily activity is beneath every Week date and large analysis blocks are be
   const headers = page.locator(".fc-col-header-cell");
   await expect(headers).toHaveCount(7);
   for (const header of await headers.all()) {
-    const dots = header.locator(".day-activity-dots");
+    const dots = header.locator(".day-activity-indicator");
     await expect(dots).toBeVisible();
     await expect(dots).toHaveAttribute("role", "img");
     await expect(dots).toHaveAttribute(
       "aria-label",
-      /of 5 activity dots.*PSU-wide and national.*not a scheduling score/,
+      /of 5 activity dots.*PSU-wide and national.*not availability or a scheduling score/,
     );
     await expect(dots.locator(".activity-dot")).toHaveCount(5);
     const date = header.locator(".planner-date-label");
     expect((await dots.boundingBox())!.y).toBeGreaterThanOrEqual(
       (await date.boundingBox())!.y + (await date.boundingBox())!.height,
     );
-    expect((await dots.boundingBox())!.height).toBeLessThanOrEqual(10);
+    expect(
+      (await dots.locator(".day-activity-dots").boundingBox())!.height,
+    ).toBeLessThanOrEqual(10);
+    expect((await dots.boundingBox())!.height).toBeLessThanOrEqual(24);
   }
   const grid = (await page.locator(".calendar-surface").boundingBox())!;
   expect(
@@ -138,12 +141,12 @@ test("Month and 2 Weeks use per-date dots, uniform tighter gaps and the existing
 }) => {
   await sample(page);
   const cells = page.locator(".fc-daygrid-day");
-  await expect(page.locator(".fc-daygrid-day .day-activity-dots")).toHaveCount(
-    await cells.count(),
-  );
+  await expect(
+    page.locator(".fc-daygrid-day .day-activity-indicator"),
+  ).toHaveCount(await cells.count());
   for (const cell of await cells.all()) {
     const date = await cell.getAttribute("data-date");
-    await expect(cell.locator(".day-activity-dots")).toHaveAttribute(
+    await expect(cell.locator(".day-activity-indicator")).toHaveAttribute(
       "data-activity-date",
       date!,
     );
@@ -169,9 +172,9 @@ test("Month and 2 Weeks use per-date dots, uniform tighter gaps and the existing
   await expect(page.locator(".weekly-summary-column")).toBeVisible();
   await capture(page, "month-spacing");
   await page.getByRole("button", { name: "2 Weeks", exact: true }).click();
-  await expect(page.locator(".fc-daygrid-day .day-activity-dots")).toHaveCount(
-    14,
-  );
+  await expect(
+    page.locator(".fc-daygrid-day .day-activity-indicator"),
+  ).toHaveCount(14);
   await expect(
     page.locator(".weekly-summary-column .weekly-summary-cell"),
   ).toHaveCount(2);
@@ -246,7 +249,9 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
     await sample(page);
     if (width < 1024) {
       const headers = page.locator(".fc-list-day");
-      await expect(headers.first().locator(".day-activity-dots")).toBeVisible();
+      await expect(
+        headers.first().locator(".day-activity-indicator"),
+      ).toBeVisible();
       for (const h of await headers.all()) {
         const labelledBy = await h
           .locator("th")
@@ -256,7 +261,7 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
     }
     await noOverflow(page);
     await page.getByRole("button", { name: "Day", exact: true }).click();
-    const dots = page.locator(".fc-col-header .day-activity-dots");
+    const dots = page.locator(".fc-col-header .day-activity-indicator");
     await expect(dots).toHaveCount(1);
     const prev = page.getByRole("button", {
         name: "Previous day",
