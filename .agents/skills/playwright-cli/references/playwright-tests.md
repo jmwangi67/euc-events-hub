@@ -1,13 +1,11 @@
 # Running Playwright Tests
 
-To run Playwright tests, use the `npx playwright test` command, or a package manager script. To avoid opening the interactive html report, use `PLAYWRIGHT_HTML_OPEN=never` environment variable.
+Use EUC's existing npm scripts and locked `@playwright/test`. To avoid opening the interactive HTML report, use `PLAYWRIGHT_HTML_OPEN=never`. CLI attachment is optional debugging and does not replace rerunning the regression suite. Verify any existing optional CLI version first; missing tools do not authorize downloads.
 
 ```bash
-# Run all tests
-PLAYWRIGHT_HTML_OPEN=never npx playwright test
-
-# Run all tests through a custom npm script
-PLAYWRIGHT_HTML_OPEN=never npm run special-test-command
+# Run the existing production and synthetic development-preview suites
+PLAYWRIGHT_HTML_OPEN=never npm run test:browser
+PLAYWRIGHT_HTML_OPEN=never npm run test:exam-preview
 ```
 
 # Debugging Playwright Tests
@@ -20,7 +18,7 @@ Once instructions containing a session name are printed, use `playwright-cli` to
 
 ```bash
 # Run the test
-PLAYWRIGHT_HTML_OPEN=never npx playwright test --debug=cli
+PLAYWRIGHT_HTML_OPEN=never npm run test:browser -- --debug=cli
 # ...
 # ... debugging instructions for "tw-abcdef" session ...
 # ...

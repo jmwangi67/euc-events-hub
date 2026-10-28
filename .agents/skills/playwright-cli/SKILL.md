@@ -1,10 +1,12 @@
 ---
 name: playwright-cli
-description: Use the official Microsoft Playwright CLI for browser verification, snapshots, screenshots, responsive checks and existing Playwright tests; complements the installed playwright skill.
+description: Use an already available Microsoft Playwright CLI for exploratory snapshots, screenshots and interactive debugging in EUC; use the project's npm scripts for automated regression tests.
 license: See LICENSE
 ---
 
-Prefer an existing supported browser connector when it covers the task. For terminal work use npx --yes --package @playwright/cli playwright-cli if absent. Use fresh snapshot refs. Visual regression requires a real baseline comparison.
+For automated regression testing, follow [EUC browser verification](../playwright/SKILL.md): the existing locked `@playwright/test`, npm scripts and configurations are authoritative. This skill supplies optional exploratory CLI command reference. It never replaces required regression suites or authorizes another test framework.
+
+Use an already available browser connector or a reviewed installed CLI. Do not fetch a missing CLI automatically. Before terminal inspection, verify the existing executable/version using the [non-downloading wrapper](../playwright/scripts/playwright_cli.sh) and its documented `PLAYWRIGHT_CLI_EXPECTED_VERSION` guard. The command examples below assume that prerequisite. Keep output under gitignored `work/playwright/`; use fresh snapshot refs and a real baseline before claiming visual regression coverage. Cleanup commands must target only the session created for this task.
 
 ## Codex integration
 
@@ -266,11 +268,13 @@ playwright-cli --raw localstorage-get theme
 ```
 
 For structured output wrapping every reply as JSON, pass --json
+
 ```bash
 playwright-cli list --json
 ```
 
 ## Open parameters
+
 ```bash
 # Use specific browser when creating session
 playwright-cli open --browser=chrome
@@ -405,19 +409,9 @@ playwright-cli kill-all
 
 ## Installation
 
-Package installation and custom `npm` scripts may require separate approval.
+Discovery does not install packages. A missing optional CLI is a reported limitation, not an instruction to run `npx`, a global install, or an unrestricted latest version. The locked Playwright test runner is already the project's regression tool; its presence does not prove that a separate CLI command is supported.
 
-If global `playwright-cli` command is not available, try a local version via `npx playwright cli`:
-
-```bash
-npx --no-install playwright --version
-```
-
-When local version is available, use `npx playwright cli` in all commands. Otherwise, install `playwright-cli` as a global command:
-
-```bash
-npm install -g @playwright/cli@latest
-```
+Provisioning requires an actual task need and authorization covering the installation. Review/select an exact compatible version and its runtime requirements first, keep optional tooling outside application dependencies, and record the selected version. This review task does not authorize provisioning. See the [shared browser skill](../playwright/SKILL.md) for capability checks and the wrapper's version guard.
 
 ## Example: Form submission
 
@@ -485,13 +479,13 @@ See [references/pr-attachments.md](references/pr-attachments.md) for alt text, i
 
 ## Specific tasks
 
-* **Running and Debugging Playwright tests** [references/playwright-tests.md](references/playwright-tests.md)
-* **Request mocking** [references/request-mocking.md](references/request-mocking.md)
-* **Running Playwright code** [references/running-code.md](references/running-code.md)
-* **Browser session management** [references/session-management.md](references/session-management.md)
-* **Storage state (cookies, localStorage)** [references/storage-state.md](references/storage-state.md)
-* **Test generation (plan / generate / heal)** [references/test-generation.md](references/test-generation.md)
-* **Tracing** [references/tracing.md](references/tracing.md)
-* **Video recording** [references/video-recording.md](references/video-recording.md)
-* **Attaching screenshots and videos to pull requests** [references/pr-attachments.md](references/pr-attachments.md)
-* **Inspecting element attributes** [references/element-attributes.md](references/element-attributes.md)
+- **Running and Debugging Playwright tests** [references/playwright-tests.md](references/playwright-tests.md)
+- **Request mocking** [references/request-mocking.md](references/request-mocking.md)
+- **Running Playwright code** [references/running-code.md](references/running-code.md)
+- **Browser session management** [references/session-management.md](references/session-management.md)
+- **Storage state (cookies, localStorage)** [references/storage-state.md](references/storage-state.md)
+- **Test generation (plan / generate / heal)** [references/test-generation.md](references/test-generation.md)
+- **Tracing** [references/tracing.md](references/tracing.md)
+- **Video recording** [references/video-recording.md](references/video-recording.md)
+- **Attaching screenshots and videos to pull requests** [references/pr-attachments.md](references/pr-attachments.md)
+- **Inspecting element attributes** [references/element-attributes.md](references/element-attributes.md)

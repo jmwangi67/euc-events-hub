@@ -1,8 +1,8 @@
 # Playwright CLI Workflows
 
-Use the wrapper script and snapshot often.
-Assume `PWCLI` is set and `pwcli` is an alias for `"$PWCLI"`.
-In this repo, run commands from `output/playwright/<label>/` to keep artifacts contained.
+Use an already installed, version-verified CLI through the wrapper and snapshot often. Follow [the shared browser skill](../SKILL.md); use the existing npm suites for regression tests. These examples do not authorize installation.
+Assume `PWCLI` is set and `pwcli` is an alias for `bash "$PWCLI"`.
+In this repo, keep exploratory artifacts under gitignored `work/playwright/<label>/`.
 
 ## Standard interaction loop
 

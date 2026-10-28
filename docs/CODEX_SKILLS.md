@@ -38,7 +38,7 @@ These checks establish repository discovery and package compatibility. This PR w
 | Application checks           | Use the existing `.nvmrc`, `package-lock.json`, npm scripts and CI workflow. Node must satisfy `package.json` (`>=22.13.0`).                                                                                                                                                                                                                               |
 | UI/UX local search           | Python 3.10+ and bundled CSV files; no pip dependencies. Example from the repository root: `python3 .agents/skills/ui-ux-pro-max/scripts/search.py "focus not obscured" --domain ux`.                                                                                                                                                                      |
 | Graphify AST                 | Existing `graphifyy==0.9.92`, Python >=3.10, NetworkX, NumPy, RapidFuzz and tree-sitter grammars. No semantic/provider extras or API key. Exact versions installed locally were checked against public PyPI metadata: all 30 packages have universal or compatible CPython 3.12 Linux x86-64 wheels. This is a metadata check, not a cloud execution test. |
-| Browser verification         | Prefer locked project `@playwright/test` and existing npm scripts. The optional `@playwright/cli` helper is separate and can fetch packages when invoked. Confirm browser/network availability first; do not install it automatically.                                                                                                                     |
+| Browser verification         | Use locked project `@playwright/test` and existing npm scripts for regression tests. Optional CLI inspection uses an already installed executable with an exact reviewed version; its wrapper never downloads packages. Confirm browser/runtime availability first.                                                                                        |
 | shadcn / animation examples  | Conditional reference material only. No shadcn configuration or GSAP dependency was added.                                                                                                                                                                                                                                                                 |
 
 Graphify is already installed locally; no additional local installation is needed. On a cloud host where it is absent, first inspect Python, architecture, `graphify --help`, package/network policy and available tools. For a compatible Linux x86-64/Python 3.12 environment, an optional isolated setup is:
@@ -56,3 +56,17 @@ Provision this during environment setup if package downloads are restricted duri
 Use [the EUC architecture skill](../.agents/skills/euc-architecture/SKILL.md). The initial run is `graphify . --code-only`. `.graphifyignore` excludes private data, scratch output, installed dependencies and skill helper code. `/graphify-out/` is also gitignored. Neither an ignore file nor a code-only flag makes a pre-existing mixed graph safe: start with a clean output location.
 
 Keep raw graphs, cache files, local paths, HTML and reports generated from private sources out of commits. This PR retains a [source-checked architectural review](reviews/GRAPHIFY_ARCHITECTURE.md), with no raw generated graph files or private dataset contents.
+
+## Browser testing and optional tooling
+
+`npm run test:browser` and `npm run test:exam-preview` are the authoritative regression suites. The former uses the existing production build; the latter starts a separate synthetic development preview through its existing configuration. CLI snapshots and screenshots supplement those tests. They do not replace regression coverage or justify adding a testing framework.
+
+The `playwright` skill routes verification work; `playwright-cli` retains detailed exploratory commands. Both share the same rules. Optional CLI use requires an existing reviewed executable and `PLAYWRIGHT_CLI_EXPECTED_VERSION` matching its exact `--version` output. `PLAYWRIGHT_CLI_BIN` can select an already installed path. The wrapper exits before browser commands when the executable or expectation is missing or the version differs. It contains no package runner or installer. Its hermetic checks use fake tools and block installers:
+
+```bash
+bash .agents/skills/playwright/scripts/test_playwright_cli.sh
+```
+
+Discovery loads instructions, not installers. Prefer locked project dependencies; a missing optional tool is a limitation unless the current task actually needs it and authorization covers provisioning. Before an authorized download, select and verify an exact compatible package/executable version and runtime requirements. Do not use unrestricted `@latest` examples from upstream references verbatim. Keep optional tools outside the application's dependency manifests. Existing CI browser provisioning uses the project's locked Playwright version and does not provision the optional CLI.
+
+These rules apply to all bundled skills, including future shadcn adoption, motion-library examples and the optional Graphify setup above. No discovery event authorizes a new service, paid API, database or application dependency.

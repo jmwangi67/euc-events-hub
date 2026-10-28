@@ -16,7 +16,7 @@ EUC currently has no shadcn configuration. Use this skill only for explicitly ap
 
 A framework for building ui, components and design systems. Components are added as source code to the user's project via the CLI.
 
-> **IMPORTANT:** Run all CLI commands using the project's package runner: `npx shadcn@latest`, `pnpm dlx shadcn@latest`, or `bunx --bun shadcn@latest` — based on the project's `packageManager`. Examples below use `npx shadcn@latest` but substitute the correct runner for the project.
+> **EUC tooling policy:** Only after explicitly approved shadcn adoption, use an existing reviewed executable with a verified exact version. Missing optional tooling requires a concrete task need and installation authorization; do not fetch packages on discovery. The upstream `npx shadcn@latest` examples below and in references describe command syntax, not a permitted version choice. Resolve them to the reviewed installed executable, or an exact version selected before authorized provisioning. Never run unrestricted latest examples verbatim or add application dependencies just to use this skill.
 
 ## Current Project Context
 

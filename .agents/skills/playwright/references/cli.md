@@ -1,10 +1,10 @@
 # Playwright CLI Reference
 
-Use the wrapper script unless the CLI is already installed globally:
+These exploratory commands assume an already installed CLI whose exact `--version` output has been reviewed and set in `PLAYWRIGHT_CLI_EXPECTED_VERSION`. The wrapper never downloads tools. Follow [the shared browser skill](../SKILL.md) for regression tests and installation policy.
 
 ```bash
 export PWCLI="$PWD/.agents/skills/playwright/scripts/playwright_cli.sh"
-"$PWCLI" --help
+bash "$PWCLI" --help
 ```
 
 Run this path setup from the EUC repository root. Resolve supporting files relative to this SKILL.md from other working directories.
@@ -12,7 +12,7 @@ Run this path setup from the EUC repository root. Resolve supporting files relat
 Optional convenience alias:
 
 ```bash
-alias pwcli="$PWCLI"
+alias pwcli='bash "$PWCLI"'
 ```
 
 ## Core
