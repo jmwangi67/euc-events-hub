@@ -1,0 +1,11 @@
+{
+  "name": "blast-radius",
+  "repository": "cursor/plugins",
+  "source_path": "pstack/skills/blast-radius",
+  "commit": "99b609a72323b70204eab407c622f436e858e112",
+  "stars": 14016,
+  "last_pushed": "2026-10-25T06:24:27Z",
+  "original_sha256": "2e10745b97f5862323dcda3b29ca60d56b5c3c98e37020085d26b48efbe0a436",
+  "adapted": true,
+  "automatic_selection": true
+}

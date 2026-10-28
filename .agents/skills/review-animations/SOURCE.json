@@ -1,0 +1,11 @@
+{
+  "name": "review-animations",
+  "repository": "emilkowalski/skills",
+  "source_path": "skills/review-animations",
+  "commit": "2d228630ba1446365f614a108cb8252f1feda202",
+  "stars": 49590,
+  "last_pushed": "2026-10-11T13:58:36Z",
+  "original_sha256": "6ff590d29e436766135aa3d137be1fac2a867165c7257fc315b189361f1873af",
+  "adapted": true,
+  "automatic_selection": true
+}

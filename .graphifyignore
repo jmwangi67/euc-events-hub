@@ -1,0 +1,9 @@
+# Defense in depth: never analyze private data or task/runtime artifacts.
+data/local/
+work/
+graphify-out/
+node_modules/
+.next/
+.git/
+# Analyze the application, not the development skills' examples and scripts.
+.agents/
