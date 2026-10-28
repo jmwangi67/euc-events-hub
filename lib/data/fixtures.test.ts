@@ -91,7 +91,7 @@ describe("fixture-backed queries", () => {
         filters: {
           audience: { mode: "recommended", majorIds: ["bme"] },
           organizationIds: ["example-process"],
-          categories: ["corporate-recruiting"],
+          categories: ["career-networking"],
         },
       }).map((e) => e.id),
     ).toEqual(["example-industry"]));
@@ -177,7 +177,7 @@ describe("fixture-backed queries", () => {
         termId: "different-term",
       }),
     ).toEqual([]);
-    expect(exams).toHaveLength(2);
+    expect(exams).toHaveLength(7);
   });
   it("rejects malformed, reversed and empty windows", () => {
     expect(() => getEvents({ start: "invalid", end: "2026-10-23" })).toThrow();

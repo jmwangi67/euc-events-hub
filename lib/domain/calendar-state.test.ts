@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getEvents, getMajors, getOrganizations } from "../data/fixtures";
+import {
+  getEvents,
+  getMajors,
+  getStudentOrganizations,
+} from "../data/fixtures";
 import {
   clearDiscoveryFilters,
   discoveryFilters,
@@ -8,7 +12,7 @@ import {
 } from "./calendar-state";
 const options = {
   majorIds: getMajors().map((major) => major.id),
-  organizationIds: getOrganizations().map((org) => org.id),
+  organizationIds: getStudentOrganizations().map((org) => org.id),
 };
 const parse = (query = "") =>
   parseCalendarState(new URLSearchParams(query), "2026-10-19", options);
@@ -32,6 +36,8 @@ describe("student discovery and shareable state", () => {
     expect(result).toEqual([
       "example-welcome",
       "example-industry",
+      "example-gbm",
+      "example-social",
       "example-design-meeting",
       "example-design-days",
       "example-night-build",
@@ -43,7 +49,7 @@ describe("student discovery and shareable state", () => {
     expect(ids("mode=recommended&majors=bme,che")).toContain(
       "example-process-lab",
     );
-    expect(ids("mode=recommended")).toEqual(["example-welcome"]);
+    expect(ids("mode=recommended")).toEqual(ids());
   });
   it("keeps majors and host filters independent and combines category filters", () => {
     expect(
@@ -57,6 +63,8 @@ describe("student discovery and shareable state", () => {
     expect(ids("categories=corporate-recruiting,technical-workshop")).toEqual([
       "example-process-lab",
       "example-industry",
+      "example-open-studio",
+      "example-night-build",
     ]);
   });
   it("searches titles and descriptions without case or surrounding whitespace sensitivity", () => {
@@ -88,6 +96,8 @@ describe("student discovery and shareable state", () => {
       mode: "all",
       majorIds: [],
       organizationIds: [],
+      clusterIds: [],
+      universityOnly: false,
       categories: [],
       search: "",
     });
@@ -104,7 +114,7 @@ describe("student discovery and shareable state", () => {
     );
     expect(state.date).toBe("2026-10-19");
     expect(state.view).toBeUndefined();
-    expect(state.mode).toBe("all");
+    expect(state.mode).toBe("recommended");
     expect(state.majorIds).toEqual(["bme"]);
     expect(state.organizationIds).toEqual([]);
     expect(state.categories).toEqual([]);

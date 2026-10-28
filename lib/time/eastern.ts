@@ -116,18 +116,25 @@ export function formatEventTime(event: {
 }
 
 /** Presentation only: use institution-local clocks, never the browser's zone. */
-export function formatEventClockRange(event: {
-  start: string;
-  end: string;
-}): string {
-  const clock = new Intl.DateTimeFormat("en-US", {
+export function formatEventClock(instant: string, compact = false): string {
+  const label = new Intl.DateTimeFormat("en-US", {
     timeZone: DISPLAY_TIME_ZONE,
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  });
-  const start = clock.format(new Date(event.start));
-  const end = clock.format(new Date(event.end));
+  }).format(new Date(instant));
+  return compact ? label.replace(":00", "") : label;
+}
+
+export function formatEventClockRange(
+  event: {
+    start: string;
+    end: string;
+  },
+  compact = false,
+): string {
+  const start = formatEventClock(event.start, compact);
+  const end = formatEventClock(event.end, compact);
   const samePeriod = start.slice(-2) === end.slice(-2);
   const range = `${samePeriod ? start.slice(0, -3) : start}–${end}`;
   // Fall-back can repeat or reverse wall-clock labels. State elapsed time to

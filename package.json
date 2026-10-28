@@ -15,7 +15,11 @@
     "test:watch": "vitest",
     "format": "prettier --write app components lib data tests .github package.json tsconfig.json *.mjs *.ts README.md",
     "format:check": "prettier --check app components lib data tests .github package.json tsconfig.json *.mjs *.ts README.md",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "exams:import": "node exam-tools.mjs import",
+    "exams:validate": "node exam-tools.mjs validate",
+    "exams:audit-build": "node exam-tools.mjs audit-build",
+    "test:exam-preview": "playwright test --config playwright.exam-preview.config.ts"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "5.3.0",

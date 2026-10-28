@@ -1,4 +1,3 @@
-
 # EUC Events Hub: Architecture Proposal
 
 **Status:** Draft for review  
@@ -298,7 +297,7 @@ However:
 - The score should not be represented as a guaranteed attendance prediction.
 - Display filters should not silently change the analysis scope.
 
-**A numerical 0–100 scheduling-pressure score is not required for Milestone 1.**
+**A numerical overall scheduling-pressure score is not authorized for this prototype.** ADR 003 documents the approved PR #5 expansion: weekly factual counts, independent major/academic-level/cluster audiences, significant external scenarios, and a separately labeled experimental exam-preparation model. Overall weighting/aggregation remains a reviewed design, with `score: null`.
 
 The initial planner will show known scheduling conflicts.
 
@@ -549,7 +548,7 @@ Implement:
 - Explanatory conflict details.
 - Priority-star visual examples where useful.
 
-Do not implement production authentication, live data synchronization, or numerical pressure scoring during this milestone.
+Do not implement production authentication, live data synchronization, or numerical overall pressure scoring. The approved PR #5 expansion adds weekly intelligence and a separate experimental exam-preparation model under ADR 003.
 
 ## 16. Key Risks
 
@@ -580,3 +579,45 @@ The following decisions remain unresolved:
 8. Newsletter delivery infrastructure.
 
 These decisions should be resolved when their corresponding implementation milestones approach, rather than blocking initial frontend development.
+
+## Approved Milestone 1C expansion (PR #5)
+
+See [ADR 003](decisions/003-weekly-planning-intelligence.md) for audience semantics, curated many-to-many clusters, typical-level exam uncertainty, separately classified synthetic PSU-wide, local-context and national commitments, weekly Sunday–Saturday summaries, per-major × academic-level preparation, exact interval limits and examples, and the overall-score approval gate. Calendar display toggles never narrow analysis. The student calendar and existing module/technology boundaries remain intact. No live schedules, empirical attendance claims, dark mode or production services are introduced.
+
+## PR #5 final owner requirements and review corrections
+
+ADR 003 now governs the corrected prototype: relevant commitments and preparation are analyzed per selected major × academic-level cell, without pooling disjoint majors or inventing enrollment shares. Curated many-to-many clusters add event relevance only through explicit event targeting. Unmapped exams remain source-labeled audience-uncertain cautions and add no numerical preparation. Typical, atypical and unknown-level strengths are centralized candidate parameters.
+
+Overall eligibility is limited to explicitly designated PSU-wide commitments, curated major national events, and commitments relevant to the selected audience. Ordinary nearby concerts/local events remain context-only unless an explicit audience relationship qualifies them. Visibility never narrows analysis; factual counts remain separate from pressure.
+
+Planner desktop views are Month, 2 Weeks (date grid), 1 Week (hourly), Day (hourly), and List. Month and 2 Weeks have weekly summaries after Saturday; compact lists place a selectable weekly summary above events and keep empty weeks concise. The student calendar retains its approved four-view experience.
+
+Week/Day lead with overall scoring unavailable pending methodology review (`score: null`). Optional experimental preparation reports evening references, exact daily/proposal interval maxima and affected cells; known start cutoffs and unknown-hour ranges are distinct from direct overlaps. Saturday preparation may come from an exam in the following week without changing factual weekly exam counts. No overall score, thresholds, attendance probability or dark mode is introduced.
+
+**Future enhancement: Smart Scheduling Recommendations.** Comparing prospective dates and suggesting lower-conflict alternatives is deferred; no recommendation algorithm or UI is authorized in PR #5. See the review reconciliation and updated Claude handoff before independent re-review and any merge decision.
+
+## PR #5 master refinement: independent scheduling indicators
+
+[ADR 004](decisions/004-independent-scheduling-indicators.md) adds a pure non-exam scheduling module alongside the preserved ADR 003 exam-preparation model. `analyzeNonExamScheduling` accepts non-exam events, organizations, a selected audience, an exact instant range, and centralized provisional policy parameters. It accepts neither exams nor display filters. Its source-aware constraints, per-cell concurrency segments, date summaries, all-day counts, timing uncertainties, and cautions remain separate from preparation calculations. Both its numerical score and the overall score remain `null`.
+
+Factual density measures the maximum **0/1/2/3+ simultaneous known-time commitments within one selected major × academic-level cell**, never a pooled population or attendance estimate. Unknown clocks, conflicting source alternatives, all-day engineering records, academic-break departures, and context-only Local events do not generate fabricated timed density. Their appropriate separate counts, date-level cautions, and provenance remain available. Timing and audience metadata stay associated within source alternatives before identity deduplication.
+
+Policy configuration defines THON avoidance and preparation-week precedence, explicit major Local music buffers, documented academic-break departure cautions, relevant career-fair windows, and ordinary actual intervals. Day policies use Eastern calendar arithmetic; hour buffers use elapsed instants. The data layer calls `policySourceWindow` for sufficient source lookaround and retains the separate exam lookahead. Calculation windows intersect exact proposed hours; calendar callers provide Eastern day boundaries. See ADR 004 for default values and uncertainty semantics.
+
+The existing FullCalendar adapter adds optional noninteractive density backgrounds, count legends, and accessible policy reasons. Event-scope classification, non-exam density, and experimental preparation use separate semantic tokens and presentations. Event cards and dialog activation remain interactive above overlays. Planner caution visibility, density visibility, ordinary display filters, and analytical audience eligibility are distinct controls. The student calendar continues to use its approved views and published-only discovery; it does not automatically acquire planner density.
+
+Preparation-range bars show a solid lower bound and striped uncertainty to the upper bound without inventing a midpoint. Equivalent cell results may be grouped only for presentation; complete sources and methodology remain in optional disclosures. This refinement introduces no new infrastructure, service, dependency, persistence, or ingestion pathway. Specific provisional policy advice is now authorized; automated candidate-date ranking and numerical overall/non-exam scoring remain deferred.
+
+## PR #5 student discovery and host identity refinement
+
+[ADR 005](decisions/005-student-discovery-and-host-identity.md) authorizes six public categories with lossless legacy migration and explicit event subtypes, including preserved career-fair policy behavior. Unresolved legacy purposes remain published records with an explanatory review flag. The existing Organization model is extended with structured hosting identity, parent units, full/compact names and separate identity sources; no duplicate host model is introduced.
+
+Public discovery uses selected major relevance AND active student-organization/student-host-membership cluster/category restrictions, with OR within each dimension. University entities stay in the shared host registry for rendering and analysis, but are excluded from student organization choices, proposal-host selection and cluster memberships. Department events remain discoverable by major or the separate University Events filter; the planner's university-card visibility control never narrows scheduling analysis. Empty filters impose no restriction. Host membership discovery never changes the planner's explicit cluster-targeting semantics. Source-backed institutional badges are presentation only, using an original generic SVG rather than an official trademark. Student category colors remain separate from planner scope/density palettes.
+
+The planner's permanent sidebar is removed in favor of collapsible dropdown controls and an independent local-proposal disclosure above the full-width calendar. All existing proposal validation, audience selection, display visibility, density, source uncertainty, independent indicators, five views and inline weekly summaries remain. Exam mathematics and numerical overall/non-exam score gates are unchanged. No new dependency, service, persistence, authentication or live data is introduced. Owner visual acceptance remains pending.
+
+## Milestone 2A.0: private academic staging
+
+[ADR 006](decisions/006-local-exam-import-and-review.md) adds pure `lib/exams/` versioned parsing, validation, normalization, identity reconciliation, range queries and explicit preparation eligibility. Offline tooling reads/writes only ignored local exam storage. The server-only loader guards private reads by development mode, explicit flag and loopback request; a separate `/planner/exam-preview` reuses the existing calendar and details dialog without mixing records into fictional planner analysis. Production denies access and excludes private storage from file tracing. Private development caches are isolated from production output.
+
+Multi-date exams remain one canonical occurrence with multiple retained source claims and distinct possible-only dates. Source certainty, verification, publication workflow, permissions and audience review are independent. An explicit compatibility adapter admits only sufficiently reviewed single-date records to the existing model; default-hour and multi-date records remain review-only. Formulae, major × year cells, non-exam independence and null score gates are unchanged. No database, production authentication, upload/publication endpoint or admin UI is introduced. See the [local setup/contract guide](LOCAL_EXAM_IMPORT.md) and [Milestone 2A checklist](milestones/2A-ACADEMIC-EXAM-ADMINISTRATION.md).

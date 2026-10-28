@@ -1,0 +1,103 @@
+.panel {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.panel h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+.unavailable {
+  border: 1px dashed var(--color-control-border);
+  padding: 10px 12px;
+  background: var(--color-surface-muted);
+  font-size: 13px;
+  color: var(--color-foreground-muted);
+}
+.days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+.day {
+  min-width: 0;
+  border-top: 2px solid var(--color-border);
+  padding: 12px 0;
+  font-size: 13px;
+}
+.day h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.day p {
+  margin: 6px 0;
+}
+.day summary,
+.panel > details > summary {
+  cursor: pointer;
+  color: var(--color-primary);
+  padding: 8px 0;
+}
+.guidance {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  border: 1px solid var(--color-control-border);
+  padding: 10px;
+  margin: 10px 0;
+  background: var(--color-surface-muted);
+  color: var(--color-brand-navy);
+}
+.guidance > span {
+  border: 1px solid currentColor;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex: none;
+  font-weight: 700;
+}
+.guidance p {
+  margin: 4px 0 0;
+}
+.guidance[data-guidance="avoid-scheduling"] {
+  background: var(--color-brand-navy);
+  color: var(--color-foreground-inverse);
+  border: 2px solid var(--color-brand-navy);
+}
+.guidance[data-guidance="avoid-scheduling"] :global(.field-help) {
+  color: inherit;
+}
+.guidance[data-guidance="scheduling-caution"] {
+  border-style: dashed;
+}
+.records,
+.reasons {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+.records > li,
+.reasons > li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.records p {
+  margin: 6px 0;
+}
+.records summary {
+  cursor: pointer;
+  color: var(--color-primary);
+  padding: 6px 0;
+}
+@media (forced-colors: active) {
+  .guidance,
+  .unavailable {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}

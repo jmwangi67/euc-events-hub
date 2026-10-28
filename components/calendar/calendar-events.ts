@@ -1,6 +1,6 @@
 import type { EventInput } from "@fullcalendar/core";
 import type { Event } from "../../lib/domain/models";
-import { EVENT_CATEGORIES } from "../../lib/domain/event-categories";
+import { categoryLabel } from "../../lib/domain/event-categories";
 import {
   formatEventClockRange,
   addCalendarDays,
@@ -18,7 +18,11 @@ export function toCalendarEvent(event: Event): EventInput {
     allDay: event.allDay,
     classNames: [`category-${event.category}`],
     extendedProps: {
-      category: EVENT_CATEGORIES[event.category],
+      category: categoryLabel(event.category),
+      eventType: event.category,
+      subtype: event.subtype,
+      categoryMappingNote: event.categoryMappingNote,
+      location: event.location,
       timeLabel: formatEventTime(event),
       listTimes: listEventTimes(event),
     },
@@ -30,13 +34,13 @@ export function listEventTimes(
   event: Pick<Event, "allDay" | "start" | "end">,
 ): string[] {
   if (event.allDay) return ["All day"];
-  const [range, elapsed] = formatEventClockRange(event).split(" (");
+  const [range, elapsed] = formatEventClockRange(event, true).split(" (");
   const days =
     (Date.parse(easternDate(event.end)) -
       Date.parse(easternDate(event.start))) /
     86400000;
   // Same-period ranges fit as a unit; otherwise break only between full clocks.
-  const labels = /AM.*PM|PM.*AM/.test(range) ? range.split(/(?<=–)/) : [range];
+  const labels = [range];
   if (elapsed) labels.push(`(${elapsed}`);
   if (days > 0) labels.push(days === 1 ? "Next day" : `+${days} days`);
   return labels;
