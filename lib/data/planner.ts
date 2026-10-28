@@ -4,7 +4,9 @@ import { getEvents, getExams } from "./fixtures";
 import { getNonExamAnalysisRecords } from "./weekly-planning";
 
 /** Fetch proposal-window identities and all their source alternatives, independent of display. */
-export function getProposalContext(proposal: Proposal) {
+export function getProposalContext(
+  proposal: Pick<Proposal, "start" | "end"> & Partial<Proposal>,
+) {
   const window = {
     start: easternDate(proposal.start),
     end: addCalendarDays(
@@ -19,7 +21,9 @@ export function getProposalContext(proposal: Proposal) {
 }
 
 /** Full proposal days plus the following week for preparation; visibility is never an input. */
-export function getProposalIntelligenceContext(proposal: Proposal) {
+export function getProposalIntelligenceContext(
+  proposal: Pick<Proposal, "start" | "end"> & Partial<Proposal>,
+) {
   const window = {
     start: easternDate(proposal.start),
     end: addCalendarDays(

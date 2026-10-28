@@ -25,7 +25,7 @@ import { analyzePlanningProposal } from "./proposal-analysis";
 import {
   loadCalendarItems,
   loadCalendarScheduling,
-} from "../../components/calendar/calendar-source";
+} from "../data/test-helpers/calendar";
 import type { PlanningCalendarOptions } from "../../components/calendar/calendar-types";
 
 const hosts = getOrganizations();

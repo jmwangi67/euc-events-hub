@@ -12,6 +12,7 @@ import type {
   Organization,
   Exam,
   AcademicLevel,
+  OrganizationCluster,
 } from "../../lib/domain/models";
 import type { PlannerCalendarView } from "../../lib/domain/planner-calendar-state";
 import {
@@ -19,9 +20,13 @@ import {
   proposalSchema,
   type Proposal,
 } from "../../lib/domain/planning";
-import { getEventById } from "../../lib/data/fixtures";
+import { useDataQuery } from "../../lib/client/use-data-query";
+import {
+  eventResponseSchema,
+  planningContextSchema,
+} from "../../lib/data/contracts";
+import { DataStatus } from "../data-status";
 import { studentOrganizations } from "../../lib/domain/hosting";
-import { getProposalIntelligenceContext } from "../../lib/data/planner";
 import { analyzePlanningProposal } from "../../lib/domain/proposal-analysis";
 import { ProposalFactors } from "./proposal-factors";
 import { SelectionDropdown } from "../filters/selection-dropdown";
@@ -42,7 +47,6 @@ import {
   ALL_LEVELS,
   ACADEMIC_LEVELS,
 } from "../../lib/domain/planning-audience";
-import { getOrganizationClusters } from "../../lib/data/weekly-planning";
 import { ExamDetails } from "./exam-details";
 
 type Draft = {
@@ -65,14 +69,28 @@ const emptyDraft = (date: string): Draft => ({
   startOccurrence: "",
   endOccurrence: "",
 });
-export function OrganizationPlanner({
+export function OrganizationPlanner(props: {
+  majors: Major[];
+  organizations: Organization[];
+  clusters: OrganizationCluster[];
+  initialDate: string;
+}) {
+  if (!props.majors.length || !studentOrganizations(props.organizations).length)
+    return (
+      <p role="status">Planner unavailable: no planning reference data.</p>
+    );
+  return <LoadedOrganizationPlanner {...props} />;
+}
+function LoadedOrganizationPlanner({
   majors,
   organizations,
   initialDate,
+  clusters,
 }: {
   majors: Major[];
   organizations: Organization[];
   initialDate: string;
+  clusters: OrganizationCluster[];
 }) {
   const studentOrgs = useMemo(
     () => studentOrganizations(organizations),
@@ -86,7 +104,6 @@ export function OrganizationPlanner({
     ...ALL_LEVELS,
   ]);
   const [clusterIds, setClusterIds] = useState<string[]>([]);
-  const clusters = useMemo(() => getOrganizationClusters(), []);
   const audience = useMemo(
     () => ({ majorIds, academicLevels, clusterIds }),
     [majorIds, academicLevels, clusterIds],
@@ -109,19 +126,29 @@ export function OrganizationPlanner({
   const titleInput = useRef<HTMLInputElement>(null);
   const mobile = useCompactCalendar();
   const activeView = mobile && view !== "timeGridDay" ? "listMonth" : view;
-  const selectedEvent = selectedId ? getEventById(selectedId) : undefined;
+  const detail = useDataQuery(
+    selectedId ? { path: "/api/data/event", body: { id: selectedId } } : null,
+    eventResponseSchema,
+  );
+  const selectedEvent = detail.data?.event;
   const organization = studentOrgs.find((org) => org.id === organizationId)!;
   const filters = useMemo(
     () => ({ audience: { mode: "recommended" as const, majorIds } }),
     [majorIds],
   );
-  const proposalContext = useMemo(
-    () =>
-      proposal
-        ? { ...getProposalIntelligenceContext(proposal), organizations }
-        : null,
-    [proposal, organizations],
+  const intelligence = useDataQuery(
+    proposal
+      ? {
+          path: "/api/data/planning",
+          body: {
+            kind: "proposal",
+            range: { start: proposal.start, end: proposal.end },
+          },
+        }
+      : null,
+    planningContextSchema,
   );
+  const proposalContext = intelligence.data;
   const proposalAnalysis = useMemo(
     () =>
       proposal && proposalContext
@@ -245,7 +272,8 @@ export function OrganizationPlanner({
     setDate(easternDate(result.data.start));
   }
   function sample() {
-    const org = studentOrgs.find((org) => org.id === "example-process")!;
+    const org =
+      studentOrgs.find((org) => org.id === "example-process") ?? initialOrg;
     setOrganizationId(org.id);
     setMajorIds(planningAudience(org));
     setAcademicLevels([...ALL_LEVELS]);
@@ -625,13 +653,20 @@ export function OrganizationPlanner({
           </form>
         </details>
         <div className="planner-workspace">
-          <ConflictPanel
-            proposal={proposal}
-            conflicts={proposalAnalysis?.conflicts ?? []}
-            majors={majors}
-            onEventSelect={setSelectedId}
-            onExamSelect={setSelectedExam}
+          <DataStatus
+            status={intelligence.status}
+            retry={intelligence.retry}
+            label="proposal intelligence"
           />
+          {(!proposal || proposalAnalysis) && (
+            <ConflictPanel
+              proposal={proposal}
+              conflicts={proposalAnalysis?.conflicts ?? []}
+              majors={majors}
+              onEventSelect={setSelectedId}
+              onExamSelect={setSelectedExam}
+            />
+          )}
           {proposalAnalysis && proposalContext && (
             <ProposalFactors
               analysis={proposalAnalysis}
@@ -659,6 +694,19 @@ export function OrganizationPlanner({
           </section>
         </div>
       </div>
+      <DataStatus
+        status={detail.status}
+        retry={detail.retry}
+        label="event details"
+      />
+      {selectedId && detail.status === "ready" && !selectedEvent && (
+        <p role="status">
+          Event unavailable.{" "}
+          <button className="text-button" onClick={() => setSelectedId(null)}>
+            Close
+          </button>
+        </p>
+      )}
       {selectedEvent && (
         <EventDetails
           event={selectedEvent}

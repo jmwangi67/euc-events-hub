@@ -1,10 +1,6 @@
 import { StudentCalendar } from "../components/calendar/student-calendar";
-import { getOrganizationClusters } from "../lib/data/weekly-planning";
-import {
-  getMajors,
-  getOrganizations,
-  getStudentOrganizations,
-} from "../lib/data/fixtures";
+import { loadReferenceData } from "../lib/server/data/queries";
+import { studentOrganizations } from "../lib/domain/hosting";
 import { parseCalendarState } from "../lib/domain/calendar-state";
 import { easternDate } from "../lib/time/eastern";
 
@@ -18,21 +14,21 @@ export default async function Home({
     if (typeof value === "string") params.set(key, value);
     else if (value?.length) params.set(key, value[0]);
   }
-  const majors = getMajors();
-  const organizations = getOrganizations();
+  const { majors, organizations, clusters } = await loadReferenceData();
   const state = parseCalendarState(
     params,
     easternDate(new Date().toISOString()),
     {
       majorIds: majors.map((major) => major.id),
-      organizationIds: getStudentOrganizations().map((org) => org.id),
-      clusterIds: getOrganizationClusters().map((cluster) => cluster.id),
+      organizationIds: studentOrganizations(organizations).map((org) => org.id),
+      clusterIds: clusters.map((cluster) => cluster.id),
     },
   );
   return (
     <main id="main" className="application-main">
       <StudentCalendar
         initialState={state}
+        clusters={clusters}
         majors={majors}
         organizations={organizations}
       />

@@ -1,20 +1,12 @@
 import { events, exams, organizations, majors } from "../../data/fixtures";
 import { dateOnlySchema } from "../domain/models";
-import type { Event, EventCategory, Exam } from "../domain/models";
+import type { Event, Exam } from "../domain/models";
 import { isEventRelevant } from "../domain/relevance";
-import type { MajorSelection } from "../domain/relevance";
 import { hasUniversityHost, studentOrganizations } from "../domain/hosting";
 import { addCalendarDays, easternDayStart } from "../time/eastern";
 
-export type DateWindow = { start: string; end: string };
-export type EventFilters = {
-  audience?: MajorSelection;
-  organizationIds?: readonly string[];
-  categories?: readonly EventCategory[];
-  clusterIds?: readonly string[];
-  universityOnly?: boolean;
-  search?: string;
-};
+import type { DateWindow, EventFilters } from "./contracts";
+export type { DateWindow, EventFilters } from "./contracts";
 
 /** Public query windows are Eastern date-only boundaries [start, end). */
 function parseWindow(window: DateWindow): { start: number; end: number } {

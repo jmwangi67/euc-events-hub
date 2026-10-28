@@ -1,5 +1,5 @@
 import { dateOnlySchema, eventCategorySchema } from "./models";
-import type { EventFilters } from "../data/fixtures";
+import type { EventFilters } from "../data/contracts";
 
 export const CALENDAR_VIEWS = [
   "dayGridMonth",
