@@ -1,0 +1,11 @@
+{
+  "name": "ui-ux-pro-max",
+  "repository": "nextlevelbuilder/ui-ux-pro-max-skill",
+  "source_path": ".claude/skills/ui-ux-pro-max",
+  "commit": "d14efff8ed1faa4187f004f79926f428c8074ec7",
+  "stars": 140314,
+  "last_pushed": "2026-10-23T10:06:31Z",
+  "original_sha256": "ea087c341bfb5b23195c7302027268ede86da802554c18a5c4896a6017b439f9",
+  "adapted": true,
+  "automatic_selection": true
+}

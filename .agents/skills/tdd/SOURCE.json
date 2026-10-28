@@ -1,0 +1,11 @@
+{
+  "name": "tdd",
+  "repository": "cursor/plugins",
+  "source_path": "pstack/skills/tdd",
+  "commit": "99b609a72323b70204eab407c622f436e858e112",
+  "stars": 14016,
+  "last_pushed": "2026-10-25T06:24:27Z",
+  "original_sha256": "eeb868e2dfebee528d730a67d7b17498fac4bb85dec2e38bc5c5176aca4d5d2f",
+  "adapted": true,
+  "automatic_selection": true
+}

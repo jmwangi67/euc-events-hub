@@ -1,0 +1,11 @@
+{
+  "name": "interrogate",
+  "repository": "cursor/plugins",
+  "source_path": "pstack/skills/interrogate",
+  "commit": "99b609a72323b70204eab407c622f436e858e112",
+  "stars": 14016,
+  "last_pushed": "2026-10-25T06:24:27Z",
+  "original_sha256": "a16dfe179005abc22a4651b82f25b0c8ab953284276efe4e6dc341958fb63647",
+  "adapted": true,
+  "automatic_selection": true
+}

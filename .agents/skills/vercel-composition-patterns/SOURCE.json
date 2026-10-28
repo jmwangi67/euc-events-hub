@@ -1,0 +1,11 @@
+{
+  "name": "vercel-composition-patterns",
+  "repository": "vercel-labs/agent-skills",
+  "source_path": "skills/composition-patterns",
+  "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+  "stars": 33001,
+  "last_pushed": "2026-10-14T17:58:45Z",
+  "original_sha256": "e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3",
+  "adapted": true,
+  "automatic_selection": true
+}

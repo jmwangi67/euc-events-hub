@@ -1,0 +1,11 @@
+{
+  "name": "architect",
+  "repository": "cursor/plugins",
+  "source_path": "pstack/skills/architect",
+  "commit": "99b609a72323b70204eab407c622f436e858e112",
+  "stars": 14016,
+  "last_pushed": "2026-10-25T06:24:27Z",
+  "original_sha256": "31f8e97a52bfa5432edd61f68ade2a8632ef0bacbc2d2a6802d7a0e6821944ac",
+  "adapted": true,
+  "automatic_selection": true
+}

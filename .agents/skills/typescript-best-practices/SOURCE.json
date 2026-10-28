@@ -1,0 +1,11 @@
+{
+  "name": "typescript-best-practices",
+  "repository": "cursor/plugins",
+  "source_path": "pstack/skills/typescript-best-practices",
+  "commit": "99b609a72323b70204eab407c622f436e858e112",
+  "stars": 14016,
+  "last_pushed": "2026-10-25T06:24:27Z",
+  "original_sha256": "ec1dac086d3708e5940d45d250c30a37dd953b4e3cb2ca0692f5851d7a039e27",
+  "adapted": true,
+  "automatic_selection": true
+}

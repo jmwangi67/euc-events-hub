@@ -1,0 +1,11 @@
+{
+  "name": "playwright-cli",
+  "repository": "microsoft/playwright-cli",
+  "source_path": "skills/playwright-cli",
+  "commit": "b1a5903c5b633b8c9f843ad7b629c2a78437040c",
+  "stars": 14617,
+  "last_pushed": "2026-10-19T21:35:05Z",
+  "original_sha256": "9bba755285a4c9ad72a4a41b9c7baef6fb516d329c0b44ed0573715f4479b906",
+  "adapted": true,
+  "automatic_selection": true
+}

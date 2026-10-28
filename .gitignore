@@ -158,3 +158,6 @@ vite.config.ts.timestamp-*
 # Browser test artifacts
 /test-results/
 /playwright-report/
+
+# Regenerable local architecture graphs and extraction caches
+/graphify-out/

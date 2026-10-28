@@ -1,0 +1,11 @@
+{
+  "name": "animate",
+  "repository": "emilkowalski/skills",
+  "source_path": "skills/animate",
+  "commit": "2d228630ba1446365f614a108cb8252f1feda202",
+  "stars": 49590,
+  "last_pushed": "2026-10-11T13:58:36Z",
+  "original_sha256": "b8ede161270458e6ae2e45e8a1985373515d4c63de5568ddb0f9012d7634356c",
+  "adapted": true,
+  "automatic_selection": true
+}

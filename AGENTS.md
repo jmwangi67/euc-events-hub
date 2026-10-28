@@ -531,3 +531,14 @@ Do not add features merely because they are technically interesting.
 Do not silently broaden scope.
 
 When uncertain, identify the specific issue, explain reasonable alternatives, and request a decision before making consequential architectural changes.
+
+## 17. Repository Skills
+
+EUC-relevant skills are checked into `.agents/skills/` for local and cloud discovery. Read [the setup and scope guide](docs/CODEX_SKILLS.md) when preparing a new environment. Select only skills relevant to the assignment; these instructions, the owner's request, and approved project documents take priority over generic design examples.
+
+- Use `euc-architecture` for Graphify analysis. Use local code-only AST extraction; never request or configure a paid LLM API. Exclude `data/local/` and keep generated graphs untracked.
+- Preserve the existing FullCalendar wrapper, semantic tokens, IBM Plex Sans, and Eastern Time behavior. UI guidance does not authorize a redesign.
+- The shadcn skill is available for an explicitly approved future adoption. This repository has no shadcn setup; do not initialize it or add a component library merely because the skill is present.
+- Prefer the existing locked Playwright test suite. Browser CLI helpers and GSAP examples are optional tools, not instructions to add dependencies. Check host capabilities before using them.
+- Discovering a skill does not authorize installation. Prefer locked project tools. Optional packages, browsers or services require an actual task need and authorization covering provisioning; select and verify an exact version before an authorized download. Treat unversioned or `@latest` upstream examples as syntax references, never automatic setup commands. Do not add paid APIs or application dependencies through a skill.
+- Future Supabase work requires its own approved milestone. Keep database access and authorization out of pure domain calculations.

@@ -1,0 +1,11 @@
+{
+  "name": "shadcn",
+  "repository": "shadcn-ui/ui",
+  "source_path": "skills/shadcn",
+  "commit": "481d523374745e77d0cf9c53a4115ab5dd7c8481",
+  "stars": 126514,
+  "last_pushed": "2026-10-25T08:52:32Z",
+  "original_sha256": "93951e5e83f616a3e046491c00d770bd54c0a64164706cd1191822a233d27592",
+  "adapted": true,
+  "automatic_selection": true
+}
