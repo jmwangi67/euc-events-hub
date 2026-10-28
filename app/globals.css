@@ -2739,24 +2739,21 @@ button.planner-analyze:hover {
 .day-activity-dots {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   height: 8px;
   flex: none;
 }
 .activity-dot {
   display: block;
-  box-sizing: border-box;
-  flex: 0 0 6px;
-  inline-size: 6px;
-  block-size: 6px;
-  aspect-ratio: 1;
-  border: 1px solid var(--color-activity-outline);
-  border-radius: 50%;
-  background: var(--color-surface);
+  flex: 0 0 8px;
+  inline-size: 8px;
+  block-size: 8px;
+  stroke: var(--color-activity-outline);
+  fill: var(--color-surface);
 }
 .activity-dot.filled {
-  border-color: var(--color-activity-fill);
-  background: var(--color-activity-fill);
+  stroke: var(--color-activity-fill);
+  fill: var(--color-activity-fill);
 }
 .planner-date-header,
 .planner-cell-date {
@@ -2882,11 +2879,11 @@ button.planner-analyze:hover {
 }
 @media (forced-colors: active) {
   .activity-dot {
-    border-color: CanvasText;
-    background: Canvas;
+    stroke: CanvasText;
+    fill: Canvas;
   }
   .activity-dot.filled {
-    background: CanvasText;
+    fill: CanvasText;
     forced-color-adjust: none;
   }
 }

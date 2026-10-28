@@ -42,6 +42,12 @@ it.each([
     expect(html.match(/class="activity-dot filled"/g) ?? []).toHaveLength(
       day.filled,
     );
+    expect(html.match(/viewBox="0 0 8 8" width="8" height="8"/g)).toHaveLength(
+      5,
+    );
+    expect(
+      html.match(/<circle cx="4" cy="4" r="3.5" stroke-width="1"/g),
+    ).toHaveLength(5);
     expect(JSON.stringify(day)).toBe(before);
   },
 );

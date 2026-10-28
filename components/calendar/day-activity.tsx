@@ -30,12 +30,18 @@ export function DayActivityDots({ day }: { day: DisplayDay }) {
       </span>
       <span className="day-activity-dots" aria-hidden="true">
         {Array.from({ length: 5 }, (_, index) => (
-          <span
+          <svg
             key={index}
+            viewBox="0 0 8 8"
+            width="8"
+            height="8"
+            focusable="false"
             className={
               index < day.filled ? "activity-dot filled" : "activity-dot"
             }
-          />
+          >
+            <circle cx="4" cy="4" r="3.5" strokeWidth="1" />
+          </svg>
         ))}
       </span>
     </span>

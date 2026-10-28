@@ -38,20 +38,22 @@ async function indicatorGeometry(indicator: Locator) {
         x: b.x,
         width: b.width,
         height: b.height,
-        border: s.borderTopWidth,
-        radius: s.borderRadius,
-        sizing: s.boxSizing,
+        viewBox: n.getAttribute("viewBox"),
+        circle: n.querySelector("circle")?.getAttribute("r"),
+        stroke: getComputedStyle(n.querySelector("circle")!).strokeWidth,
+        flex: s.flexShrink,
       };
     }),
   );
   expect(circles).toHaveLength(5);
   for (const [i, circle] of circles.entries()) {
-    expect(circle.width).toBe(6);
-    expect(circle.height).toBe(6);
-    expect(circle.border).toBe("1px");
-    expect(circle.radius).toBe("50%");
-    expect(circle.sizing).toBe("border-box");
-    if (i) expect(circle.x - circles[i - 1].x).toBe(9);
+    expect(circle.width).toBe(8);
+    expect(circle.height).toBe(8);
+    expect(circle.viewBox).toBe("0 0 8 8");
+    expect(circle.circle).toBe("3.5");
+    expect(circle.stroke).toBe("1px");
+    expect(circle.flex).toBe("0");
+    if (i) expect(circle.x - circles[i - 1].x).toBe(12);
   }
 }
 async function preview(page: Page, name: string) {
@@ -92,12 +94,12 @@ test("all six labels have equal circular dots, accessible counts and the request
     for (const empty of await indicator
       .locator(".activity-dot:not(.filled)")
       .all()) {
-      await expect(empty).toHaveCSS("background-color", "rgb(255, 255, 255)");
-      await expect(empty).toHaveCSS("border-top-color", "rgb(71, 85, 105)");
+      await expect(empty).toHaveCSS("fill", "rgb(255, 255, 255)");
+      await expect(empty).toHaveCSS("stroke", "rgb(71, 85, 105)");
     }
     if (filled)
       await expect(indicator.locator(".filled").first()).toHaveCSS(
-        "background-color",
+        "fill",
         colors[filled]!,
       );
     const header = cell(page, date).locator(".fc-daygrid-day-top");
