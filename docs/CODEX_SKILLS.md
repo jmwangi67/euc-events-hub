@@ -28,7 +28,20 @@ Checked against official documentation on October 28, 2026:
 - Repository skills are available in cloud tasks. Personal skills from a local computer do not sync into cloud environments. See [Cloud environments](https://learn.chatgpt.com/docs/environments/cloud-environments).
 - Legacy Codex environments support setup/maintenance scripts and separate agent-network settings. See [Codex Cloud (Legacy)](https://learn.chatgpt.com/docs/environments/cloud-environment). Follow the settings for the environment actually in use; a local install is not evidence that a cloud VM has the same tools.
 
-These checks establish repository discovery and package compatibility. This PR was prepared on Windows; it does not claim an end-to-end run in the owner's Codex Cloud environment or change its settings. Official current Cloud documentation lists computer/browser use as a limitation. Check the selected host's capabilities before promising browser verification. Terminal Playwright requires a working browser runtime and Linux libraries; a skill alone supplies neither.
+These documentation/package checks establish documented support, not observed automatic discovery or tool execution. The live Cloud smoke below records those separately. Official current Cloud documentation lists computer/browser use as a limitation; capabilities vary by host, and the existing Cloud terminal used below did support installed Chromium. Check the selected host before promising browser verification. Terminal Playwright requires a working browser runtime and Linux libraries; a skill alone supplies neither.
+
+### Live Cloud smoke on October 28, 2026
+
+The existing Cloud chat validated the corrected skill code at `ed324f91cff90d243a6075a47e049beb7dccdac4` in an isolated tracked-files worktree. Its environment was Debian 13.6/Linux x86-64, Node 24.19.0 and Python 3.12.14. No application files, dependencies, environment settings or APIs were changed.
+
+| Skill/capability   | Observed discovery                        | Execution result                                                                                                                                                                                                                   |
+| ------------------ | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `architect`        | Repository file located and read manually | Confirmed fixture/range/context loading in `lib/data/` and supplied-context calculations in `lib/domain/`. `calendar-state.ts` has an existing type-only `EventFilters` import from data; no architectural redesign was performed. |
+| `euc-architecture` | Repository file located and read manually | Source/ignore workflow inspected. Graphify executable, Python distribution and documented venv were absent, so no Cloud extraction or graph counts are claimed.                                                                    |
+| `playwright`       | Repository file located and read manually | Existing locked/installed `@playwright/test` 1.64.1 and Chromium 154.0.8037.57 passed synthetic heading lookup, Enter activation, expected output and an in-memory PNG with zero network requests.                                 |
+| `playwright-cli`   | Repository file located and read manually | Optional CLI absent; ten fake-executable wrapper checks passed without downloads. A separate PATH Python `playwright` 1.62.0 was identified and was not treated as the project's Node runner or optional CLI.                      |
+
+Automatic repository-skill metadata discovery remains unverified in this existing chat: host-native executor listings were empty before and after checkout. Manual file access and successful smoke tests do not prove automatic discovery in a newly started repository-root Cloud task. The original checkout and temporary validation worktree remained clean; no optional tooling was installed and no private datasets were read. The local Graphify results in the architecture review remain local evidence, not Cloud execution results.
 
 ## Runtime requirements
 

@@ -411,7 +411,7 @@ playwright-cli kill-all
 
 Discovery does not install packages. A missing optional CLI is a reported limitation, not an instruction to run `npx`, a global install, or an unrestricted latest version. The locked Playwright test runner is already the project's regression tool; its presence does not prove that a separate CLI command is supported.
 
-Provisioning requires an actual task need and authorization covering the installation. Review/select an exact compatible version and its runtime requirements first, keep optional tooling outside application dependencies, and record the selected version. This review task does not authorize provisioning. See the [shared browser skill](../playwright/SKILL.md) for capability checks and the wrapper's version guard.
+Provisioning requires an actual task need and authorization covering the installation. Review/select an exact compatible version and its runtime requirements first, keep optional tooling outside application dependencies, and record the selected version. Merely using this skill does not authorize provisioning. See the [shared browser skill](../playwright/SKILL.md) for capability checks and the wrapper's version guard.
 
 ## Example: Form submission
 
