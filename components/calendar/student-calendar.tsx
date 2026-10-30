@@ -1,9 +1,14 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Major, Organization } from "../../lib/domain/models";
+import type {
+  Major,
+  Organization,
+  OrganizationCluster,
+} from "../../lib/domain/models";
 import { studentOrganizations } from "../../lib/domain/hosting";
-import { getOrganizationClusters } from "../../lib/data/weekly-planning";
-import { getEventById } from "../../lib/data/fixtures";
+import { useDataQuery } from "../../lib/client/use-data-query";
+import { eventResponseSchema } from "../../lib/data/contracts";
+import { DataStatus } from "../data-status";
 import {
   clearDiscoveryFilters,
   discoveryFilters,
@@ -20,15 +25,25 @@ import { EventDetails } from "./event-details";
 import { useCompactCalendar } from "./use-compact-calendar";
 type Props = {
   initialState: DiscoveryState;
+  clusters: OrganizationCluster[];
   majors: Major[];
   organizations: Organization[];
 };
-export function StudentCalendar({
+export function StudentCalendar(props: Props) {
+  if (!props.majors.length || !props.organizations.length)
+    return (
+      <p role="status">
+        Student calendar unavailable: no discovery reference data.
+      </p>
+    );
+  return <LoadedStudentCalendar {...props} />;
+}
+function LoadedStudentCalendar({
   initialState,
+  clusters,
   majors,
   organizations,
 }: Props) {
-  const clusters = useMemo(() => getOrganizationClusters(), []);
   const [state, setState] = useState(initialState);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const mobile = useCompactCalendar();
@@ -37,7 +52,11 @@ export function StudentCalendar({
       ? "listMonth"
       : (state.view ?? "dayGridMonth");
   const filters = useMemo(() => discoveryFilters(state), [state]);
-  const selectedEvent = selectedId ? getEventById(selectedId) : undefined;
+  const detail = useDataQuery(
+    selectedId ? { path: "/api/data/event", body: { id: selectedId } } : null,
+    eventResponseSchema,
+  );
+  const selectedEvent = detail.data?.event;
   const update = useCallback((next: DiscoveryState, replace = false) => {
     setState(next);
     window.history[replace ? "replaceState" : "pushState"](
@@ -154,6 +173,19 @@ export function StudentCalendar({
           </p>
         </div>
       </div>
+      <DataStatus
+        status={detail.status}
+        retry={detail.retry}
+        label="event details"
+      />
+      {selectedId && detail.status === "ready" && !selectedEvent && (
+        <p role="status">
+          Event unavailable.{" "}
+          <button className="text-button" onClick={() => setSelectedId(null)}>
+            Close
+          </button>
+        </p>
+      )}
       {selectedEvent && (
         <EventDetails
           event={selectedEvent}

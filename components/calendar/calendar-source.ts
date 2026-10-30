@@ -5,13 +5,7 @@ import {
   hasUniversityHost,
 } from "../../lib/domain/hosting";
 import type { EventInput } from "@fullcalendar/core";
-import {
-  getEvents,
-  getExams,
-  getOrganizations,
-  type EventFilters,
-} from "../../lib/data/fixtures";
-import { getExternalEvents } from "../../lib/data/weekly-planning";
+import type { CalendarData } from "../../lib/data/contracts";
 import {
   eventAudienceMatch,
   examAudienceMatch,
@@ -25,7 +19,6 @@ import {
 } from "./planner-events";
 import type { PlanningCalendarOptions } from "./calendar-types";
 import { analyzeNonExamScheduling } from "../../lib/domain/non-exam-scheduling";
-import { getWeeklyPlanningContext } from "../../lib/data/weekly-planning";
 import type { PlanningAudience } from "../../lib/domain/planning-audience";
 import { easternDayStart } from "../../lib/time/eastern";
 import { displayBusynessDays } from "./display-busyness";
@@ -33,18 +26,18 @@ import { displayBusynessDays } from "./display-busyness";
 /** View-filtered display signal, with the owner's explicit broad-scope exception. */
 export function loadCalendarDisplayDays(
   range: { start: string; end: string },
-  filters: EventFilters,
   planning: PlanningCalendarOptions,
+  data: CalendarData,
 ) {
   const visible = loadCalendarItems(
     {
       startStr: easternDayStart(range.start),
       endStr: easternDayStart(range.end),
     },
-    filters,
     planning,
+    data,
   );
-  const mandatory = getExternalEvents(range)
+  const mandatory = data.externalEvents
     .filter((event) => event.scope === "psu-wide" || event.scope === "national")
     .map(toExternalCalendarItem);
   return displayBusynessDays(range, visible, mandatory);
@@ -54,26 +47,20 @@ export function loadCalendarDisplayDays(
 export function loadCalendarScheduling(
   range: { start: string; end: string },
   audience: PlanningAudience,
+  context: CalendarData,
 ) {
-  return analyzeNonExamScheduling(getWeeklyPlanningContext(range), audience, {
+  return analyzeNonExamScheduling(context, audience, {
     start: easternDayStart(range.start),
     end: easternDayStart(range.end),
   });
 }
 export function loadCalendarItems(
   range: { startStr: string; endStr: string },
-  filters: EventFilters,
-  planning?: PlanningCalendarOptions,
+  planning: PlanningCalendarOptions | undefined,
+  data: CalendarData,
 ): EventInput[] {
-  const window = {
-    start: range.startStr.slice(0, 10),
-    end: range.endStr.slice(0, 10),
-  };
-  const organizations = getOrganizations();
-  const events =
-    planning && !planning.showEvents
-      ? []
-      : getEvents({ ...window, filters: planning ? undefined : filters });
+  const organizations = data.organizations;
+  const events = planning && !planning.showEvents ? [] : data.events;
   const items: EventInput[] = events
     .filter(
       (event) =>
@@ -96,13 +83,13 @@ export function loadCalendarItems(
     });
   if (planning?.showExams)
     items.push(
-      ...getExams(window)
+      ...data.exams
         .filter((exam) => examAudienceMatch(exam, planning.audience).relevant)
         .map(toExamCalendarItem),
     );
   if (planning)
     items.push(
-      ...getExternalEvents(window)
+      ...data.externalEvents
         .filter((event) =>
           event.scope === "national"
             ? planning.showNational

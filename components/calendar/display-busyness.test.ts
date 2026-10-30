@@ -5,7 +5,7 @@ import {
   loadCalendarDisplayDays,
   loadCalendarItems,
   loadCalendarScheduling,
-} from "./calendar-source";
+} from "../../lib/data/test-helpers/calendar";
 import type { PlanningCalendarOptions } from "./calendar-types";
 const range = { start: "2026-10-19", end: "2026-10-22" };
 const timed = (

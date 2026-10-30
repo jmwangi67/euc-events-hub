@@ -1,4 +1,4 @@
-import type { EventFilters } from "../../lib/data/fixtures";
+import type { EventFilters } from "../../lib/data/contracts";
 import type { CalendarView } from "../../lib/domain/calendar-state";
 import type { PlannerCalendarView } from "../../lib/domain/planner-calendar-state";
 import type { Exam } from "../../lib/domain/models";

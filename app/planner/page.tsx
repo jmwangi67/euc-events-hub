@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { OrganizationPlanner } from "../../components/planner/organization-planner";
-import { getMajors, getOrganizations } from "../../lib/data/fixtures";
+import { loadReferenceData } from "../../lib/server/data/queries";
 import { easternDate } from "../../lib/time/eastern";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     "Evaluate local scheduling proposals against fictional event and academic exam constraints.",
 };
 export default async function PlannerPage() {
+  const { majors, organizations, clusters } = await loadReferenceData();
   const previewEnabled = privateExamPreviewAllowed(
     process.env,
     await headers(),
@@ -26,8 +27,9 @@ export default async function PlannerPage() {
         </p>
       )}
       <OrganizationPlanner
-        majors={getMajors()}
-        organizations={getOrganizations()}
+        majors={majors}
+        organizations={organizations}
+        clusters={clusters}
         initialDate={easternDate(new Date().toISOString())}
       />
     </main>

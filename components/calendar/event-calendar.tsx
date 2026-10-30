@@ -26,7 +26,12 @@ import type { Exam } from "../../lib/domain/models";
 import type { DisplayDay } from "./display-busyness";
 import { DayActivityDots, DayActivityContext } from "./day-activity";
 import { listRangeCrossesYears } from "./calendar-events";
-import { getWeeklyPlanningContext } from "../../lib/data/weekly-planning";
+import { useDataQuery } from "../../lib/client/use-data-query";
+import {
+  calendarDataSchema,
+  planningContextSchema,
+} from "../../lib/data/contracts";
+import { DataStatus } from "../data-status";
 import {
   calendarWeeks,
   summarizeWeek,
@@ -116,23 +121,40 @@ export function EventCalendar(props: EventCalendarProps) {
   } | null>(null);
   const planningAudience = planning?.audience;
   const isPlanning = !!planningAudience;
-  const context = useMemo(
-    () => (isPlanning ? getWeeklyPlanningContext(window) : null),
-    [window, isPlanning],
+  const remote = !examReview && !previewItems;
+  const records = useDataQuery(
+    remote
+      ? {
+          path: "/api/data/calendar",
+          body: {
+            window,
+            planning: isPlanning,
+            ...(isPlanning ? {} : { filters }),
+          },
+        }
+      : null,
+    calendarDataSchema,
   );
+  const intelligence = useDataQuery(
+    isPlanning
+      ? { path: "/api/data/planning", body: { kind: "weekly", window } }
+      : null,
+    planningContextSchema,
+  );
+  const context = intelligence.data;
   const scheduling = useMemo(
     () =>
-      planningAudience
-        ? loadCalendarScheduling(window, planningAudience)
+      planningAudience && context
+        ? loadCalendarScheduling(window, planningAudience, context)
         : null,
-    [window, planningAudience],
+    [window, planningAudience, context],
   );
   const displayDays = useMemo(
     () =>
-      planning
-        ? loadCalendarDisplayDays(window, filters, planning)
+      planning && records.data
+        ? loadCalendarDisplayDays(window, planning, records.data)
         : new Map<string, DisplayDay>(),
-    [window, filters, planning],
+    [window, planning, records.data],
   );
   const displayDay = (day: string) =>
     displayDays.get(day) ?? { date: day, items: [], filled: 0 };
@@ -151,7 +173,9 @@ export function EventCalendar(props: EventCalendarProps) {
         >
           {info.text}
         </span>
-        <DayActivityDots day={displayDay(date)} />
+        {records.status === "ready" && (
+          <DayActivityDots day={displayDay(date)} />
+        )}
       </span>
     );
   };
@@ -163,7 +187,7 @@ export function EventCalendar(props: EventCalendarProps) {
     surface.current
       ?.querySelectorAll<HTMLElement>(".fc-daygrid-day[data-date]")
       .forEach((cell) => {
-        if (planning?.showDensity && view.startsWith("dayGrid")) {
+        if (planning?.showDensity && scheduling && view.startsWith("dayGrid")) {
           const count =
             densityDays.get(cell.dataset.date!)?.maximumConcurrent ?? 0;
           cell.setAttribute(
@@ -172,7 +196,7 @@ export function EventCalendar(props: EventCalendarProps) {
           );
         } else cell.removeAttribute("aria-description");
       });
-  }, [densityDays, planning?.showDensity, view]);
+  }, [densityDays, planning?.showDensity, view, scheduling]);
   const weeks = useMemo(
     () =>
       planningAudience && context
@@ -236,7 +260,9 @@ export function EventCalendar(props: EventCalendarProps) {
                     last >= range.startStr.slice(0, 10)
                   );
                 })
-              : loadCalendarItems(range, filters, planning);
+              : records.data
+                ? loadCalendarItems(range, planning, records.data)
+                : [];
         const items =
           view.startsWith("dayGrid") && !examReview
             ? dayGridItems(canonicalItems)
@@ -247,15 +273,7 @@ export function EventCalendar(props: EventCalendarProps) {
           planning?.showDensity && view.startsWith("timeGrid")
             ? [
                 ...items,
-                ...densityCalendarItems(
-                  loadCalendarScheduling(
-                    {
-                      start: range.startStr.slice(0, 10),
-                      end: range.endStr.slice(0, 10),
-                    },
-                    planning.audience,
-                  ).timeSegments,
-                ),
+                ...densityCalendarItems(scheduling?.timeSegments ?? []),
               ]
             : items,
         );
@@ -266,7 +284,7 @@ export function EventCalendar(props: EventCalendarProps) {
         );
       }
     },
-    [filters, planning, view, examReview, previewItems],
+    [planning, view, examReview, previewItems, records.data, scheduling],
   );
   useEffect(() => {
     const api = calendar.current?.getApi();
@@ -370,11 +388,15 @@ export function EventCalendar(props: EventCalendarProps) {
       />
       <div className="calendar-summary">
         <p role="status">
-          {error
-            ? "Unable to load events."
-            : count === null
-              ? "Loading events…"
-              : `${count} ${examReview ? "canonical exam occurrences" : planning ? "calendar items" : count === 1 ? "event" : "events"} in this range`}
+          {remote && records.status !== "ready"
+            ? records.status === "error"
+              ? "Unable to load events."
+              : "Loading events…"
+            : error
+              ? "Unable to load events."
+              : count === null
+                ? "Loading events…"
+                : `${count} ${examReview ? "canonical exam occurrences" : planning ? "calendar items" : count === 1 ? "event" : "events"} in this range`}
         </p>
       </div>
       {error && (
@@ -382,8 +404,18 @@ export function EventCalendar(props: EventCalendarProps) {
           Events could not be loaded. Change the date range to retry.
         </p>
       )}
+      <DataStatus
+        status={records.status}
+        retry={records.retry}
+        label="calendar data"
+      />
+      <DataStatus
+        status={intelligence.status}
+        retry={intelligence.retry}
+        label="planning intelligence"
+      />
       {planning && <EventScopeLegend />}
-      {planning?.showDensity && (
+      {planning?.showDensity && scheduling && (
         <SchedulingDensityLegend
           segments={
             view.startsWith("timeGrid") ? scheduling?.timeSegments : undefined
@@ -485,9 +517,11 @@ export function EventCalendar(props: EventCalendarProps) {
             planning && view.startsWith("dayGrid") ? (
               <span className="planner-cell-date">
                 <span>{info.dayNumberText}</span>
-                <DayActivityDots
-                  day={displayDay(easternDate(info.date.toISOString()))}
-                />
+                {records.status === "ready" && (
+                  <DayActivityDots
+                    day={displayDay(easternDate(info.date.toISOString()))}
+                  />
+                )}
               </span>
             ) : (
               info.dayNumberText
@@ -505,53 +539,65 @@ export function EventCalendar(props: EventCalendarProps) {
                     : "planner-week-empty",
                 ]
               : [];
-            if (planning?.showDensity && view.startsWith("dayGrid"))
+            if (
+              planning?.showDensity &&
+              scheduling &&
+              view.startsWith("dayGrid")
+            )
               classes.push(`density-${densityDays.get(date)?.band ?? "none"}`);
             if (densityDays.get(date)?.primaryCaution)
               classes.push("has-scheduling-guidance");
             return classes;
           }}
           allDayText={examReview ? "Date options" : "All day"}
-          noEventsContent={() => (
-            <div className="empty-state">
-              <h3>
-                {examReview
-                  ? "No staged exam occurrences in this range"
-                  : planning
-                    ? "No visible planning items in this range"
-                    : "No published events in this range"}
-              </h3>
-              <p>
-                {examReview
-                  ? "Choose a reported or possible testing date. This review does not publish records."
-                  : planning
-                    ? "Try another date or restore the calendar display. Analysis remains tied to the proposal."
-                    : "Try another date, adjust your search, or clear your filters."}
+          noEventsContent={() =>
+            remote && records.status !== "ready" ? (
+              <p role="status">
+                {records.status === "error"
+                  ? "Calendar data unavailable."
+                  : "Loading events…"}
               </p>
-              {planning && view.startsWith("list") && (
-                <div
-                  className="empty-activity-dates"
-                  aria-label="Broad-scope calendar activity"
-                >
-                  {[...displayDays.values()]
-                    .filter((day) => day.items.length > 0)
-                    .map((day) => (
-                      <span className="empty-activity-date" key={day.date}>
-                        <span>{formatAllDayDate(day.date)}</span>
-                        <DayActivityDots day={day} />
-                      </span>
-                    ))}
-                </div>
-              )}
-              <button className="control" onClick={onReset}>
-                {examReview
-                  ? "Return to first exam date"
-                  : planning
-                    ? "Restore calendar display"
-                    : "Clear filters"}
-              </button>
-            </div>
-          )}
+            ) : (
+              <div className="empty-state">
+                <h3>
+                  {examReview
+                    ? "No staged exam occurrences in this range"
+                    : planning
+                      ? "No visible planning items in this range"
+                      : "No published events in this range"}
+                </h3>
+                <p>
+                  {examReview
+                    ? "Choose a reported or possible testing date. This review does not publish records."
+                    : planning
+                      ? "Try another date or restore the calendar display. Analysis remains tied to the proposal."
+                      : "Try another date, adjust your search, or clear your filters."}
+                </p>
+                {planning && view.startsWith("list") && (
+                  <div
+                    className="empty-activity-dates"
+                    aria-label="Broad-scope calendar activity"
+                  >
+                    {[...displayDays.values()]
+                      .filter((day) => day.items.length > 0)
+                      .map((day) => (
+                        <span className="empty-activity-date" key={day.date}>
+                          <span>{formatAllDayDate(day.date)}</span>
+                          <DayActivityDots day={day} />
+                        </span>
+                      ))}
+                  </div>
+                )}
+                <button className="control" onClick={onReset}>
+                  {examReview
+                    ? "Return to first exam date"
+                    : planning
+                      ? "Restore calendar display"
+                      : "Clear filters"}
+                </button>
+              </div>
+            )
+          }
           eventClick={(info) => {
             info.jsEvent.preventDefault();
             if (info.event.extendedProps.kind === "density") return;
@@ -614,7 +660,7 @@ export function EventCalendar(props: EventCalendarProps) {
           </aside>
         )}
       </div>
-      {planning && (
+      {planning && records.status === "ready" && (
         <div className="planner-calendar-context">
           <p className="field-help activity-explanation">
             Calendar activity: one dot per displayed commitment, up to five.
@@ -666,7 +712,7 @@ export function EventCalendar(props: EventCalendarProps) {
           onClose={() => setExternalSelection(null)}
         />
       )}
-      {selectedWeek && planning && (
+      {selectedWeek && planning && context && (
         <WeeklyDetails
           triggerId={weekTriggerId}
           week={selectedWeek}
@@ -674,18 +720,20 @@ export function EventCalendar(props: EventCalendarProps) {
           onClose={() => setSelectedWeek(null)}
         />
       )}
-      {count === 0 && view !== "listMonth" && (
-        <div className="empty-state">
-          <p>
-            {planning
-              ? "No visible planning items match this range and display selection."
-              : "No published events match this range and filters."}
-          </p>
-          <button className="control" onClick={onReset}>
-            {planning ? "Restore calendar display" : "Clear filters"}
-          </button>
-        </div>
-      )}
+      {count === 0 &&
+        (!remote || records.status === "ready") &&
+        view !== "listMonth" && (
+          <div className="empty-state">
+            <p>
+              {planning
+                ? "No visible planning items match this range and display selection."
+                : "No published events match this range and filters."}
+            </p>
+            <button className="control" onClick={onReset}>
+              {planning ? "Restore calendar display" : "Clear filters"}
+            </button>
+          </div>
+        )}
     </section>
   );
 }
