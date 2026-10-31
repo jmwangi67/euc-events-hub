@@ -239,3 +239,12 @@ validated pressure score. Counts and hidden PSU-wide/national inclusion remain
 unchanged. Native `+N more` links count additional hidden cards only, separately
 from dots. See the [updated fictional preview gallery](docs/previews/planner/dot-refinement/README.md)
 for responsive screenshots, exact-fit/overflow examples and validation.
+
+### B2a local database foundation
+
+The optional [closed PostgreSQL foundation](docs/B2A_DATABASE_FOUNDATION.md) uses
+Supabase CLI 2.122.0 with loopback-only Docker services, versioned migrations,
+explicit ownership and executable grants/RLS/API-denial tests. The application
+continues using fixtures and works with PostgreSQL stopped. B2a adds no
+application tables or authentication. See the guide before running the explicitly
+local, disposable reset verification commands.
