@@ -19,7 +19,17 @@
     "exams:import": "node exam-tools.mjs import",
     "exams:validate": "node exam-tools.mjs validate",
     "exams:audit-build": "node exam-tools.mjs audit-build",
-    "test:exam-preview": "playwright test --config playwright.exam-preview.config.ts"
+    "test:exam-preview": "playwright test --config playwright.exam-preview.config.ts",
+    "db:preflight": "node local-db.mjs preflight",
+    "db:start": "node local-db.mjs start",
+    "db:reset": "node local-db.mjs reset",
+    "db:migrate": "node local-db.mjs migrate",
+    "db:test": "node local-db.mjs test",
+    "db:api-start": "node local-db.mjs api-start",
+    "db:api-test": "node local-db.mjs api-test",
+    "db:verify": "node local-db.mjs verify",
+    "db:stop": "node local-db.mjs stop",
+    "test:db:guard": "node --test local-db.test.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "5.3.0",
@@ -44,6 +54,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.1",
     "prettier": "3.9.10",
+    "supabase": "2.122.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "vitest": "5.0.4"

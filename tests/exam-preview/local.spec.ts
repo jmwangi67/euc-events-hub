@@ -7,6 +7,9 @@ test("switches from demonstration planner to an explicitly separate invented rev
   await page
     .getByRole("link", { name: "Open private academic dataset review" })
     .click();
+  // The first development navigation compiles this route on Windows. Wait for
+  // the transition before applying the normal content-assertion timeout.
+  await expect(page).toHaveURL(/\/planner\/exam-preview$/, { timeout: 30000 });
   await expect(
     page.getByText("Private exam data preview — unverified", { exact: true }),
   ).toBeVisible();
