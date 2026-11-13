@@ -45,7 +45,7 @@ export function ConflictPanel({
       {!proposal ? (
         <p className="planner-placeholder">
           Enter your local scenario and select Analyze proposal to check the
-          available sample data.
+          available records.
         </p>
       ) : (
         <>
@@ -55,8 +55,8 @@ export function ConflictPanel({
           </p>
           {!conflicts.length ? (
             <p role="status" className="planner-placeholder">
-              No conflicts found in the available sample data. This does not
-              mean the date is free; coverage may be incomplete.
+              No conflicts found in the available records. This does not mean
+              the date is free; coverage may be incomplete.
             </p>
           ) : (
             <ul className="conflict-list">

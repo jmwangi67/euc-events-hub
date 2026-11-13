@@ -15,7 +15,7 @@ import { intervalsOverlap } from "../domain/planning";
 import { easternDayStart } from "../time/eastern";
 import { policySourceWindow } from "../domain/non-exam-scheduling";
 import type { ExternalEvent } from "../domain/external-events";
-import type { Event } from "../domain/models";
+import type { Event, Exam, Organization } from "../domain/models";
 import { events as defaultEvents } from "../../data/fixtures";
 export function getOrganizationClusters() {
   return structuredClone(organizationClusters);
@@ -63,19 +63,34 @@ export function getNonExamAnalysisRecords(
   });
 }
 /** Include the following week for exam-preparation lookahead; no display filters accepted. */
-export function getWeeklyPlanningContext(window: DateWindow) {
+export function getWeeklyPlanningContext(
+  window: DateWindow,
+  data?: {
+    events: readonly Event[];
+    externalEvents: readonly ExternalEvent[];
+    exams: readonly Exam[];
+    organizations: Organization[];
+  },
+) {
   const weeks = calendarWeeks(window.start, window.end);
   const completeWeeks = {
     start: weeks[0].start,
     end: weeks[weeks.length - 1].end,
   };
   return {
-    ...getNonExamAnalysisRecords(completeWeeks),
-    exams: getExams({
-      ...completeWeeks,
-      end: addCalendarDays(completeWeeks.end, 7),
-      includeIdentityAlternatives: true,
-    }),
-    organizations: getOrganizations(),
+    ...getNonExamAnalysisRecords(
+      completeWeeks,
+      data?.events,
+      data?.externalEvents,
+    ),
+    exams: getExams(
+      {
+        ...completeWeeks,
+        end: addCalendarDays(completeWeeks.end, 7),
+        includeIdentityAlternatives: true,
+      },
+      data?.exams,
+    ),
+    organizations: data?.organizations ?? getOrganizations(),
   };
 }

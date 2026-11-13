@@ -29,7 +29,9 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "data/local/exams/.next-preview/types/**/*.ts",
-    "data/local/exams/.next-preview/dev/types/**/*.ts"
+    "data/local/exams/.next-preview/dev/types/**/*.ts",
+    "work/.next-browser-fixtures/types/**/*.ts",
+    "work/.next-browser-fixtures/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

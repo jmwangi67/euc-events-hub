@@ -20,7 +20,7 @@ export function SiteHeader() {
             Organization planner
           </Link>
         </nav>
-        <span className="header-preview">Development preview</span>
+        <span className="header-preview">Schedule pilot</span>
       </div>
     </header>
   );

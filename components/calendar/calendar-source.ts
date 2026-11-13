@@ -4,6 +4,7 @@ import {
   hostingIdentity,
   hasUniversityHost,
 } from "../../lib/domain/hosting";
+import { stagedExamCalendarItems } from "./staged-exam-events";
 import type { EventInput } from "@fullcalendar/core";
 import type { CalendarData } from "../../lib/data/contracts";
 import {
@@ -75,6 +76,7 @@ export function loadCalendarItems(
         ...mapped,
         extendedProps: {
           ...mapped.extendedProps,
+          synthetic: event.source.verification === "synthetic",
           hosts: hostNames(eventHosts(event, organizations)),
           compactHosts: hostNames(eventHosts(event, organizations), true),
           hostingIdentity: hostingIdentity(event, organizations),
@@ -87,18 +89,23 @@ export function loadCalendarItems(
         .filter((exam) => examAudienceMatch(exam, planning.audience).relevant)
         .map(toExamCalendarItem),
     );
-  if (planning)
+  if (data.publicExams && (!planning || planning.showExams))
     items.push(
-      ...data.externalEvents
-        .filter((event) =>
-          event.scope === "national"
+      ...stagedExamCalendarItems(data.publicExams.exams, data.publicExams),
+    );
+  items.push(
+    ...data.externalEvents
+      .filter(
+        (event) =>
+          !planning ||
+          (event.scope === "national"
             ? planning.showNational
             : event.scope === "psu-wide"
               ? planning.showPsuWide
-              : planning.showCampusLocal,
-        )
-        .map(toExternalCalendarItem),
-    );
+              : planning.showCampusLocal),
+      )
+      .map(toExternalCalendarItem),
+  );
   if (
     planning?.proposal &&
     intervalsOverlap(planning.proposal, {

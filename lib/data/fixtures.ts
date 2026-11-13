@@ -45,26 +45,23 @@ export function getEvents(
     includeIdentityAlternatives?: boolean;
   },
   eventFixtures: readonly Event[] = events,
+  hosts = organizations,
 ): Event[] {
   const window = parseWindow({ start, end });
   const search = filters.search?.trim().toLowerCase() ?? "";
-  const studentHosts = studentOrganizations(organizations);
+  const studentHosts = studentOrganizations(hosts);
   const matching = eventFixtures.filter(
     (event) =>
       event.status === "published" &&
       overlaps(eventInterval(event), window) &&
-      isEventRelevant(
-        event,
-        filters.audience ?? { mode: "all" },
-        organizations,
-      ) &&
+      isEventRelevant(event, filters.audience ?? { mode: "all" }, hosts) &&
       (!filters.organizationIds?.length ||
         filters.organizationIds.some(
           (id) =>
             studentHosts.some((org) => org.id === id) &&
             event.hostOrganizationIds.includes(id),
         )) &&
-      (!filters.universityOnly || hasUniversityHost(event, organizations)) &&
+      (!filters.universityOnly || hasUniversityHost(event, hosts)) &&
       (!filters.clusterIds?.length ||
         studentHosts.some(
           (org) =>

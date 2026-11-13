@@ -155,7 +155,7 @@ test("organization defaults, explicit audience requirement, overrides and known 
   await page.getByLabel("End time", { exact: true }).fill("21:00");
   await analyze(page);
   await expect(panel(page)).toContainText(
-    "No conflicts found in the available sample data",
+    "No conflicts found in the available records",
   );
   await expect(panel(page)).toContainText("does not mean the date is free");
 });

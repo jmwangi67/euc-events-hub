@@ -49,7 +49,7 @@ export function ExamReview({
           Local review only. Not an official published schedule.{" "}
           {synthetic
             ? "All records in this view are invented synthetic test data."
-            : "Source-reported records are not independently verified or authorized for publication."}
+            : "The staging archive remains local. The approved public export is separate."}
         </p>
       </div>
       <div className="page-heading">
@@ -63,7 +63,7 @@ export function ExamReview({
       </div>
       <nav className="exam-review-switch" aria-label="Exam dataset">
         <Link className="control" href="/planner">
-          Fictional demonstration planner
+          Organization planner
         </Link>
         <span aria-current="page">
           {synthetic
@@ -72,9 +72,9 @@ export function ExamReview({
         </span>
       </nav>
       <p className="field-help">
-        Review-only calendar. No staged data is added to the public student
-        calendar, preparation model, Other Scheduling Constraints, or non-exam
-        density. Displayed date options do not establish all-day occupancy.
+        This view reviews the staging archive. Public calendar records come from
+        a separately reviewed export. Displayed date options do not establish
+        all-day occupancy.
       </p>
       <EventCalendar
         date={date}

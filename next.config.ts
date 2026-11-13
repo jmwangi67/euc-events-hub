@@ -8,6 +8,9 @@ const config: NextConfig = {
     process.env.NODE_ENV === "development" &&
     process.env.EUC_PRIVATE_EXAM_PREVIEW === "1"
       ? "data/local/exams/.next-preview"
-      : ".next",
+      : process.env.NODE_ENV === "development" &&
+          process.env.EUC_BROWSER_FIXTURES === "1"
+        ? "work/.next-browser-fixtures"
+        : ".next",
 };
 export default config;

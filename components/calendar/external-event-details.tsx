@@ -9,6 +9,7 @@ import {
 } from "../../lib/domain/source-labels";
 import {
   formatAllDayDate,
+  formatEventClock,
   addCalendarDays,
   formatEventTime,
 } from "../../lib/time/eastern";
@@ -30,10 +31,13 @@ export function ExternalEventDetails({
       label="External event details"
       onClose={onClose}
     >
-      <p className="example-note">
-        Fictional demonstration scenario, not a real or independently verified
-        schedule.
-      </p>
+      {event.source.verification === "synthetic" && (
+        <p className="example-note">
+          Fictional demonstration scenario, not a real or independently verified
+          schedule.
+        </p>
+      )}
+      {event.scheduleNote && <p>{event.scheduleNote}</p>}
       <p>
         <EventTypeIcon props={{ externalEvent: event }} large />
         {EXTERNAL_CATEGORIES[event.category]} ·{" "}
@@ -49,7 +53,9 @@ export function ExternalEventDetails({
                   start: event.start,
                   end: event.end,
                 })
-              : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))}`}
+              : event.endDate === addCalendarDays(event.startDate, 1)
+                ? formatAllDayDate(event.startDate)
+                : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))}`}
           </dd>
         </div>
         <div>
@@ -59,9 +65,17 @@ export function ExternalEventDetails({
             {!event.timeKnown &&
               (event.dateWide
                 ? " — Date-wide commitment; individual hours are not supplied. This does not establish continuous 24-hour attendance."
-                : " — Time unknown; no hours or all-day attendance are assumed.")}
+                : event.reportedStart
+                  ? ""
+                  : " — Time unknown; no hours or all-day attendance are assumed.")}
           </dd>
         </div>
+        {event.doorsOpen && (
+          <div>
+            <dt>Doors open</dt>
+            <dd>{formatEventClock(event.doorsOpen, true)}</dd>
+          </div>
+        )}
         <div>
           <dt>Applicability</dt>
           <dd>

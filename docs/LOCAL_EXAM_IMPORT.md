@@ -1,6 +1,6 @@
 # Local academic exam import and review (Milestone 2A.0)
 
-This is an offline import/read-only review workflow, not an administrator portal or publication system. Keep real inputs, outputs and validation reports under gitignored `data/local/exams/`. Do not copy them into fixtures, screenshots, tests, `public/`, or Git. The application's normal production/public data remains fictional.
+This is an offline import/read-only review workflow, not an administrator portal or publication system. Keep real inputs, outputs and validation reports under gitignored `data/local/exams/`. Do not copy them into fixtures, screenshots, tests, `public/`, or Git. The original archive remains private. The owner-authorized schedule-facts export is documented in [the public calendar pilot](PUBLIC_CALENDAR_PILOT.md).
 
 ## Supported contract
 

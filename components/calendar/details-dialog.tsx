@@ -41,7 +41,39 @@ export function DetailsDialog({
             document.querySelector<HTMLElement>(
               `[data-calendar-event-id="${CSS.escape(triggerId)}"]`,
             ));
-      trigger?.focus();
+      if (!triggerId.startsWith("week:")) {
+        trigger?.focus();
+        return;
+      }
+      // Keep the selected week as the focus target while the compact range loads.
+      const selector = `[data-calendar-event-id="${CSS.escape(triggerId)}"]`;
+      const restoreWeekFocus = () => {
+        if (element.open) return true;
+        const current = document.activeElement;
+        if (
+          current instanceof HTMLElement &&
+          current !== document.body &&
+          current !== trigger &&
+          current.isConnected
+        )
+          return true;
+        const replacement = [
+          ...document.querySelectorAll<HTMLElement>(selector),
+        ].find((item) => item.getClientRects().length);
+        replacement?.focus();
+        return document.activeElement === replacement;
+      };
+      if (restoreWeekFocus()) return;
+      const observer = new MutationObserver(() => {
+        if (restoreWeekFocus()) observer.disconnect();
+      });
+      observer.observe(calendarRegion ?? document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["data-calendar-event-id", "class"],
+      });
+      window.setTimeout(() => observer.disconnect(), 3000);
     };
   }, [triggerId]);
   return (

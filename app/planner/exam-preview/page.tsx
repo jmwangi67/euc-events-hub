@@ -27,7 +27,7 @@ export default async function ExamPreviewPage() {
           Check the local dataset setting and run the offline validator. No
           partial dataset was loaded.
         </p>
-        <Link href="/planner">Return to fictional planner</Link>
+        <Link href="/planner">Return to organization planner</Link>
       </main>
     );
   }

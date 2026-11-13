@@ -26,6 +26,7 @@ type BaseProps = {
   onEventSelect: (id: string) => void;
   onReset: () => void;
   mobile: boolean;
+  demo?: boolean;
 };
 export type EventCalendarProps = BaseProps &
   (

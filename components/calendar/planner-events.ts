@@ -4,6 +4,7 @@ import type { Proposal } from "../../lib/domain/planning";
 import {
   addCalendarDays,
   formatAllDayDate,
+  formatEventClock,
   formatEventTime,
 } from "../../lib/time/eastern";
 import { listEventTimes } from "./calendar-events";
@@ -62,7 +63,7 @@ export function toExternalCalendarItem(
 ): EventInput {
   const timeLabel = event.timeKnown
     ? formatEventTime({ allDay: false, start: event.start, end: event.end })
-    : `${formatAllDayDate(event.startDate)} – ${formatAllDayDate(addCalendarDays(event.endDate, -1))} · ${externalTimingLabel(event)}`;
+    : `${formatAllDayDate(event.startDate)}${event.endDate === addCalendarDays(event.startDate, 1) ? "" : ` – ${formatAllDayDate(addCalendarDays(event.endDate, -1))}`} · ${externalTimingLabel(event)}`;
   return {
     id: `external:${event.id}`,
     title: event.title,
@@ -78,6 +79,8 @@ export function toExternalCalendarItem(
       listTimes: event.timeKnown
         ? listEventTimes({ allDay: false, start: event.start, end: event.end })
         : [externalTimingLabel(event)],
+      location:
+        event.source.verification === "synthetic" ? undefined : event.geography,
     },
   };
 }
@@ -88,7 +91,13 @@ export function externalTimingLabel(
 ) {
   return event.timeKnown
     ? formatEventTime({ allDay: false, start: event.start, end: event.end })
-    : event.dateWide
-      ? "Date-wide commitment"
-      : "Time TBD";
+    : event.reportedStart
+      ? `${formatEventClock(event.reportedStart, true)} · End time unlisted`
+      : event.dateWide
+        ? event.category === "academic-date" ||
+          (event.category === "academic-break" &&
+            event.source.verification !== "synthetic")
+          ? "Date-wide context"
+          : "Date-wide commitment"
+        : "Time TBD";
 }
