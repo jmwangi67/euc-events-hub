@@ -1,5 +1,7 @@
 "use client";
 import { EventTypeIcon } from "../calendar/event-type-icon";
+import type { StagedExam } from "../../lib/exams/staging";
+import { reportedDates, possibleDates } from "../../lib/exams/staging";
 import type { WeeklySummary } from "../../lib/domain/weekly-planning";
 import { SCHEDULING_FACTORS } from "../../lib/domain/weekly-planning";
 import type { PlanningAudience } from "../../lib/domain/planning-audience";
@@ -115,7 +117,7 @@ export function WeeklyDetails({
   triggerId,
   onClose,
 }: {
-  week: WeeklySummary;
+  week: WeeklySummary & { reportedExams?: StagedExam[] };
   triggerId: string;
   audience: PlanningAudience;
   onClose: () => void;
@@ -129,8 +131,7 @@ export function WeeklyDetails({
       onClose={onClose}
     >
       <p className="example-note">
-        Example scenarios, not real or verified schedules. Counts describe
-        available records, not expected attendance or pressure.
+        Counts describe available records, not expected attendance or pressure.
       </p>
       <p>
         <strong>{week.counts.uniqueTotal} unique commitments.</strong> Each
@@ -143,6 +144,48 @@ export function WeeklyDetails({
         matches · {week.counts.clusterMatches} explicit cluster matches. Cluster
         membership alone never targets an event.
       </p>
+      {!!week.reportedExams?.length && (
+        <>
+          <h3>Reported exam occurrences ({week.reportedExams.length})</h3>
+          <p>
+            Audience and exact schedule may be uncertain. These occurrences do
+            not contribute to numerical preparation or the commitment total.
+          </p>
+          <ul className="weekly-detail-records">
+            {week.reportedExams.map((exam) => (
+              <li key={exam.id}>
+                <strong>
+                  {[
+                    ...new Set(
+                      exam.claims.map((claim) =>
+                        [claim.courseId, claim.designation]
+                          .filter(Boolean)
+                          .join(" · "),
+                      ),
+                    ),
+                  ].join(" / ")}
+                </strong>
+                <span>
+                  {[
+                    ...new Set(
+                      exam.claims.flatMap((claim) =>
+                        reportedDates(claim.timing),
+                      ),
+                    ),
+                  ]
+                    .map(formatAllDayDate)
+                    .join(", ")}
+                </span>
+                {exam.claims.some(
+                  (claim) => claim.sourceStatus === "requested-unapproved",
+                ) && <span>Requested, not approved</span>}
+                {exam.claims.flatMap((claim) => possibleDates(claim.timing))
+                  .length > 0 && <span>Possible additional date reported</span>}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       <h3>Engineering and organization events ({week.events.length})</h3>
       <ul className="weekly-detail-records">
         {week.events.map((event) => (

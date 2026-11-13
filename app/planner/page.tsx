@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { OrganizationPlanner } from "../../components/planner/organization-planner";
+import { browserFixturesEnabled } from "../../lib/server/data/browser-fixtures";
 import { loadReferenceData } from "../../lib/server/data/queries";
 import { easternDate } from "../../lib/time/eastern";
+import { dateOnlySchema } from "../../lib/domain/models";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { privateExamPreviewAllowed } from "../../lib/exams/preview-policy";
@@ -9,10 +11,21 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "EUC Events Hub — Organization Planner",
   description:
-    "Evaluate local scheduling proposals against fictional event and academic exam constraints.",
+    "Compare local scheduling proposals with published events and academic context.",
 };
-export default async function PlannerPage() {
-  const { majors, organizations, clusters } = await loadReferenceData();
+export default async function PlannerPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string | string[] }>;
+}) {
+  const requested = dateOnlySchema.safeParse((await searchParams).date);
+  const demo = browserFixturesEnabled();
+  const { majors, organizations, clusters } = await (
+    demo
+      ? (await import("../../lib/server/data/browser-fixture-queries"))
+          .loadReferenceData
+      : loadReferenceData
+  )();
   const previewEnabled = privateExamPreviewAllowed(
     process.env,
     await headers(),
@@ -27,10 +40,15 @@ export default async function PlannerPage() {
         </p>
       )}
       <OrganizationPlanner
+        demo={demo}
         majors={majors}
         organizations={organizations}
         clusters={clusters}
-        initialDate={easternDate(new Date().toISOString())}
+        initialDate={
+          requested.success
+            ? requested.data
+            : easternDate(new Date().toISOString())
+        }
       />
     </main>
   );

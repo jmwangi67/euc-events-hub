@@ -25,6 +25,7 @@ import { EventDetails } from "./event-details";
 import { useCompactCalendar } from "./use-compact-calendar";
 type Props = {
   initialState: DiscoveryState;
+  demo?: boolean;
   clusters: OrganizationCluster[];
   majors: Major[];
   organizations: Organization[];
@@ -40,6 +41,7 @@ export function StudentCalendar(props: Props) {
 }
 function LoadedStudentCalendar({
   initialState,
+  demo,
   clusters,
   majors,
   organizations,
@@ -89,17 +91,19 @@ function LoadedStudentCalendar({
   }, [majors, organizations, clusters]);
   return (
     <>
-      <div className="development-notice">
-        <p>
-          <strong>Fictional events only.</strong> No live event feeds.
-        </p>
-        <button
-          className="text-button"
-          onClick={() => update({ ...state, date: "2026-10-19" })}
-        >
-          View sample dates
-        </button>
-      </div>
+      {demo && (
+        <div className="development-notice">
+          <p>
+            <strong>Fictional events only.</strong> No live event feeds.
+          </p>
+          <button
+            className="text-button"
+            onClick={() => update({ ...state, date: "2026-10-19" })}
+          >
+            View sample dates
+          </button>
+        </div>
+      )}
       <div className="page-heading student-welcome">
         <div>
           <p className="eyebrow">Student calendar</p>
@@ -166,10 +170,11 @@ function LoadedStudentCalendar({
             onViewChange={(view) => update({ ...state, view })}
             onEventSelect={setSelectedId}
             onReset={reset}
+            demo={demo}
           />
           <p className="calendar-footnote">
-            All dates and times use America/New_York. All examples are
-            fictional; no live event feeds are connected.
+            Times are Eastern. Check event sources for updates. Exam listings
+            may be incomplete or provisional.
           </p>
         </div>
       </div>

@@ -63,10 +63,14 @@ export function stagedExamCalendarItems(
               : "Source-reported explicit hours"
             : claim.timing.kind === "date-only"
               ? "Examination date — hours unknown"
-              : "Testing window — individual exam time unknown";
+              : "Alternative testing date — individual exam time unknown";
         const status = conflicting
           ? "Conflicting source information"
-          : claim.sourceStatus.replaceAll("-", " ");
+          : claim.sourceStatus === "requested-unapproved"
+            ? "Requested, not approved"
+            : claim.sourceStatus === "reported-unverified"
+              ? "Source-reported, not independently verified"
+              : claim.sourceStatus.replaceAll("-", " ");
         const timeLabel = timed
           ? formatEventTime({
               allDay: false,
@@ -94,6 +98,10 @@ export function stagedExamCalendarItems(
           extendedProps: {
             kind: "exam-review",
             canonicalExamId: exam.id,
+            certainty:
+              claim.publicationStatus === "approved-for-public"
+                ? status
+                : undefined,
             category,
             reviewDates: timed
               ? undefined
@@ -106,7 +114,7 @@ export function stagedExamCalendarItems(
                   end: timed.end,
                 })
               : [segment.possible ? "Possible date" : "Time unknown"],
-            reviewLabel: `${title}. ${timeLabel}. ${category}. ${claim.designation ?? "Exam designation not supplied"}. ${dataset.termId}. One canonical exam; date options are not separate examinations. Open exam review details.`,
+            reviewLabel: `${title}. ${timeLabel}. ${category}. ${claim.designation ?? "Exam designation not supplied"}. ${dataset.termId}. One canonical exam; date options are not separate examinations. Open ${claim.publicationStatus === "approved-for-public" ? "exam details" : "exam review details"}.`,
           },
         });
       }

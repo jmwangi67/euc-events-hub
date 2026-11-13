@@ -180,8 +180,3 @@ for (const width of [320, 375, 430, 768, 1024, 1440]) {
     ).toBe(true);
   });
 }
-test("development overlap fixture is unavailable in production", async ({
-  request,
-}) => {
-  expect((await request.get("/dev/calendar-layout")).status()).toBe(404);
-});

@@ -74,6 +74,7 @@ export function OrganizationPlanner(props: {
   organizations: Organization[];
   clusters: OrganizationCluster[];
   initialDate: string;
+  demo?: boolean;
 }) {
   if (!props.majors.length || !studentOrganizations(props.organizations).length)
     return (
@@ -85,11 +86,13 @@ function LoadedOrganizationPlanner({
   majors,
   organizations,
   initialDate,
+  demo,
   clusters,
 }: {
   majors: Major[];
   organizations: Organization[];
   initialDate: string;
+  demo?: boolean;
   clusters: OrganizationCluster[];
 }) {
   const studentOrgs = useMemo(
@@ -273,7 +276,7 @@ function LoadedOrganizationPlanner({
   }
   function sample() {
     const org =
-      studentOrgs.find((org) => org.id === "example-process") ?? initialOrg;
+      studentOrgs.find((entry) => entry.id === "example-process") ?? initialOrg;
     setOrganizationId(org.id);
     setMajorIds(planningAudience(org));
     setAcademicLevels([...ALL_LEVELS]);
@@ -305,12 +308,20 @@ function LoadedOrganizationPlanner({
     <>
       <div className="development-notice">
         <p>
-          <strong>Demo planner — not a real schedule.</strong> Fictional events
-          and exams only. Nothing is saved, approved, or submitted.
+          {demo ? (
+            <>
+              <strong>Demo planner — not a real schedule.</strong> Fictional
+              events and exams only. Nothing is saved, approved, or submitted.
+            </>
+          ) : (
+            "Proposals stay in this browser session. Exam coverage may be incomplete."
+          )}
         </p>
-        <button className="text-button" onClick={sample}>
-          Load sample scenario
-        </button>
+        {demo && (
+          <button className="text-button" onClick={sample}>
+            Load sample scenario
+          </button>
+        )}
       </div>
       <div className="page-heading">
         <p className="eyebrow">Organization planning</p>
@@ -389,10 +400,10 @@ function LoadedOrganizationPlanner({
         </p>
         <div className="planner-controls-grid">
           <label className="planner-field">
-            Example organization
+            {demo ? "Example organization" : "Organization"}
             <select
               className="control"
-              aria-label="Example organization"
+              aria-label={demo ? "Example organization" : "Organization"}
               value={organizationId}
               onChange={(e) => {
                 const org = studentOrgs.find(
@@ -682,6 +693,7 @@ function LoadedOrganizationPlanner({
             </div>
             <EventCalendar
               date={date}
+              demo={demo}
               view={activeView}
               filters={filters}
               mobile={mobile}

@@ -43,7 +43,7 @@ export function displayBusynessDays(
     const last = item.allDay
       ? addCalendarDays(String(item.end), -1)
       : easternDate(new Date(Date.parse(String(item.end)) - 1).toISOString());
-    const id = String(p?.canonicalEventId ?? item.id);
+    const id = String(p?.canonicalExamId ?? p?.canonicalEventId ?? item.id);
     for (
       let date = first < range.start ? range.start : first;
       date <= last && date < range.end;

@@ -145,7 +145,7 @@ export function AudienceControls({
             </label>
           ))}
           <p className="field-help">
-            Example organization memberships. {organization.name} belongs to:{" "}
+            {organization.name} belongs to:{" "}
             {clusters
               .filter((cluster) =>
                 organization.clusterIds?.includes(cluster.id),

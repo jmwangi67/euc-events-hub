@@ -7,15 +7,18 @@ import {
   sourceSchema,
 } from "./models";
 export const EXTERNAL_CATEGORIES = {
-  thon: "THON scenario",
-  homecoming: "Homecoming scenario",
-  football: "Football scenario",
-  concert: "Major concert scenario",
-  festival: "Music festival scenario",
-  "academic-break": "Academic break scenario",
-  "state-college": "State College event scenario",
+  "academic-date": "Academic calendar",
+  "athletic-event": "Athletics and arena events",
+  "campus-event": "Campus event",
+  thon: "THON",
+  homecoming: "Homecoming",
+  football: "Football",
+  concert: "Concert",
+  festival: "Music festival",
+  "academic-break": "Academic break",
+  "state-college": "State College event",
   election: "Major election scenario",
-  "super-bowl": "Super Bowl scenario",
+  "super-bowl": "Super Bowl",
 } as const;
 const fields = {
   id: z.string().min(1),
@@ -43,6 +46,10 @@ const fields = {
   dateWide: z.boolean().optional(),
   impactPolicy: z.enum(["major-local-music", "academic-break"]).optional(),
   policyRationale: z.string().min(1).optional(),
+  reportedStart: instantSchema.optional(),
+  reportedEnd: instantSchema.optional(),
+  doorsOpen: instantSchema.optional(),
+  scheduleNote: z.string().min(1).optional(),
   geography: z.string().min(1),
   audience: z.string().min(1),
   source: sourceSchema,
@@ -99,6 +106,7 @@ export const externalEventSchema = z
       "homecoming",
       "football",
       "academic-break",
+      "academic-date",
     ].includes(event.category);
     if (universityWide !== (event.scope === "psu-wide"))
       ctx.addIssue({

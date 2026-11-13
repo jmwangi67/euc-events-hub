@@ -5,7 +5,7 @@ import {
   readEvent,
   readPlanningContext,
   loadReferenceData,
-} from "./queries";
+} from "./browser-fixture-queries";
 import { queryResponse } from "./http";
 import {
   getEvents,

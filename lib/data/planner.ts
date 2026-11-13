@@ -1,3 +1,5 @@
+import type { Event, Exam } from "../domain/models";
+import type { ExternalEvent } from "../domain/external-events";
 import type { Proposal } from "../domain/planning";
 import { addCalendarDays, easternDate } from "../time/eastern";
 import { getEvents, getExams } from "./fixtures";
@@ -23,6 +25,11 @@ export function getProposalContext(
 /** Full proposal days plus the following week for preparation; visibility is never an input. */
 export function getProposalIntelligenceContext(
   proposal: Pick<Proposal, "start" | "end"> & Partial<Proposal>,
+  data?: {
+    events: readonly Event[];
+    externalEvents: readonly ExternalEvent[];
+    exams: readonly Exam[];
+  },
 ) {
   const window = {
     start: easternDate(proposal.start),
@@ -32,11 +39,14 @@ export function getProposalIntelligenceContext(
     ),
   };
   return {
-    ...getNonExamAnalysisRecords(window),
-    exams: getExams({
-      ...window,
-      end: addCalendarDays(window.end, 7),
-      includeIdentityAlternatives: true,
-    }),
+    ...getNonExamAnalysisRecords(window, data?.events, data?.externalEvents),
+    exams: getExams(
+      {
+        ...window,
+        end: addCalendarDays(window.end, 7),
+        includeIdentityAlternatives: true,
+      },
+      data?.exams,
+    ),
   };
 }

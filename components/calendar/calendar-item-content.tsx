@@ -19,7 +19,8 @@ export function CalendarItemContent({
   const grid = info.view.type.startsWith("dayGrid");
   const hourly = info.view.type.startsWith("timeGrid") && !info.event.allDay;
   const headerCard = info.view.type.startsWith("timeGrid") && info.event.allDay;
-  const compact = (grid || hourly || headerCard) && p.kind !== "exam-review";
+  const compact =
+    (grid || hourly || headerCard) && (p.kind !== "exam-review" || p.certainty);
   const external = p.kind === "external" ? p.externalEvent : null;
   const times = p.segmentTime
     ? [p.segmentTime, p.segmentNote]
@@ -80,7 +81,7 @@ export function CalendarItemContent({
       {identity && <span className="compact-identity">{identity}</span>}
       <span className="event-category">
         {p.category}
-        {!p.kind && " · Example Event"}
+        {p.synthetic && " · Example Event"}
       </span>
       {hosts}
       {p.reviewDates && <span className="event-location">{p.reviewDates}</span>}
@@ -105,6 +106,7 @@ export function CalendarItemContent({
           </span>
         )}
         {title}
+        {p.certainty && <span className="card-detail">{p.certainty}</span>}
         {identity ? (
           <span className="card-detail compact-identity">{identity}</span>
         ) : !p.kind && (p.hosts || p.hostingIdentity) ? (

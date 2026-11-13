@@ -1,5 +1,7 @@
 "use client";
 import { dayGridItems } from "./display-items";
+import { PublicExamDetails } from "./public-exam-details";
+import type { StagedExam, StagedExamDataset } from "../../lib/exams/staging";
 import { ExternalEventDetails } from "./external-event-details";
 import type { ExternalEvent } from "../../lib/domain/external-events";
 import { plannerEventOrder } from "./planner-presentation";
@@ -82,6 +84,7 @@ export function EventCalendar(props: EventCalendarProps) {
     onEventSelect,
     onReset,
     mobile,
+    demo,
     planning,
     examReview,
     previewItems,
@@ -109,12 +112,19 @@ export function EventCalendar(props: EventCalendarProps) {
     start: date,
     end: addCalendarDays(date, 1),
   });
+  const [publicExam, setPublicExam] = useState<{
+    exam: StagedExam;
+    dataset: StagedExamDataset;
+    triggerId: string;
+  } | null>(null);
   const [externalSelection, setExternalSelection] = useState<{
     event: ExternalEvent;
     triggerId: string;
   } | null>(null);
   const [weekTriggerId, setWeekTriggerId] = useState("");
-  const [selectedWeek, setSelectedWeek] = useState<WeeklySummary | null>(null);
+  const [selectedWeek, setSelectedWeek] = useState<
+    (WeeklySummary & { reportedExams?: StagedExam[] }) | null
+  >(null);
   const [summarySelection, setSummarySelection] = useState<{
     date: string;
     start: string;
@@ -200,9 +210,22 @@ export function EventCalendar(props: EventCalendarProps) {
   const weeks = useMemo(
     () =>
       planningAudience && context
-        ? calendarWeeks(window.start, window.end).map((week) =>
-            summarizeWeek(week, planningAudience, context),
-          )
+        ? calendarWeeks(window.start, window.end).map((week) => {
+            const summary = summarizeWeek(week, planningAudience, context);
+            return {
+              ...summary,
+              reportedExams: context.publicExams
+                ? queryStagedExams(
+                    context.publicExams,
+                    week.start,
+                    week.end,
+                  ).filter(
+                    (exam) =>
+                      !summary.exams.some((mapped) => mapped.id === exam.id),
+                  )
+                : [],
+            };
+          })
         : [],
     [window, planningAudience, context],
   );
@@ -268,7 +291,15 @@ export function EventCalendar(props: EventCalendarProps) {
             ? dayGridItems(canonicalItems)
             : canonicalItems;
         setError(false);
-        setCount(reviewExams ? reviewExams.length : canonicalItems.length);
+        setCount(
+          reviewExams
+            ? reviewExams.length
+            : new Set(
+                canonicalItems.map(
+                  (item) => item.extendedProps?.canonicalExamId ?? item.id,
+                ),
+              ).size,
+        );
         success(
           planning?.showDensity && view.startsWith("timeGrid")
             ? [
@@ -301,7 +332,14 @@ export function EventCalendar(props: EventCalendarProps) {
     const id = event.extendedProps.canonicalEventId ?? event.id;
     if (event.extendedProps.kind === "exam-review" && examReview)
       examReview.onSelect(event.extendedProps.canonicalExamId, event.id);
-    else if (event.extendedProps.kind === "external")
+    else if (event.extendedProps.kind === "exam-review") {
+      const dataset = records.data?.publicExams;
+      const exam = dataset?.exams.find(
+        (item) => item.id === event.extendedProps.canonicalExamId,
+      );
+      if (exam && dataset)
+        setPublicExam({ exam, dataset, triggerId: event.id });
+    } else if (event.extendedProps.kind === "external")
       setExternalSelection({
         event: event.extendedProps.externalEvent,
         triggerId: event.id,
@@ -335,7 +373,7 @@ export function EventCalendar(props: EventCalendarProps) {
   const itemLabel = (event: EventApi) =>
     event.extendedProps.kind === "exam-review"
       ? (event.extendedProps.reviewLabel as string)
-      : `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? "Example scenario, not a real or verified event. Open external event details." : event.extendedProps.kind === "exam" ? "Open exam details." : "Fictional Example Event. Open event details."}`;
+      : `${event.title}. ${event.extendedProps.hosts ? `Hosted by ${event.extendedProps.hosts}. ` : ""}${event.extendedProps.hostingIdentity === "psu-hosted" ? "PSU Hosted. " : event.extendedProps.hostingIdentity === "co-hosted" ? "Co-hosted by Penn State and a student organization. " : ""}${event.extendedProps.timeLabel}. ${event.extendedProps.category}. ${event.extendedProps.kind === "proposal" ? "Open proposal form." : event.extendedProps.kind === "external" ? (event.extendedProps.externalEvent.source.verification === "synthetic" ? "Example scenario, not a real or verified event. Open external event details." : "Open external event details.") : event.extendedProps.kind === "exam" ? "Open exam details." : event.extendedProps.synthetic ? "Fictional Example Event. Open event details." : "Open event details."}`;
   const datesSet = (range: DatesSetArg) => {
     setTitle(range.view.title);
     const next = {
@@ -549,7 +587,13 @@ export function EventCalendar(props: EventCalendarProps) {
               classes.push("has-scheduling-guidance");
             return classes;
           }}
-          allDayText={examReview ? "Date options" : "All day"}
+          allDayText={
+            examReview
+              ? "Date options"
+              : demo
+                ? "All day"
+                : "All day / date context"
+          }
           noEventsContent={() =>
             remote && records.status !== "ready" ? (
               <p role="status">
@@ -705,6 +749,12 @@ export function EventCalendar(props: EventCalendarProps) {
           )}
         </div>
       )}
+      {publicExam && (
+        <PublicExamDetails
+          {...publicExam}
+          onClose={() => setPublicExam(null)}
+        />
+      )}
       {externalSelection && (
         <ExternalEventDetails
           event={externalSelection.event}
@@ -712,7 +762,7 @@ export function EventCalendar(props: EventCalendarProps) {
           onClose={() => setExternalSelection(null)}
         />
       )}
-      {selectedWeek && planning && context && (
+      {selectedWeek && planning && (
         <WeeklyDetails
           triggerId={weekTriggerId}
           week={selectedWeek}

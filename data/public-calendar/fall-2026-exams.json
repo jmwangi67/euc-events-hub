@@ -1,0 +1,2424 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "fall-2026-public-pilot",
+  "termId": "fall-2026",
+  "timeZone": "America/New_York",
+  "sources": [
+    {
+      "id": "fall-2026-science-schedule",
+      "label": "Fall 2026 science exam schedule, supplied for the EUC pilot",
+      "independentlyVerified": false,
+      "permissions": { "public": true, "planner": false }
+    }
+  ],
+  "exams": [
+    {
+      "id": "fall26-biol-114-course-testing-window-1",
+      "claims": [
+        {
+          "courseId": "BIOL 114",
+          "termId": "fall-2026",
+          "designation": "Exam 1",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-09-21", "2026-09-22"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "requested-unapproved",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-114-course-testing-window-2",
+      "claims": [
+        {
+          "courseId": "BIOL 114",
+          "termId": "fall-2026",
+          "designation": "Exam 2",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-10-15", "2026-10-16"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "requested-unapproved",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-114-course-testing-window-3",
+      "claims": [
+        {
+          "courseId": "BIOL 114",
+          "termId": "fall-2026",
+          "designation": "Exam 3",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-11-09", "2026-11-10"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "requested-unapproved",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-114-course-testing-window-4",
+      "claims": [
+        {
+          "courseId": "BIOL 114",
+          "termId": "fall-2026",
+          "designation": "Exam 4",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-12-07", "2026-12-08"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "requested-unapproved",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-141-course-testing-window-1",
+      "claims": [
+        {
+          "courseId": "BIOL 141",
+          "termId": "fall-2026",
+          "designation": "Exam 1",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-09-14", "2026-09-15"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-141-course-testing-window-2",
+      "claims": [
+        {
+          "courseId": "BIOL 141",
+          "termId": "fall-2026",
+          "designation": "Exam 2",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-10-12", "2026-10-13"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-141-course-testing-window-3",
+      "claims": [
+        {
+          "courseId": "BIOL 141",
+          "termId": "fall-2026",
+          "designation": "Exam 3",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-11-09", "2026-11-10"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-224-course-testing-window-1",
+      "claims": [
+        {
+          "courseId": "BIOL 224",
+          "termId": "fall-2026",
+          "designation": "eTesting Exam 1",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-09-23", "2026-09-24"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-224-course-testing-window-2",
+      "claims": [
+        {
+          "courseId": "BIOL 224",
+          "termId": "fall-2026",
+          "designation": "eTesting Exam 2",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-10-21", "2026-10-22"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-biol-224-course-testing-window-3",
+      "claims": [
+        {
+          "courseId": "BIOL 224",
+          "termId": "fall-2026",
+          "designation": "eTesting Exam 3",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-11-18", "2026-11-19"],
+            "additionalPossibleDates": ["2026-11-20"]
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-110-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 110",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-21T22:15:00.000Z",
+            "end": "2026-09-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-110-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 110",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-12T22:15:00.000Z",
+            "end": "2026-10-12T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-110-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "CHEM 110",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-09T23:15:00.000Z",
+            "end": "2026-11-10T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-110b-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 110B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-22T22:15:00.000Z",
+            "end": "2026-09-22T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-110b-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 110B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-13T22:15:00.000Z",
+            "end": "2026-10-13T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-110b-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "CHEM 110B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-10T23:15:00.000Z",
+            "end": "2026-11-11T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-112-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 112",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-15T22:15:00.000Z",
+            "end": "2026-09-15T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-112-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 112",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-06T22:15:00.000Z",
+            "end": "2026-10-06T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-112-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "CHEM 112",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-03T23:15:00.000Z",
+            "end": "2026-11-04T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-112-evening-timetable-4",
+      "claims": [
+        {
+          "courseId": "CHEM 112",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-12-01T23:15:00.000Z",
+            "end": "2026-12-02T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-130-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 130",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-16T22:15:00.000Z",
+            "end": "2026-09-16T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-130-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 130",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-14T22:15:00.000Z",
+            "end": "2026-10-14T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-130-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "CHEM 130",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-11T23:15:00.000Z",
+            "end": "2026-11-12T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-212-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 212",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-23T22:15:00.000Z",
+            "end": "2026-09-23T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-212-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 212",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-26T22:15:00.000Z",
+            "end": "2026-10-26T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-212-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "CHEM 212",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-12-02T23:15:00.000Z",
+            "end": "2026-12-03T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-227-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 227",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-13T22:15:00.000Z",
+            "end": "2026-10-13T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-227-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 227",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-10T23:15:00.000Z",
+            "end": "2026-11-11T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-404-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 404",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-30T22:15:00.000Z",
+            "end": "2026-09-30T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-404-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 404",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-04T23:15:00.000Z",
+            "end": "2026-11-05T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-430-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 430",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-16T22:15:00.000Z",
+            "end": "2026-09-16T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-430-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 430",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-07T22:15:00.000Z",
+            "end": "2026-10-07T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-430-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "CHEM 430",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-04T23:15:00.000Z",
+            "end": "2026-11-05T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-430-evening-timetable-4",
+      "claims": [
+        {
+          "courseId": "CHEM 430",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-12-02T23:15:00.000Z",
+            "end": "2026-12-03T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-452-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "CHEM 452",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-30T22:15:00.000Z",
+            "end": "2026-09-30T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-chem-452-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "CHEM 452",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-04T23:15:00.000Z",
+            "end": "2026-11-05T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-110-course-testing-window-1",
+      "claims": [
+        {
+          "courseId": "MATH 110",
+          "termId": "fall-2026",
+          "designation": "Exam 1",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-09-17", "2026-09-18"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-110-course-testing-window-2",
+      "claims": [
+        {
+          "courseId": "MATH 110",
+          "termId": "fall-2026",
+          "designation": "Exam 2",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-10-07", "2026-10-08"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-110-course-testing-window-3",
+      "claims": [
+        {
+          "courseId": "MATH 110",
+          "termId": "fall-2026",
+          "designation": "Exam 3",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-10-26", "2026-10-27"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-110-course-testing-window-4",
+      "claims": [
+        {
+          "courseId": "MATH 110",
+          "termId": "fall-2026",
+          "designation": "Exam 4",
+          "timing": {
+            "kind": "date-options",
+            "timeZone": "America/New_York",
+            "reportedDates": ["2026-11-12", "2026-11-13"],
+            "additionalPossibleDates": []
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Course testing window",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-140-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 140",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-23T22:15:00.000Z",
+            "end": "2026-09-23T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-140-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 140",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-22T22:15:00.000Z",
+            "end": "2026-10-22T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-140-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 140",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-17T23:15:00.000Z",
+            "end": "2026-11-18T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-140b-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 140B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-22T22:15:00.000Z",
+            "end": "2026-09-22T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-140b-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 140B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-27T22:15:00.000Z",
+            "end": "2026-10-27T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-141-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 141",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-24T22:15:00.000Z",
+            "end": "2026-09-24T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-141-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 141",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-21T22:15:00.000Z",
+            "end": "2026-10-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-141-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 141",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-16T23:15:00.000Z",
+            "end": "2026-11-17T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-141b-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 141B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-22T22:15:00.000Z",
+            "end": "2026-09-22T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-141b-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 141B",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-27T22:15:00.000Z",
+            "end": "2026-10-27T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-21-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 21",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-21T22:15:00.000Z",
+            "end": "2026-09-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-21-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 21",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-20T22:15:00.000Z",
+            "end": "2026-10-20T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-21-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 21",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-17T23:15:00.000Z",
+            "end": "2026-11-18T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-22-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 22",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-21T22:15:00.000Z",
+            "end": "2026-09-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-22-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 22",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-20T22:15:00.000Z",
+            "end": "2026-10-20T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-22-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 22",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-17T23:15:00.000Z",
+            "end": "2026-11-18T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-220-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 220",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-29T22:15:00.000Z",
+            "end": "2026-09-29T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-220-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 220",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-05T23:15:00.000Z",
+            "end": "2026-11-06T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-230-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 230",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-24T22:15:00.000Z",
+            "end": "2026-09-24T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-230-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 230",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-21T22:15:00.000Z",
+            "end": "2026-10-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-230-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 230",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-18T23:15:00.000Z",
+            "end": "2026-11-19T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-231-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 231",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-13T22:15:00.000Z",
+            "end": "2026-10-13T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-231-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 231",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-18T23:15:00.000Z",
+            "end": "2026-11-19T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-250-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 250",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-01T22:15:00.000Z",
+            "end": "2026-10-01T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-250-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 250",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-10T23:15:00.000Z",
+            "end": "2026-11-11T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-251-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 251",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-30T22:15:00.000Z",
+            "end": "2026-09-30T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-251-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 251",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-16T23:15:00.000Z",
+            "end": "2026-11-17T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-26-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 26",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-21T22:15:00.000Z",
+            "end": "2026-09-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-26-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 26",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-20T22:15:00.000Z",
+            "end": "2026-10-20T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-26-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 26",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-17T23:15:00.000Z",
+            "end": "2026-11-18T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-41-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "MATH 41",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-24T22:15:00.000Z",
+            "end": "2026-09-24T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-41-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "MATH 41",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-21T22:15:00.000Z",
+            "end": "2026-10-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-math-41-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "MATH 41",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-16T23:15:00.000Z",
+            "end": "2026-11-17T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-211-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "PHYS 211",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-09-17T22:15:00.000Z",
+            "end": "2026-09-17T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-211-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "PHYS 211",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-15T22:15:00.000Z",
+            "end": "2026-10-15T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-211-evening-timetable-3",
+      "claims": [
+        {
+          "courseId": "PHYS 211",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-12T23:15:00.000Z",
+            "end": "2026-11-13T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-212-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "PHYS 212",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-01T22:15:00.000Z",
+            "end": "2026-10-01T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-212-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "PHYS 212",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-05T23:15:00.000Z",
+            "end": "2026-11-06T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-213-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "PHYS 213",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-14T22:15:00.000Z",
+            "end": "2026-10-14T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-214-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "PHYS 214",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-21T22:15:00.000Z",
+            "end": "2026-10-21T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-250-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "PHYS 250",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-06T22:15:00.000Z",
+            "end": "2026-10-06T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-250-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "PHYS 250",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-11T23:15:00.000Z",
+            "end": "2026-11-12T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-251-evening-timetable-1",
+      "claims": [
+        {
+          "courseId": "PHYS 251",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-10-05T22:15:00.000Z",
+            "end": "2026-10-05T23:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "fall26-phys-251-evening-timetable-2",
+      "claims": [
+        {
+          "courseId": "PHYS 251",
+          "termId": "fall-2026",
+          "designation": "Evening exam — designation not supplied",
+          "timing": {
+            "kind": "timed",
+            "timeZone": "America/New_York",
+            "start": "2026-11-09T23:15:00.000Z",
+            "end": "2026-11-10T00:30:00.000Z",
+            "basis": "source-default",
+            "basisNote": "Master evening schedule heading: 6:15–7:30 PM unless otherwise stated"
+          },
+          "sourceStatus": "reported-unverified",
+          "sourceId": "fall-2026-science-schedule",
+          "importBatchId": "fall-2026-public-pilot",
+          "sourceReference": "Evening timetable",
+          "publicationStatus": "approved-for-public",
+          "sections": null,
+          "audience": {
+            "reviewed": false,
+            "majorIds": [],
+            "academicLevels": []
+          }
+        }
+      ]
+    }
+  ]
+}

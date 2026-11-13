@@ -9,6 +9,7 @@ import {
   eventCategorySchema,
   instantSchema,
 } from "../domain/models";
+import { stagedExamDatasetSchema } from "../exams/staging";
 import { externalEventSchema } from "../domain/external-events";
 
 const ids = z.array(z.string().min(1).max(200)).max(100);
@@ -64,6 +65,7 @@ export const calendarDataSchema = z
     events: z.array(eventSchema),
     exams: z.array(examSchema),
     externalEvents: z.array(externalEventSchema),
+    publicExams: stagedExamDatasetSchema.optional(),
     organizations: z.array(organizationSchema),
   })
   .strict();

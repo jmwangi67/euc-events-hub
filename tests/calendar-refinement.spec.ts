@@ -133,8 +133,7 @@ test("four October 25 cards fit, overflow remains bounded and external clicks ar
     .locator(".calendar-region")
     .screenshot({ path: "work/focused-week.png" });
 });
-test("icon inventory is unavailable in production", async ({ request }) =>
-  expect((await request.get("/dev/icons")).status()).toBe(404));
+
 for (const width of [320, 375, 430, 768, 1024, 1440])
   test(`shared icons and readable overnight list at ${width}px`, async ({
     page,

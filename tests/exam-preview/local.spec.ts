@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test("switches from demonstration planner to an explicitly separate invented review dataset", async ({
+test("switches from the organization planner to an explicitly separate invented review dataset", async ({
   page,
 }) => {
   await page.goto("/planner");
@@ -28,10 +28,11 @@ test("switches from demonstration planner to an explicitly separate invented rev
     page.locator(".fc-event").filter({ hasText: "EXAMPLE-" }),
   ).toHaveCount(0);
   await page
-    .getByRole("link", { name: "Fictional demonstration planner", exact: true })
+    .getByRole("navigation", { name: "Exam dataset" })
+    .getByRole("link", { name: "Organization planner", exact: true })
     .click();
   await expect(
-    page.getByRole("button", { name: "Load sample scenario", exact: true }),
+    page.getByRole("heading", { name: "Find a time for your audience" }),
   ).toBeVisible();
   await expect(page.locator(".calendar-surface")).not.toContainText(
     "DEMO-LAB-A",
@@ -106,7 +107,7 @@ for (const width of [320, 375, 430, 768, 1440]) {
         '.calendar-region [data-calendar-event-id^="staged:invented-request:"]',
       )
       .first();
-    await expect(requested).toContainText("requested unapproved");
+    await expect(requested).toContainText("Requested, not approved");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

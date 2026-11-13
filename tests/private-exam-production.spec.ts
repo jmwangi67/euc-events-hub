@@ -4,6 +4,8 @@ test("production never serves the private review even when preview flags are sup
   request,
 }) => {
   const response = await request.get("/planner/exam-preview");
+  expect((await request.get("/dev/calendar-layout")).status()).toBe(404);
+  expect((await request.get("/dev/icons")).status()).toBe(404);
   expect(response.status()).toBe(404);
   expect(await response.text()).not.toContain("invented-review-dataset");
   await page.goto("/planner");
@@ -14,7 +16,7 @@ test("production never serves the private review even when preview flags are sup
     page.getByText("Private exam data preview — unverified", { exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Load sample scenario", exact: true }),
+    page.getByRole("heading", { name: "Find a time for your audience" }),
   ).toBeVisible();
   await page.goto("/");
   await expect(page.locator("body")).not.toContainText("DEMO-LAB-A");
