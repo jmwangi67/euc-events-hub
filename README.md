@@ -248,3 +248,12 @@ explicit ownership and executable grants/RLS/API-denial tests. The application
 continues using fixtures and works with PostgreSQL stopped. B2a adds no
 application tables or authentication. See the guide before running the explicitly
 local, disposable reset verification commands.
+
+### B2b reference registries
+
+Six private, normalized [reference registries](docs/B2B_REFERENCE_REGISTRIES.md)
+add majors, host identities, ordered default majors, clusters, student-only
+memberships and multiple parent affiliations. They remain closed to application
+roles with forced RLS and zero access policies. Tests use a separate disposable
+database; the retained development volume cannot be reset through that mode.
+The application continues using its existing fixtures.

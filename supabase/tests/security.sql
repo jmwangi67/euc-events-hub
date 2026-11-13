@@ -1,27 +1,7 @@
 \set ON_ERROR_STOP on
 BEGIN;
 
--- Test helpers live only in this connection and transaction. No SECURITY DEFINER.
-CREATE FUNCTION pg_temp.check_true(ok boolean, message text) RETURNS void
-LANGUAGE plpgsql AS $$ BEGIN
-  IF ok IS DISTINCT FROM true THEN RAISE EXCEPTION '%', message; END IF;
-END $$;
-
-CREATE FUNCTION pg_temp.expect_error(statement text, code text, message text)
-RETURNS void LANGUAGE plpgsql AS $$
-DECLARE actual_code text; actual_message text;
-BEGIN
-  BEGIN
-    EXECUTE statement;
-  EXCEPTION WHEN OTHERS THEN
-    GET STACKED DIAGNOSTICS actual_code = RETURNED_SQLSTATE, actual_message = MESSAGE_TEXT;
-    IF actual_code <> code OR position(message in actual_message) = 0 THEN
-      RAISE EXCEPTION 'Wrong error: % %', actual_code, actual_message;
-    END IF;
-    RETURN;
-  END;
-  RAISE EXCEPTION 'Expected denial but statement succeeded: %', statement;
-END $$;
+-- @test-helpers@
 
 CREATE FUNCTION pg_temp.check_foundation() RETURNS void LANGUAGE plpgsql AS $$
 DECLARE actor text;
@@ -79,9 +59,12 @@ BEGIN
 END $$;
 
 SELECT pg_temp.check_foundation();
-SELECT pg_temp.check_true(NOT EXISTS (SELECT FROM pg_class WHERE relnamespace = 'euc'::regnamespace)
-  AND NOT EXISTS (SELECT FROM pg_proc WHERE pronamespace = 'euc'::regnamespace),
-  'B2a must contain no permanent application objects');
+-- Strict six-table allowlist, also enforced by baseline.sql before/after probes.
+SELECT pg_temp.check_true((SELECT array_agg(relname::text ORDER BY relname)
+  FROM pg_class WHERE relnamespace='euc'::regnamespace AND relkind='r') =
+  (SELECT array_agg(value ORDER BY value) FROM jsonb_array_elements_text(
+    current_setting('euc.reference_manifest')::jsonb->'tables')),
+  'B2b must contain exactly the six approved reference tables');
 
 -- Prove the drift checks actually fail, then restore the original state.
 SAVEPOINT drift;
@@ -179,7 +162,7 @@ RESET SESSION AUTHORIZATION;
 -- Ordinary object ACLs remain closed even if schema USAGE is temporarily
 -- granted. This isolates object denial from the schema's earlier denial.
 GRANT USAGE ON SCHEMA euc TO anon, authenticated, service_role;
-DO $$ DECLARE actor text; statement text; BEGIN
+DO $$ DECLARE actor text; statement text; relation text; operation text; BEGIN
   FOREACH actor IN ARRAY ARRAY['anon','authenticated','service_role'] LOOP
     EXECUTE format('SET SESSION AUTHORIZATION %I', actor);
     FOREACH statement IN ARRAY ARRAY[
@@ -196,6 +179,15 @@ DO $$ DECLARE actor text; statement text; BEGIN
         RAISE EXCEPTION 'ordinary privilege leaked: % %', actor, statement;
       EXCEPTION WHEN insufficient_privilege THEN NULL;
       END;
+    END LOOP;
+    FOREACH relation IN ARRAY ARRAY(SELECT jsonb_array_elements_text(current_setting('euc.reference_manifest')::jsonb->'tables')) LOOP
+      FOREACH operation IN ARRAY ARRAY['SELECT * FROM euc.%I','INSERT INTO euc.%I DEFAULT VALUES','DELETE FROM euc.%I','TRUNCATE euc.%I'] LOOP
+        BEGIN
+          EXECUTE format(operation,relation);
+          RAISE EXCEPTION 'reference object access leaked: % %',actor,relation;
+        EXCEPTION WHEN insufficient_privilege THEN NULL;
+        END;
+      END LOOP;
     END LOOP;
     RESET SESSION AUTHORIZATION;
   END LOOP;
@@ -250,7 +242,7 @@ SELECT pg_temp.check_true((SELECT count(*) = 1 AND min(marker) = 'synthetic'
 ROLLBACK;
 DO $$ BEGIN
   IF EXISTS (SELECT FROM pg_roles WHERE rolname='euc_rls_probe')
-    OR EXISTS (SELECT FROM pg_class WHERE relnamespace='euc'::regnamespace)
+    OR EXISTS (SELECT FROM pg_class WHERE relnamespace='euc'::regnamespace AND left(relname,2)='__')
     OR EXISTS (SELECT FROM pg_namespace WHERE nspname='__euc_default_probe') THEN
     RAISE EXCEPTION 'Security probe cleanup failed';
   END IF;

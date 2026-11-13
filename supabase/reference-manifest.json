@@ -1,0 +1,95 @@
+{
+  "migrations": [
+    "20261031000100_closed_foundation.sql",
+    "20261101000100_reference_registries.sql"
+  ],
+  "tables": [
+    "majors",
+    "organizations",
+    "organization_default_majors",
+    "organization_clusters",
+    "organization_cluster_memberships",
+    "organization_parents"
+  ],
+  "columns": {
+    "majors": [
+      "id",
+      "public_id",
+      "name",
+      "abbreviation",
+      "display_order",
+      "is_synthetic",
+      "created_at"
+    ],
+    "organizations": [
+      "id",
+      "public_id",
+      "name",
+      "display_order",
+      "is_synthetic",
+      "created_at",
+      "description",
+      "classification",
+      "host_type",
+      "institution_key",
+      "unit_type",
+      "short_name",
+      "compact_name",
+      "identity_source_label",
+      "identity_source_url",
+      "identity_source_verification"
+    ],
+    "organization_default_majors": ["organization_id", "major_id", "position"],
+    "organization_clusters": [
+      "id",
+      "public_id",
+      "name",
+      "description",
+      "display_order",
+      "is_synthetic",
+      "created_at"
+    ],
+    "organization_cluster_memberships": [
+      "organization_id",
+      "cluster_id",
+      "position",
+      "organization_host_type"
+    ],
+    "organization_parents": [
+      "organization_id",
+      "parent_organization_id",
+      "position"
+    ]
+  },
+  "indexes": [
+    "majors_pkey",
+    "majors_public_id_key",
+    "organizations_pkey",
+    "organizations_public_id_key",
+    "organizations_id_host_type_key",
+    "organization_default_majors_pkey",
+    "organization_default_majors_position_key",
+    "organization_default_majors_reverse_idx",
+    "organization_clusters_pkey",
+    "organization_clusters_public_id_key",
+    "organization_cluster_memberships_pkey",
+    "organization_cluster_memberships_position_key",
+    "organization_cluster_memberships_reverse_idx",
+    "organization_parents_pkey",
+    "organization_parents_position_key",
+    "organization_parents_reverse_idx"
+  ],
+  "infrastructure": {
+    "auth_migrations": [
+      "20171026211738",
+      "20171026211808",
+      "20171026211834",
+      "20180103212743",
+      "20180108183307",
+      "20180119214651",
+      "20180125194653"
+    ],
+    "schema_signature": "3cd3be27e31c5a0ddc184a2c1a0c5049d06767cd3fa5187049015d6c1299666d",
+    "function_migrations": ["20210809183423_update_grants", "initial"]
+  }
+}

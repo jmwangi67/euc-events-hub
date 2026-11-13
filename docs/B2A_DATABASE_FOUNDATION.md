@@ -1,5 +1,11 @@
 # B2a: closed local PostgreSQL foundation
 
+This documents the original B2a foundation. B2b extends it with six private
+reference tables and a separate disposable reset target. Follow the current
+[B2b schema and command guide](B2B_REFERENCE_REGISTRIES.md) for migration,
+verification and reset behavior; `--disposable` now selects the isolated test
+project and cannot reset the retained development volume.
+
 The application still uses the B1 fixture provider. PostgreSQL is optional for
 running the student calendar, planner, public endpoints and private exam preview.
 B2a creates no application tables, public functions, views, access policies or

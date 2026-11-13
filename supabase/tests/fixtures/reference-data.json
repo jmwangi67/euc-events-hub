@@ -1,0 +1,113 @@
+{
+  "majors": [
+    {
+      "id": "invented-flux",
+      "name": "Invented Flux Engineering",
+      "abbreviation": "IFE"
+    },
+    {
+      "id": "invented-resonance",
+      "name": "Invented Flux Engineering",
+      "abbreviation": "IFE"
+    },
+    {
+      "id": "invented-lattice",
+      "name": "Invented Lattice Engineering",
+      "abbreviation": "ILE"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "invented-guild",
+      "name": "Invented Resonance Guild",
+      "description": "",
+      "classification": "invented cross-disciplinary grouping",
+      "hostType": "student-organization",
+      "shortName": "IRG",
+      "compactName": "Guild",
+      "defaultMajorIds": ["invented-resonance", "invented-flux"],
+      "clusterIds": ["invented-builders", "invented-research"],
+      "parentUnitIds": [],
+      "networkIds": [],
+      "source": {
+        "label": "Invented identity fixture, not an institutional claim",
+        "url": "https://registry.example.invalid/identity?type=guild#synthetic",
+        "verification": "synthetic"
+      }
+    },
+    {
+      "id": "invented-unclassified",
+      "name": "Invented Unclassified Host",
+      "hostType": "unknown",
+      "defaultMajorIds": [],
+      "clusterIds": [],
+      "parentUnitIds": [],
+      "networkIds": []
+    },
+    {
+      "id": "invented-college",
+      "name": "Invented College of Lattices",
+      "hostType": "university-unit",
+      "institutionId": "invented-institution",
+      "unitType": "college",
+      "defaultMajorIds": [],
+      "clusterIds": [],
+      "parentUnitIds": [],
+      "networkIds": []
+    },
+    {
+      "id": "invented-school",
+      "name": "Invented School of Resonance",
+      "hostType": "university-unit",
+      "institutionId": "invented-institution",
+      "unitType": "school",
+      "defaultMajorIds": [],
+      "clusterIds": [],
+      "parentUnitIds": [],
+      "networkIds": []
+    },
+    {
+      "id": "invented-department",
+      "name": "Invented Joint Department of Flux",
+      "description": "Invented dual affiliation; first parent is the administrative home.",
+      "hostType": "university-unit",
+      "institutionId": "invented-institution",
+      "unitType": "department",
+      "shortName": "Flux Dept.",
+      "compactName": "Flux",
+      "defaultMajorIds": ["invented-lattice"],
+      "clusterIds": [],
+      "parentUnitIds": ["invented-school", "invented-college"],
+      "networkIds": [],
+      "source": {
+        "label": "Invented joint identity",
+        "verification": "synthetic"
+      }
+    },
+    {
+      "id": "invented-absent-kind",
+      "name": "Invented Host With Unspecified Kind",
+      "defaultMajorIds": [],
+      "clusterIds": [],
+      "parentUnitIds": [],
+      "networkIds": []
+    }
+  ],
+  "clusters": [
+    {
+      "id": "invented-builders",
+      "name": "Invented Builders Circle",
+      "description": "Invented technical activity cluster."
+    },
+    {
+      "id": "invented-research",
+      "name": "Invented Research Circle",
+      "description": "Invented research activity cluster."
+    },
+    {
+      "id": "invented-spare",
+      "name": "Invented Unassigned Circle",
+      "description": "Invented constraint-test cluster."
+    }
+  ]
+}
