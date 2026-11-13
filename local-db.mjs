@@ -1,19 +1,53 @@
 import { spawnSync } from "node:child_process";
 import { createHmac } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, statfsSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  statfsSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(fileURLToPath(import.meta.url));
-const project = "euc-events-hub-b2a";
-const network = "euc-b2a-local";
-const database = `supabase_db_${project}`;
-const serviceNames = [
+const manifest = JSON.parse(
+  readFileSync(join(root, "supabase/reference-manifest.json"), "utf8"),
+);
+export function targetFor(disposable) {
+  const project = disposable ? "euc-events-hub-b2b-test" : "euc-events-hub-b2a";
+  return {
+    disposable,
+    project,
+    network: disposable ? "euc-b2b-test-local" : "euc-b2a-local",
+    directory: disposable ? join(root, "work", "b2b-disposable") : root,
+    apiPort: disposable ? 55321 : 54321,
+    ports: disposable
+      ? [55320, 55321, 55322, 55323, 55324, 55329]
+      : [54320, 54321, 54322, 54323, 54324, 54329],
+  };
+}
+let target = targetFor(false);
+let { project, network, ports } = target;
+let database = `supabase_db_${project}`;
+let serviceNames = [
   database,
   `supabase_rest_${project}`,
   `supabase_kong_${project}`,
 ];
-const ports = [54320, 54321, 54322, 54323, 54324, 54329];
+function selectTarget(disposable) {
+  target = targetFor(disposable);
+  ({ project, network, ports } = target);
+  database = `supabase_db_${project}`;
+  serviceNames = [
+    database,
+    `supabase_rest_${project}`,
+    `supabase_kong_${project}`,
+  ];
+}
 const host =
   process.platform === "win32"
     ? "npipe:////./pipe/dockerDesktopLinuxEngine"
@@ -26,7 +60,9 @@ export function parseOperation(args) {
   if (
     mode !== "--local" ||
     extra.length ||
-    (destructive ? disposable !== "--disposable" : disposable !== undefined) ||
+    (destructive
+      ? disposable !== "--disposable"
+      : disposable !== undefined && disposable !== "--disposable") ||
     ![
       "preflight",
       "start",
@@ -134,7 +170,7 @@ const cli = (...args) =>
     join(root, "node_modules/supabase/dist/supabase.js"),
     ...args,
     "--workdir",
-    root,
+    target.directory,
     "--network-id",
     network,
   ]);
@@ -321,6 +357,80 @@ function preflight() {
   );
   console.log(docker("system", "df"));
 }
+function prepareTarget(stage = "full") {
+  const files = readdirSync(join(root, "supabase/migrations")).sort();
+  if (
+    JSON.stringify(files) !== JSON.stringify([...manifest.migrations].sort())
+  ) {
+    throw new Error(
+      "Unexpected migration files; only the reviewed B2a/B2b migration manifest is accepted.",
+    );
+  }
+  if (!target.disposable) return;
+  const directory = join(target.directory, "supabase");
+  for (const path of [
+    ".env",
+    ".env.local",
+    "supabase/.env",
+    "supabase/.env.local",
+    "supabase/.temp/project-ref",
+  ]) {
+    if (existsSync(join(target.directory, path)))
+      throw new Error(`Unsafe disposable workdir: ${path}`);
+  }
+  mkdirSync(join(directory, "migrations"), { recursive: true });
+  if (
+    readdirSync(join(directory, "migrations")).some(
+      (file) => !manifest.migrations.includes(file),
+    )
+  ) {
+    throw new Error(
+      "Unexpected migration in disposable workdir; refusing to overwrite or delete it.",
+    );
+  }
+  const config = readFileSync(join(root, "supabase/config.toml"), "utf8")
+    .replace('project_id = "euc-events-hub-b2a"', `project_id = "${project}"`)
+    .replace(/^port = 54321$/m, "port = 55321")
+    .replace(/^port = 54322$/m, "port = 55322")
+    .replace(/^shadow_port = 54320$/m, "shadow_port = 55320");
+  writeFileSync(join(directory, "config.toml"), config);
+  copyFileSync(join(root, "supabase/roles.sql"), join(directory, "roles.sql"));
+  for (const [index, file] of manifest.migrations.entries()) {
+    const destination = join(directory, "migrations", file);
+    if (stage === "b2a" && index > 0) {
+      // Only this known generated migration file, never a volume or unknown file.
+      if (existsSync(destination)) unlinkSync(destination);
+    } else copyFileSync(join(root, "supabase/migrations", file), destination);
+  }
+}
+function baselineSql(b2a, empty = false) {
+  const spec = {
+    ...manifest,
+    tables: b2a ? [] : manifest.tables,
+    indexes: b2a ? [] : manifest.indexes,
+    versions: (b2a ? manifest.migrations.slice(0, 1) : manifest.migrations).map(
+      (file) => file.split("_")[0],
+    ),
+  };
+  return `SET euc.reference_manifest = '${JSON.stringify(spec).replaceAll("'", "''")}';\nSET euc.infrastructure_query = '${readFileSync(join(root, "supabase/tests/infrastructure-inventory.sql"), "utf8").replaceAll("'", "''")}';\nSET euc.require_empty = '${empty}';\n${readFileSync(join(root, "supabase/tests/baseline.sql"), "utf8")}`;
+}
+function currentBaseline() {
+  const history = sql(
+    "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version;",
+  );
+  const baseline = manifest.migrations[0].split("_")[0];
+  if (history === baseline) return true;
+  if (
+    history === manifest.migrations.map((file) => file.split("_")[0]).join("\n")
+  )
+    return false;
+  throw new Error(
+    `Unexpected migration history; refusing operation: ${history}`,
+  );
+}
+function assertBaseline(b2a = false, empty = false) {
+  sql(baselineSql(b2a, empty));
+}
 function start() {
   preflight();
   ensureNetwork(true);
@@ -332,7 +442,11 @@ function start() {
   cli("db", "start");
   checkServices();
 }
-async function reset() {
+async function reset(stage = "full") {
+  if (!target.disposable)
+    throw new Error(
+      "Persistent development databases cannot be reset by this tool.",
+    );
   preflight();
   const containers = checkServices();
   const db = containers.find((item) => item.Name === `/${database}`);
@@ -342,44 +456,67 @@ async function reset() {
   if (mount?.Type !== "volume" || mount.Name !== database)
     throw new Error("Unexpected reset data volume.");
   const [volume] = JSON.parse(docker("volume", "inspect", mount.Name));
-  if (volume.Labels?.["com.supabase.cli.project"] !== project)
+  if (
+    volume.Labels?.["com.supabase.cli.project"] !== project ||
+    volume.Driver !== "local" ||
+    Object.keys(volume.Options ?? {}).length
+  )
     throw new Error("Unexpected volume project label.");
-  const count = sql(
-    "SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','euc') AND c.relkind IN ('r','p','v','m','S','f');",
-  );
-  if (count !== "0")
-    throw new Error(
-      "Reset refused: public/euc contains application objects. B2a resets are only for empty disposable foundations.",
-    );
+  assertBaseline(currentBaseline(), true);
   console.log(
-    `Verified disposable reset target: ${volume.Name}; application relations=0`,
+    `Verified isolated disposable reset target: ${volume.Name}; known baseline, stored rows=0`,
   );
+  prepareTarget(stage);
   cli("db", "reset", "--local", "--no-seed", "--yes");
   const hasApi = containers.some((item) => item.Name.includes("_kong_"));
   checkServices(hasApi);
+  assertBaseline(stage === "b2a", true);
   if (hasApi) await apiTest();
   console.log(
     "PASS: fresh local reset, roles.sql bootstrap and versioned migrations",
   );
 }
+function runSqlTest(file) {
+  const quote = (value) => value.replaceAll("'", "''");
+  const source = readFileSync(join(root, "supabase/tests", file), "utf8")
+    .replace("-- @test-helpers@", () =>
+      readFileSync(join(root, "supabase/tests/helpers.sql"), "utf8"),
+    )
+    .replace("-- @synthetic-fixtures@", () =>
+      readFileSync(
+        join(root, "supabase/tests/fixtures/reference-data.sql"),
+        "utf8",
+      ),
+    );
+  const settings = `SET euc.synthetic_reference = '${quote(readFileSync(join(root, "supabase/tests/fixtures/reference-data.json"), "utf8"))}';\nSET euc.baseline_assertion = '${quote(readFileSync(join(root, "supabase/tests/baseline.sql"), "utf8"))}';`;
+  console.log(sql(`${baselineSql(false)}\n${settings}\n${source}`));
+}
 function securityTest() {
   checkServices();
-  console.log(
-    sql(readFileSync(join(root, "supabase/tests/security.sql"), "utf8")),
-  );
+  assertBaseline();
+  runSqlTest("security.sql");
   sql(
     `BEGIN;\n${readFileSync(join(root, "supabase/roles.sql"), "utf8")}\nROLLBACK;`,
     "postgres",
   );
   console.log("PASS: bootstrap can be rerun without changing security state");
+  runSqlTest("reference-integrity.sql");
+  assertBaseline(false, target.disposable);
+  if (target.disposable)
+    console.log(
+      "PASS: reference and infrastructure user-data tables are empty after probe rollback",
+    );
 }
 function migrate() {
   checkServices();
+  assertBaseline(currentBaseline());
   const before = sql(
     "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version;",
   );
+  prepareTarget();
   cli("migration", "up", "--local");
   checkServices();
+  assertBaseline();
   const after = sql(
     "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version;",
   );
@@ -454,7 +591,7 @@ async function apiTest() {
       Connection: "close",
     };
     const request = (path, options = {}) =>
-      fetch(`http://127.0.0.1:54321/rest/v1/${path}`, {
+      fetch(`http://127.0.0.1:${target.apiPort}/rest/v1/${path}`, {
         redirect: "error",
         signal: AbortSignal.timeout(10_000),
         ...options,
@@ -479,28 +616,30 @@ async function apiTest() {
         `${actor}: invalid bearer was not rejected by PostgREST; actor verification is unreliable.`,
       );
     }
-    for (const method of ["GET", "POST"]) {
-      const response = await request("__b2a_probe", {
-        method,
-        headers: {
-          [method === "GET" ? "Accept-Profile" : "Content-Profile"]: "euc",
-          "Content-Type": "application/json",
-        },
-        ...(method === "POST" ? { body: "{}" } : {}),
-      });
-      const body = await response.json();
-      if (response.status !== 406 || body.code !== "PGRST106")
-        throw new Error(
-          `${actor} ${method}: expected schema exclusion (406/PGRST106), got ${response.status}/${body.code}.`,
-        );
-    }
+    for (const table of manifest.tables)
+      for (const method of ["GET", "POST"]) {
+        const response = await request(table, {
+          method,
+          headers: {
+            [method === "GET" ? "Accept-Profile" : "Content-Profile"]: "euc",
+            "Content-Type": "application/json",
+          },
+          ...(method === "POST" ? { body: "{}" } : {}),
+        });
+        const body = await response.json();
+        if (response.status !== 406 || body.code !== "PGRST106")
+          throw new Error(
+            `${actor} ${method} ${table}: expected schema exclusion (406/PGRST106), got ${response.status}/${body.code}.`,
+          );
+      }
     console.log(
-      `PASS: ${actor} API positive control=200; invalid bearer=401/PGRST301; private GET/POST=406/PGRST106`,
+      `PASS: ${actor} API positive control=200; invalid bearer=401/PGRST301; private GET/POST on all ${manifest.tables.length} tables=406/PGRST106`,
     );
   }
 }
 async function main() {
   const operation = parseOperation(process.argv.slice(2));
+  selectTarget(process.argv.slice(2).includes("--disposable"));
   for (const path of [
     "supabase/.temp/project-ref",
     ".env",
@@ -513,7 +652,7 @@ async function main() {
   }
   const config = readFileSync(join(root, "supabase/config.toml"), "utf8");
   if (
-    !config.includes(`project_id = "${project}"`) ||
+    !config.includes('project_id = "euc-events-hub-b2a"') ||
     config.includes("env(") ||
     !config.includes('schemas = ["public"]') ||
     !config.includes('extra_search_path = ["public", "extensions"]')
@@ -521,6 +660,8 @@ async function main() {
     throw new Error("Unexpected local project configuration.");
   mkdirSync(env.SUPABASE_HOME, { recursive: true });
   mkdirSync(env.DOCKER_CONFIG, { recursive: true });
+  if (operation !== "stop")
+    prepareTarget(operation === "verify" ? "b2a" : "full");
   if (cli("--version") !== "2.122.0")
     throw new Error("Supabase CLI must be exactly 2.122.0.");
   try {
@@ -549,13 +690,24 @@ async function main() {
         break;
       case "stop":
         stopOwned();
-        console.log("B2a services stopped; named volumes retained.");
+        console.log(`${project} services stopped; named volumes retained.`);
         break;
       case "verify":
         try {
           start();
+          await reset("b2a");
+          assertBaseline(true, true);
+          console.log(
+            "PASS: actual merged B2a schema prepared for incremental migration",
+          );
+          migrate();
+          securityTest();
+          console.log(
+            "PASS: B2a-to-B2b incremental migration and security/integrity tests",
+          );
           await reset();
-          securityTest(); // Fresh bootstrap/migration baseline.
+          securityTest();
+          console.log("PASS: fresh creation from all B2a/B2b migrations");
           startApi();
           await apiTest();
           for (let iteration = 1; iteration <= 2; iteration++) {

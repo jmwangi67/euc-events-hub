@@ -5,6 +5,7 @@ import {
   parseOperation,
   validateBindings,
   validateListeners,
+  targetFor,
 } from "./local-db.mjs";
 
 test("local commands reject URLs, linked targets and implicit destructive modes", () => {
@@ -18,6 +19,30 @@ test("local commands reject URLs, linked targets and implicit destructive modes"
   ]) {
     assert.throws(() => parseOperation(args));
   }
+});
+test("destructive commands always select a distinct disposable project and port range", () => {
+  const development = targetFor(false);
+  const disposable = targetFor(true);
+  assert.equal(disposable.project, "euc-events-hub-b2b-test");
+  assert.notEqual(development.project, disposable.project);
+  assert.notEqual(development.network, disposable.network);
+  assert.notEqual(development.directory, disposable.directory);
+  assert.equal(disposable.apiPort, 55321);
+  assert.equal(
+    disposable.ports.some((port) => development.ports.includes(port)),
+    false,
+  );
+  assert.equal(parseOperation(["start", "--local", "--disposable"]), "start");
+  assert.equal(parseOperation(["stop", "--local", "--disposable"]), "stop");
+  assert.throws(() =>
+    parseOperation([
+      "reset",
+      "--local",
+      "--disposable",
+      "--project-id",
+      development.project,
+    ]),
+  );
 });
 test("subprocess environment drops credentials, contexts and executable overrides", () => {
   const source = {

@@ -23,6 +23,6 @@ jobs:
       # Creates only the project bridge, defaulting publications to 127.0.0.1.
       # Effective Docker mappings AND live Linux listeners must agree; no skips.
       - run: npm run db:verify -- --local --disposable
-      - name: Stop only B2a services and retain data volumes
+      - name: Stop only the disposable test services and retain data volumes
         if: always()
-        run: npm run db:stop -- --local
+        run: npm run db:stop -- --local --disposable
