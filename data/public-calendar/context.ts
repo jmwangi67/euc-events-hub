@@ -529,16 +529,19 @@ export const publicContext = externalEventSchema.array().parse([
       note: "Independent bar event. The organizer listing confirms the date. Owner-reported hours are noon through 2 AM the following day; the organizer did not confirm those hours. Check age and entry requirements with the organizer.",
     },
   ),
-  context(
-    "movin-on-2027",
-    "Movin’ On",
-    "2027-04-30",
-    "https://www.movinon.org/",
-    "festival",
-    "IM Fields · Owner-reported",
-    {
-      ownerReported: true,
-      note: "The owner reports gates at 3:30 PM. Check the festival site for confirmed details.",
-    },
-  ),
+  {
+    ...context(
+      "movin-on-2027",
+      "Movin’ On",
+      "2027-04-30",
+      "https://www.movinon.org/festival",
+      "festival",
+      "IM Fields",
+      {
+        doors: "15:30",
+        note: "Free admission for ages 18+ with a Penn State student ID or government-issued ID.",
+      },
+    ),
+    reportedEnd: resolveEasternLocal("2027-04-30", "22:30"),
+  },
 ]);

@@ -91,13 +91,15 @@ export function externalTimingLabel(
 ) {
   return event.timeKnown
     ? formatEventTime({ allDay: false, start: event.start, end: event.end })
-    : event.reportedStart
-      ? `${formatEventClock(event.reportedStart, true)} · End time unlisted`
-      : event.dateWide
-        ? event.category === "academic-date" ||
-          (event.category === "academic-break" &&
-            event.source.verification !== "synthetic")
-          ? "Date-wide context"
-          : "Date-wide commitment"
-        : "Time TBD";
+    : event.reportedEnd && !event.reportedStart
+      ? `Start time unlisted · Ends ${formatEventClock(event.reportedEnd, true)}`
+      : event.reportedStart
+        ? `${formatEventClock(event.reportedStart, true)} · End time unlisted`
+        : event.dateWide
+          ? event.category === "academic-date" ||
+            (event.category === "academic-break" &&
+              event.source.verification !== "synthetic")
+            ? "Date-wide context"
+            : "Date-wide commitment"
+          : "Time TBD";
 }

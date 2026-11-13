@@ -47,6 +47,7 @@ const fields = {
   impactPolicy: z.enum(["major-local-music", "academic-break"]).optional(),
   policyRationale: z.string().min(1).optional(),
   reportedStart: instantSchema.optional(),
+  reportedEnd: instantSchema.optional(),
   doorsOpen: instantSchema.optional(),
   scheduleNote: z.string().min(1).optional(),
   geography: z.string().min(1),

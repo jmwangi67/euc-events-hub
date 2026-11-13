@@ -65,7 +65,7 @@ export function ExternalEventDetails({
             {!event.timeKnown &&
               (event.dateWide
                 ? " — Date-wide commitment; individual hours are not supplied. This does not establish continuous 24-hour attendance."
-                : event.reportedStart
+                : event.reportedStart || event.reportedEnd
                   ? ""
                   : " — Time unknown; no hours or all-day attendance are assumed.")}
           </dd>

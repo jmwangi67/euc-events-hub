@@ -382,6 +382,18 @@ export const publicEvents = eventSchema.array().parse([
     },
   ),
   timed(
+    "nj-transit-interns-2026",
+    "NJ Transit Coffee Chat: Hear From Current Interns",
+    "2026-11-12",
+    "12:00",
+    "13:00",
+    "Online",
+    coe,
+    career,
+    careerCategory,
+    { ...broad, subtype: "corporate-recruiting" },
+  ),
+  timed(
     "nj-transit-apply-2027",
     "NJ Transit Coffee Chat: How to Apply",
     "2027-01-06",
